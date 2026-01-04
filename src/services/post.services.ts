@@ -1,0 +1,34 @@
+import { fetchData } from "./api.utils";
+
+export function getPosts() {
+    return fetchData('/posts?_limit=10');
+}
+
+
+//TODO: PUT, POST, DELETE API 구현시 함수 추가
+
+//Legacy Code
+// class ApiService {
+//     protected baseURL = 'https://jsonplaceholder.typicode.com'; //내가 일할때 헀던 API 사이트에서 받아오는건데 만약
+//     //백엔드 서버단이 바뀌면 프론트엔드는 baseURL만 수정하면 됨
+
+//     async get<T>(endPoint: string): Promise<T> {
+//         try {
+//             const response = await axios.get(`${this.baseURL}${endPoint}`);
+//             return response.data;
+//         }
+//         catch (error) {
+//             // 시니어의 팁: 여기서 로그를 남기거나 전역 에러 알림을 띄웁니다.
+//             console.error(`[API Error] ${endPoint}:`, error);
+//             throw error; // 에러를 다시 던져서 UI(React Query)가 알 수 있게 합니다.
+//         }
+//     }
+// }
+
+// class PostService extends ApiService {
+//     getPosts() {
+//         return this.get<Post[]>('/posts?_limit=10');
+//     }
+// }
+
+// export const postService = new PostService();

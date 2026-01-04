@@ -15,5 +15,5 @@ export const useUiStore = create<UiState>((set) => ({
     })),
     setUserName: (name: string) => set(() => ({
         userName: name
-    }))
+    })),
 }))

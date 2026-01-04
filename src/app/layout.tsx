@@ -16,6 +16,7 @@ import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/lib/QueryProvider";
 import MainWrapper from "@/components/layout/MainWrapper";
+import Toast from "@/components/common/Toast";
 
 export const metadata: Metadata = {
   title: "Frontend Mentorship Admin",
@@ -39,6 +40,7 @@ export default function RootLayout({
             <main className="flex-1 p-8">
               {children}
             </main>
+            <Toast />
           </MainWrapper>
         </QueryProvider>
       </body>
