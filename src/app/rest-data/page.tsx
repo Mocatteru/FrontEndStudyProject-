@@ -1,5 +1,6 @@
 'use client'
 
+import { truncateTitle } from "@/lib/format";
 import { postService } from "@/services/api.service"
 import { Post } from "@/types/post";
 import { useQuery } from "@tanstack/react-query"
@@ -23,7 +24,7 @@ export default function RestDataPage() {
                 {posts?.map((post: Post) => (
                     <div key={post.id} className="rounded-lg border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors">
                         <h3 className="font-semibold text-blue-400">Post #{post.id}</h3>
-                        <p className="mt-2 text-gray-300">{post.title}</p>
+                        <p className="mt-2 text-black">{truncateTitle(post.title, 20)}</p>
                     </div>
                 ))}
             </div>

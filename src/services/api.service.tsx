@@ -5,8 +5,15 @@ class ApiService {
     //백엔드 서버단이 바뀌면 프론트엔드는 baseURL만 수정하면 됨
 
     async get<T>(endPoint: string): Promise<T> {
-        const response = await axios.get(`${this.baseURL}${endPoint}`);
-        return response.data;
+        try {
+            const response = await axios.get(`${this.baseURL}${endPoint}`);
+            return response.data;
+        }
+        catch (error) {
+            // 시니어의 팁: 여기서 로그를 남기거나 전역 에러 알림을 띄웁니다.
+            console.error(`[API Error] ${endPoint}:`, error);
+            throw error; // 에러를 다시 던져서 UI(React Query)가 알 수 있게 합니다.
+        }
     }
 }
 
