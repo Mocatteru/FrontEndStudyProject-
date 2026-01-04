@@ -2,9 +2,13 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main ]
+    branches-ignore: [ "main" ]
   pull_request:
-    branches: [ valid_end ]
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   build-and-test:
@@ -26,4 +30,11 @@ jobs:
       run: npm run lint
 
     - name: Run Unit Tests
-      run: npm run test -- --run # CI 환경이라 한번만 실행되게 --run 추가
+      run: npm run test -- --run
+
+    - name: Create Pull Request
+      if: success() && github.event_name == 'push'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh pr create --base main --head ${{ github.ref_name }} --title "Automated PR: ${{ github.ref_name }}" --body "Automated PR created by GitHub Actions after passing tests." || echo "PR might already exist, skipping."
