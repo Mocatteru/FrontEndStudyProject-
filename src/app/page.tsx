@@ -34,9 +34,9 @@ export default function Home() {
         <h3 className="text-xl font-semibold mb-4">시니어 개발자의 조언</h3>
         <div className="space-y-4 text-gray-300">
           <p>
-            "프론트엔드 개발은 단순히 화면을 그리는 것이 아닙니다.
+            &quot;프론트엔드 개발은 단순히 화면을 그리는 것이 아닙니다.
             <strong>데이터의 흐름</strong>을 어떻게 제어하고, <strong>복잡한 상태</strong>를 어떻게 관리하며,
-            <strong>사용자 경험</strong>을 어떻게 최적화할지 고민하는 과정입니다."
+            <strong>사용자 경험</strong>을 어떻게 최적화할지 고민하는 과정입니다.&quot;
           </p>
           <ul className="list-disc list-inside space-y-2 text-sm text-gray-400">
             <li>Next.js의 Server Components는 왜 사용해야 할까요?</li>
