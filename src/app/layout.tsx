@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/lib/QueryProvider";
+import MainWrapper from "@/components/layout/MainWrapper";
 
 export const metadata: Metadata = {
   title: "Frontend Mentorship Admin",
@@ -33,12 +34,12 @@ export default function RootLayout({
       >
         <QueryProvider>
           <Sidebar />
-          <div className="ml-64 flex min-h-screen flex-col">
+          <MainWrapper>
             <Header />
             <main className="flex-1 p-8">
               {children}
             </main>
-          </div>
+          </MainWrapper>
         </QueryProvider>
       </body>
     </html>

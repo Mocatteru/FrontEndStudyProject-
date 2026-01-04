@@ -1,6 +1,7 @@
 'use client'
 
 import { postService } from "@/services/api.service"
+import { Post } from "@/types/post";
 import { useQuery } from "@tanstack/react-query"
 
 export default function RestDataPage() {
@@ -19,7 +20,7 @@ export default function RestDataPage() {
         <div className="space-y-6" >
             <h2 className="text-3xl font-bold">REST API Posts</h2>
             <div className="grid gap-4 md:grid-cols-2">
-                {posts?.map((post: any) => (
+                {posts?.map((post: Post) => (
                     <div key={post.id} className="rounded-lg border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors">
                         <h3 className="font-semibold text-blue-400">Post #{post.id}</h3>
                         <p className="mt-2 text-gray-300">{post.title}</p>
