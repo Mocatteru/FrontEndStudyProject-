@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import Sidebar from "@/components/layout/Sidebar";
+import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/lib/QueryProvider";
 import MainWrapper from "@/components/layout/MainWrapper";
