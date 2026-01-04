@@ -5,7 +5,7 @@ export default function SidebarItem({ menuItems }: { menuItems: { name: string; 
     const pathname = usePathname();
 
     return (
-        <div>
+        <>
             {menuItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
@@ -21,6 +21,6 @@ export default function SidebarItem({ menuItems }: { menuItems: { name: string; 
                     </Link>
                 );
             })}
-        </div>
+        </>
     )
 }
