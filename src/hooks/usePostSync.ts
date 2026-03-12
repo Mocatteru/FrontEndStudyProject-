@@ -13,12 +13,25 @@ import { useEffect } from "react";
  *   3. Synchronization: Zustand Store(postCount)에 데이터 개수를 업데이트합니다.
  */
 export default function usePostSync() {
+    /**
+     * [useQuery 핵심 반환값]
+     * - isLoading: 데이터가 처음 로드될 때 true입니다.
+     * - isError: 쿼리 실행 중 에러가 발생한 경우 true입니다.
+     * - data: queryFn이 반환한 데이터가 담깁니다. (여기서는 posts로 이름을 바꿨습니다)
+     */
     const { isError, isLoading, data: posts } = useQuery({
-        queryKey: ['posts'],
-        queryFn: () => getPosts(),
+        queryKey: ['posts'], // 고유 키: 이 키를 기반으로 캐싱과 무효화(Invalidation)가 수행됩니다.
+        queryFn: () => getPosts(), // 실제 API 호출 함수
     });
+    
     const { setPostCount } = usePostStore();
 
+    /**
+     * [useEffect: Side Effect 처리]
+     * - 역할: 렌더링 결과가 화면에 반영된 후 실행되어야 하는 로직을 처리합니다.
+     * - 의존성 배열 [posts]: posts의 값이 변경될 때만 내부 로직을 다시 실행합니다.
+     * - 실무 패턴: 서버 데이터를 가져온 후, 전역 상태(Zustand 등)를 동기화할 때 자주 사용됩니다.
+     */
     useEffect(() => {
         setPostCount(posts?.length || 0);
     }, [posts])
