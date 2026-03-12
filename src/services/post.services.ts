@@ -1,5 +1,12 @@
 import { fetchData } from "./api.utils";
 
+
+/**
+ * [Service Layer] API 비즈니스 로직
+ * - 역할: 구성된 Axios 인스턴스를 사용하여 서버와 직접 통신합니다.
+ * - 특징: '데이터 가공'과 'API 호출'을 컴포넌트에서 분리하여 재사용성을 높였습니다.
+ * - 실무 팁: 각 함수는 Promise를 반환하며, React Query와 결합되어 강력한 시너지를 냅니다.
+ */
 export function getPosts() {
     return fetchData('/posts?_limit=10');
 }

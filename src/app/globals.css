@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/**
+ * Tailwind v4 테마 설정 (@theme)
+ * CSS 변수를 Tailwind의 유틸리티 클래스(bg-background 등)와 동적으로 바인딩합니다.
+ * 'inline' 옵션 없이 선언하여 전역 테마 시스템을 구축합니다.
+ */
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -9,12 +14,14 @@
 }
 
 :root {
+  /* 라이트 모드 컬러 변수: 디자인 시스템의 기초가 됩니다. */
   --background: #ffffff;
   --foreground: #171717;
   --border: #e5e7eb;
 }
 
 .dark {
+  /* 다크 모드 컬러 변수: next-themes에 의해 <html> 태그에 .dark 클래스가 붙을 때 적용됩니다. */
   --background: #0a0a0a;
   --foreground: #ededed;
   --border: #262626;

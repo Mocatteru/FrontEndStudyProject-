@@ -32,9 +32,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      {/* 
+        suppressHydrationWarning: 'next-themes' 사용 시 발생하는 서버/클라이언트 속성 불일치 경고를 방지합니다.
+        서버는 사용자의 테마 설정을 모르기 때문에 발생하는 Next.js의 표준 해결 방식입니다.
+      */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* 
+          ThemeProvider: 'next-themes' 라이브러리를 사용하여 테마 상태를 전역적으로 관리합니다.
+          - attribute="class": 테마 상태가 바뀔 때 <html> 태그에 'class="dark"' 혹은 'class="light"'를 자동으로 주입합니다.
+          - defaultTheme="system": 운영체제의 테마 설정을 기본값으로 사용합니다.
+          - disableTransitionOnChange: 테마 전환 시 레이아웃 흔들림(FOUC)을 방지하기 위해 전환 중 transition을 일시 중지합니다.
+        */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
