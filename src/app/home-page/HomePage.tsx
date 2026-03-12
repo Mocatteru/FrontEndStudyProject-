@@ -5,6 +5,7 @@ import React from 'react';
  * - 메인 루트(/) 경로에 해당하는 실제 대시보드 UI 컴포넌트입니다.
  * - 서버 컴포넌트(Server Component)의 이점을 그대로 가져옵니다.
  */
+
 export default function HomePage() {
   return (
     <div className="space-y-8">
@@ -15,10 +16,10 @@ export default function HomePage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Next.js 숙련도', value: '45%', color: 'from-blue-500 to-cyan-400' },
-          { label: 'API 통합 (REST)', value: '대기 중', color: 'from-purple-500 to-pink-500' },
-          { label: '상태 관리 (Zustand)', value: '구축 중', color: 'from-orange-500 to-yellow-500' },
-          { label: '테스트 커버리지', value: '0%', color: 'from-green-500 to-emerald-500' },
+          { label: 'Next.js 숙련도', value: '75%', color: 'from-blue-500 to-cyan-400' },
+          { label: 'API 통합 (REST)', value: '완료', color: 'from-purple-500 to-pink-500' },
+          { label: '상태 관리 (Zustand)', value: '완료', color: 'from-orange-500 to-yellow-500' },
+          { label: '테스트 커버리지', value: '30%', color: 'from-green-500 to-emerald-500' },
         ].map((stat, i) => (
           <div key={i} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-6 backdrop-blur-sm">
             <p className="text-sm font-medium text-gray-400">{stat.label}</p>
@@ -28,7 +29,7 @@ export default function HomePage() {
             <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
               <div
                 className={`h-full bg-linear-to-r ${stat.color}`}
-                style={{ width: stat.value.includes('%') ? stat.value : '10%' }}
+                style={{ width: stat.value.includes('%') ? stat.value : '100%' }}
               />
             </div>
           </div>
@@ -36,17 +37,18 @@ export default function HomePage() {
       </div>
 
       <div className="rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-8">
-        <h3 className="text-xl font-semibold mb-4">시니어 개발자의 조언</h3>
+        <h3 className="text-xl font-semibold mb-4">시니어 개발자의 조언 (복습 완료)</h3>
         <div className="space-y-4 text-gray-300">
           <p>
-            &quot;프론트엔드 개발은 단순히 화면을 그리는 것이 아닙니다.
-            <strong>데이터의 흐름</strong>을 어떻게 제어하고, <strong>복잡한 상태</strong>를 어떻게 관리하며,
-            <strong>사용자 경험</strong>을 어떻게 최적화할지 고민하는 과정입니다.&quot;
+            &quot;3개월 만의 복습이었지만, 우리는 프로젝트의 뼈대를 다시 세웠습니다.
+            <strong>Colocation 패턴</strong>으로 가독성을 잡고, <strong>React Query</strong>로 서버 상태를,
+            <strong>Zustand</strong>로 클라이언트 상태를 정복했습니다. 이제 당신의 코드는 단순한 작동을 넘어 <strong>설계</strong>가 보이기 시작했습니다.&quot;
           </p>
           <ul className="list-disc list-inside space-y-2 text-sm text-gray-400">
-            <li>Next.js의 Server Components는 왜 사용해야 할까요?</li>
-            <li>Client Components와의 경계를 어떻게 나누는 것이 좋을까요?</li>
-            <li>대규모 앱에서 Props Drilling을 피하기 위한 최선의 전략은 무엇일까요?</li>
+            <li><strong>Hydration Mismatch</strong>를 해결하며 SSR의 원리를 이해했습니다.</li>
+            <li><strong>React.memo</strong>를 적용하며 렌더링 최적화의 기준을 세웠습니다.</li>
+            <li><strong>GitHub Actions</strong>를 통해 배포 안정성(CI)을 확보했습니다.</li>
+            <li><strong>PascalCase vs kebab-case</strong> 논의를 통해 웹 표준의 가치를 배웠습니다.</li>
           </ul>
         </div>
       </div>

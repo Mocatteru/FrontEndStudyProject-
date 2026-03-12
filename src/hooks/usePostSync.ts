@@ -23,7 +23,7 @@ export default function usePostSync() {
         queryKey: ['posts'], // 고유 키: 이 키를 기반으로 캐싱과 무효화(Invalidation)가 수행됩니다.
         queryFn: () => getPosts(), // 실제 API 호출 함수
     });
-    
+
     const { setPostCount } = usePostStore();
 
     /**
