@@ -12,11 +12,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import Header from "@/components/layout/Header";
-import QueryProvider from "@/lib/QueryProvider";
+import QueryProvider from "@/providers/QueryProvider";
 import MainWrapper from "@/components/layout/MainWrapper";
 import Toast from "@/components/common/Toast";
 

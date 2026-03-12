@@ -1,7 +1,7 @@
 'use client';
 
 import { useUiStore } from '@/store/uiStore';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export default function Header() {
     const { userName, toggleSidebar } = useUiStore();

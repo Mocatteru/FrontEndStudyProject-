@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { truncateTitle } from '../../lib/format';
+import { truncateTitle } from '@/lib/format';
 
 describe('truncateTitle 함수 테스트', () => {
     it('글자 수가 한계치보다 적으면 그대로 반환해야 한다', () => {
