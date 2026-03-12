@@ -7,10 +7,10 @@ import { usePostStore } from '@/store/postStore';
 
 // 상수는 파일 맨 위, 컴포넌트 외부로!
 const menuItems = [
-    { name: '대시보드', href: '/' },
-    { name: '데이터 리스트 (REST)', href: '/rest-data' },
-    { name: '사용자 목록 (GraphQL)', href: '/graphql-data' },
-    { name: '설정', href: '/settings' },
+    { name: '대시보드', href: '/home-page' },
+    { name: '데이터 리스트 (REST)', href: '/rest-data-page' },
+    { name: '사용자 목록 (GraphQL)', href: '/graphql-data-page' },
+    { name: '설정', href: '/settings-page' },
 ];
 
 export default function Sidebar() {
