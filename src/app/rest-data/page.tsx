@@ -1,7 +1,7 @@
 'use client'
 
+import PostItem from "@/components/layout/PostItem/PostItem";
 import usePostSync from "@/hooks/usePostSync";
-import { truncateTitle } from "@/lib/format";
 import { useErrorStore } from "@/store/errorStore";
 import { Post } from "@/types/post";
 
@@ -22,10 +22,7 @@ export default function RestDataPage() {
             <button onClick={() => useErrorStore.getState().showError('에러 발생')}>에러버튼</button>
             <div className="grid gap-4 md:grid-cols-2">
                 {posts?.map((post: Post) => (
-                    <div key={post.id} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-                        <h3 className="font-semibold text-blue-500 dark:text-blue-400">Post #{post.id}</h3>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">{truncateTitle(post.title, 20)}</p>
-                    </div>
+                    <PostItem post={post} key={post.id} />
                 ))}
             </div>
         </div >

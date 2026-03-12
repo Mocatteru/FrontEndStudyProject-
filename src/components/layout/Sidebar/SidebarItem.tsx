@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-export default function SidebarItem({ menuItems }: { menuItems: { name: string; href: string }[] }) {
+function SidebarItem({ menuItems }: { menuItems: { name: string; href: string }[] }) {
     const pathname = usePathname();
 
     return (
@@ -24,3 +25,5 @@ export default function SidebarItem({ menuItems }: { menuItems: { name: string; 
         </>
     )
 }
+
+export default React.memo(SidebarItem);
