@@ -12,6 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/lib/QueryProvider";
@@ -29,20 +31,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <Sidebar />
-          <MainWrapper>
-            <Header />
-            <main className="flex-1 p-8">
-              {children}
-            </main>
-            <Toast />
-          </MainWrapper>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            <Sidebar />
+            <MainWrapper>
+              <Header />
+              <main className="flex-1 p-8">
+                {children}
+              </main>
+              <Toast />
+            </MainWrapper>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

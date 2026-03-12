@@ -15,14 +15,14 @@ export default function Home() {
           { label: '상태 관리 (Zustand)', value: '구축 중', color: 'from-orange-500 to-yellow-500' },
           { label: '테스트 커버리지', value: '0%', color: 'from-green-500 to-emerald-500' },
         ].map((stat, i) => (
-          <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div key={i} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-6 backdrop-blur-sm">
             <p className="text-sm font-medium text-gray-400">{stat.label}</p>
-            <div className={`mt-2 text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+            <div className={`mt-2 text-2xl font-bold bg-linear-to-r ${stat.color} bg-clip-text text-transparent`}>
               {stat.value}
             </div>
-            <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
               <div
-                className={`h-full bg-gradient-to-r ${stat.color}`}
+                className={`h-full bg-linear-to-r ${stat.color}`}
                 style={{ width: stat.value.includes('%') ? stat.value : '10%' }}
               />
             </div>
@@ -30,7 +30,7 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-white/5 p-8">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-8">
         <h3 className="text-xl font-semibold mb-4">시니어 개발자의 조언</h3>
         <div className="space-y-4 text-gray-300">
           <p>
