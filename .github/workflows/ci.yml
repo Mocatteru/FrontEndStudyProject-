@@ -1,10 +1,12 @@
 name: Frontend CI
 
+# [학습 포인트: GitHub Actions 트리거]
+# on: 어떤 이벤트가 발생했을 때 이 워크플로우를 실행할지 결정합니다.
 on:
   push:
-    branches-ignore: [ "main" ]
+    branches: [ "main" ] # main 브랜치에 코드가 푸시(머지 포함)될 때 실행
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # main 브랜치를 대상으로 PR이 생성되었을 때 실행
 
 permissions:
   contents: write
@@ -12,28 +14,34 @@ permissions:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 가상 머신 환경 (리눅스 최신판)
 
     steps:
-    - uses: actions/checkout@v4
-    
+    - name: Checkout code
+      uses: actions/checkout@v4 # 소스 코드를 가상 머신으로 가져오는 단계
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        node-version: '20' # 프로젝트에 필요한 노드 버전 설정
+        cache: 'npm' # 의존성 설치 속도를 높이기 위한 캐싱 설정
 
     - name: Install dependencies
+      # npm ci: package-lock.json에 기록된 버전과 토씨 하나 안 틀리고 똑같이 설치합니다. (실무 CI 필수)
       run: npm ci
 
     - name: Lint check
+      # 프로젝트의 코드 스타일(ESLint) 규칙에 어긋나는 게 없는지 검사합니다.
       run: npm run lint
 
     - name: Run Unit Tests
+      # Vitest를 실행하여 작성한 테스트 케이스들이 통과하는지 확인합니다.
+      # --run 옵션: 테스트가 끝나면 감시(Watch) 모드 없이 즉시 종료하게 합니다.
       run: npm run test -- --run
 
-    - name: Create Pull Request
-      if: success() && github.event_name == 'push'
+    - name: Create Pull Request (Optional)
+      # 테스트가 성공했을 때만 실행되도록 설정된 고급 기능입니다.
+      if: success() && github.event_name == 'push' && github.ref_name != 'main'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
