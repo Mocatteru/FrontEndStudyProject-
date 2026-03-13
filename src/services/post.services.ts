@@ -7,8 +7,11 @@ import { fetchData } from "./api.utils";
  * - 특징: '데이터 가공'과 'API 호출'을 컴포넌트에서 분리하여 재사용성을 높였습니다.
  * - 실무 팁: 각 함수는 Promise를 반환하며, React Query와 결합되어 강력한 시너지를 냅니다.
  */
+const baseURL = 'https://jsonplaceholder.typicode.com';
+
+
 export function getPosts() {
-    return fetchData('/posts?_limit=10');
+    return fetchData(baseURL, '/posts?_limit=10');
 }
 
 

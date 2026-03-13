@@ -9,7 +9,7 @@ import { usePostStore } from '@/store/postStore';
 const menuItems = [
     { name: '대시보드', href: '/home-page' },
     { name: '데이터 리스트 (REST)', href: '/rest-data-page' },
-    { name: '사용자 목록 (GraphQL)', href: '/graphql-data-page' },
+    { name: '주식 검색', href: '/stock-page' },
     { name: '설정', href: '/settings-page' },
 ];
 

@@ -5,9 +5,8 @@ import axios from "axios";
  * [Axios Utils] 공통 통신 유틸리티
  * - 역할: 모든 API 요청의 베이스 설정과 에러 핸들링을 한곳에서 처리합니다.
  */
-const baseURL = 'https://jsonplaceholder.typicode.com';
 
-export async function fetchData(url: string) {
+export async function fetchData(baseURL: string, url: string) {
     try {
         // axios.get: HTTP GET 요청을 보내는 메서드입니다.
         const res = await axios.get(`${baseURL}${url}`).then((res) => res.data);
