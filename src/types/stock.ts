@@ -3,6 +3,7 @@
  * - 역할: 주식 데이터의 구조를 정의하여 타입 안정성을 확보합니다.
  * - 장점: 자동 완성 기능과 컴파일 타임의 에러 체크를 통해 런타임 에러를 사전에 방지합니다.
  */
+import type { ApexOptions } from 'apexcharts';
 export interface Stock {
     // 1. 기본 식별 정보
     symbol: string;               // 종목 코드 (예: AAPL)
@@ -31,10 +32,18 @@ export interface Stock {
     forwardPE?: number;           // 선행 주가수익비율
     epsTrailingTwelveMonths?: number; // 주당 순이익 (EPS)
 
-    // 5. 시장 상태
+    // 5. 시장 상태 및 거래소
     marketState?: string;         // 시장 상태 (REGULAR, CLOSED, PRE, POST 등)
+    fullExchangeName?: string;    // 상장 거래소 (전체 이름)
+    exchange?: string;            // 상장 거래소 (단축)
 
-    // 6. 차트 데이터 (OHLC 확장)
+    // 6. 추가 통계 지표
+    sharesOutstanding?: number;   // 유통 주식수
+    dividendYield?: number;       // 배당 수익률
+    fiftyDayAverage?: number;     // 50일 평균가
+    twoHundredDayAverage?: number; // 200일 평균가
+
+    // 7. 차트 데이터 (OHLC 확장)
     historical?: {
         date: string;
         open: number;
@@ -81,10 +90,27 @@ export const getMarketStateName = (state?: string) => {
  *   3. tooltip.custom: 캔들스틱 차트 특성상 시/고/저/종 4가지 값을 한눈에 깔끔하게 보여주기 위해 
  *      기본 틀 대신 사용자 정의 HTML(Tailwind CSS 포함)을 그려주도록 커스텀했습니다.
  */
-export const getStockChartOptions = (chartType: 'line' | 'candlestick'): any => {
+export const getStockChartOptions = (chartType: 'line' | 'candlestick'): ApexOptions => {
+    // 툴팁 등에서 사용되는 ApexCharts 내부 구조를 정의합니다. (ApexOptions 내장 타입을 쓰되, 필요한 부분만 구체화)
+    interface ApexChartContext {
+        globals: {
+            seriesCandleO: number[][];
+            seriesCandleH: number[][];
+            seriesCandleL: number[][];
+            seriesCandleC: number[][];
+            seriesX: number[][];
+        }
+    }
+
+    interface TooltipParams {
+        seriesIndex: number;
+        dataPointIndex: number;
+        w: ApexChartContext;
+    }
+
     return {
         chart: {
-            type: chartType,
+            type: chartType as 'line' | 'candlestick',
             toolbar: { show: false },
             background: 'transparent',
             foreColor: '#9ca3af',
@@ -109,9 +135,9 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick'): any => 
             }],
             defaultLocale: 'ko'
         },
-        theme: { mode: 'dark' },
+        theme: { mode: 'dark' as const },
         xaxis: {
-            type: 'datetime',
+            type: 'datetime' as const,
             labels: {
                 datetimeUTC: false,
                 style: { fontSize: '10px' },
@@ -143,13 +169,13 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick'): any => 
             }
         },
         stroke: {
-            curve: 'smooth',
+            curve: 'smooth' as const,
             width: chartType === 'line' ? 2 : 1
         },
         tooltip: {
             theme: 'dark',
             x: { format: 'yyyy년 MM월 dd일 HH:mm' },
-            custom: chartType === 'candlestick' ? function ({ seriesIndex, dataPointIndex, w }: any) {
+            custom: chartType === 'candlestick' ? function ({ seriesIndex, dataPointIndex, w }: TooltipParams) {
                 const o = w.globals.seriesCandleO[seriesIndex][dataPointIndex];
                 const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
                 const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];

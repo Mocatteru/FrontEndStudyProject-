@@ -34,7 +34,7 @@ export default function usePostSync() {
      */
     useEffect(() => {
         setPostCount(posts?.length || 0);
-    }, [posts])
+    }, [posts, setPostCount])
 
     return {
         isError, isLoading, posts

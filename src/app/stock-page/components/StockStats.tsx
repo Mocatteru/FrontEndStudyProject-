@@ -26,23 +26,23 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
         { label: '거래량 (Volume)', value: stockData?.regularMarketVolume?.toLocaleString() },
         { label: '평균 거래량 (3M)', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
         { label: '시가총액 (Market Cap)', value: stockData?.marketCap ? `$${(stockData.marketCap / 1e9).toFixed(2)}B` : null },
-        { label: '유통 주식수', value: (stockData as any).sharesOutstanding?.toLocaleString() },
+        { label: '유통 주식수', value: stockData?.sharesOutstanding?.toLocaleString() },
 
         // 3. 투자 지표 (PE, EPS 등)
         { label: 'P/E Ratio (Trailing)', value: stockData?.trailingPE?.toFixed(2) },
         { label: 'P/E Ratio (Forward)', value: stockData?.forwardPE?.toFixed(2) },
         { label: 'EPS (TTM)', value: stockData?.epsTrailingTwelveMonths?.toFixed(2) },
-        { label: '배당 수익률 (Div Yield)', value: (stockData as any).dividendYield ? `${(stockData as any).dividendYield.toFixed(2)}%` : null },
+        { label: '배당 수익률 (Div Yield)', value: stockData?.dividendYield ? `${stockData.dividendYield.toFixed(2)}%` : null },
 
         // 4. 주가 범위 정보
         { label: '52주 최고가', value: stockData?.fiftyTwoWeekHigh?.toLocaleString() },
         { label: '52주 최저가', value: stockData?.fiftyTwoWeekLow?.toLocaleString() },
-        { label: '50일 평균가', value: (stockData as any).fiftyDayAverage?.toLocaleString() },
-        { label: '200일 평균가', value: (stockData as any).twoHundredDayAverage?.toLocaleString() },
+        { label: '50일 평균가', value: stockData?.fiftyDayAverage?.toLocaleString() },
+        { label: '200일 평균가', value: stockData?.twoHundredDayAverage?.toLocaleString() },
 
         // 5. 기타 정보
         { label: '거래 통화', value: stockData?.currency },
-        { label: '상장 거래소', value: (stockData as any).fullExchangeName || (stockData as any).exchange },
+        { label: '상장 거래소', value: stockData?.fullExchangeName || stockData?.exchange },
     ], [stockData]);
 
     return (
@@ -59,5 +59,7 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
         </div>
     );
 });
+
+StockStats.displayName = 'StockStats';
 
 export default StockStats;

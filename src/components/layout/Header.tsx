@@ -4,7 +4,7 @@ import { useUiStore } from '@/store/uiStore';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export default function Header() {
-    const { userName, toggleSidebar } = useUiStore();
+    const { userName } = useUiStore();
     return (
         <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/50 px-8 backdrop-blur-md">
             <div className="flex items-center gap-4">

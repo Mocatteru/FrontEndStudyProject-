@@ -25,19 +25,20 @@ export async function GET(request: NextRequest) {
     const interval = searchParams.get('interval') || '1d'; // 1m, 5m, 1h, 1d, 1wk, 1mo 등
 
     try {
-        const YahooFinanceConstructor = (yahooFinance as any).YahooFinance || yahooFinance;
-        const yahoo = new (YahooFinanceConstructor as any)({ suppressNotices: ['yahooSurvey'] });
+        // Yahoo Finance 초기화 (모듈 시스템 대응)
+        const YahooFinanceConstructor = (yahooFinance as unknown as { YahooFinance: new (opts: object) => unknown }).YahooFinance || yahooFinance;
+        const yahoo = new (YahooFinanceConstructor as new (opts: object) => {
+            quote: (ticker: string) => Promise<Record<string, unknown>>;
+            chart: (ticker: string, opts: object) => Promise<{ quotes: unknown[] }>;
+        })({ suppressNotices: ['yahooSurvey'] });
 
         // 1. 현재 시세 정보 조회
-        // [학습 포인트: 분리된 에러 핸들링 (Resilient Fetching)]
-        // 시세와 차트를 하나의 try-catch로 묶으면 하나만 실패해도 전체가 500 에러를 뿜습니다.
-        // 이렇게 각각 try-catch를 나누면 시세가 없어도 차트는 보여주는 유연한 앱이 됩니다.
-        let quoteResult: any = {};
+        let quoteResult: Record<string, unknown> = {};
         try {
             quoteResult = await yahoo.quote(ticker);
-        } catch (e: any) {
-            console.error('Quote Fetch Error:', e.message);
-            // 시세 정보가 없어도 차트 데이터는 시도해볼 수 있으므로 에러를 던지지 않음 (Graceful Degradation)
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error('Quote Fetch Error:', message);
         }
 
         // 2. 차트 데이터 조회
@@ -61,15 +62,33 @@ export async function GET(request: NextRequest) {
             default: start.setMonth(end.getMonth() - 1);
         }
 
-        let historical: any[] = [];
+        interface HistoricalItem {
+            date: string;
+            open: number;
+            high: number;
+            low: number;
+            close: number;
+            volume: number;
+            timestamp: number;
+        }
+
+        let historical: HistoricalItem[] = [];
         try {
             const chartResult = await yahoo.chart(ticker, {
                 period1: start,
                 period2: end,
-                interval: interval as any,
+                interval: interval as "1d" | "5d" | "1mo" | "3mo" | "6mo" | "1y" | "2y" | "5y" | "max",
             });
 
-            historical = (chartResult.quotes || []).map((q: any) => ({
+            historical = ((chartResult.quotes || []) as {
+                date: string | Date;
+                open?: number | null;
+                high?: number | null;
+                low?: number | null;
+                close?: number | null;
+                regularMarketPrice?: number | null;
+                volume?: number | null;
+            }[]).map((q) => ({
                 date: new Date(q.date).toLocaleString('ko-KR', {
                     month: 'short', day: 'numeric',
                     hour: interval.includes('m') || interval.includes('h') ? '2-digit' : undefined,
@@ -81,15 +100,16 @@ export async function GET(request: NextRequest) {
                 close: Number(q.close?.toFixed(2) || q.regularMarketPrice?.toFixed(2) || 0),
                 volume: q.volume || 0,
                 timestamp: new Date(q.date).getTime()
-            })).filter((q: any) => q.close !== 0);
-        } catch (e: any) {
-            console.error('Chart Fetch Error:', e.message);
+            })).filter((q: HistoricalItem) => q.close !== 0);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            console.error('Chart Fetch Error:', message);
             // 차트 데이터가 없어도 시세 정보는 반환함
         }
 
         // [학습 포인트: 최종 방어 로직]
         // 두 개 다 실패했을 때만 진짜 에러를 던져 클라이언트에게 알려줍니다.
-        if (!quoteResult.symbol && historical.length === 0) {
+        if (!quoteResult['symbol'] && historical.length === 0) {
             throw new Error('해당 종목의 데이터를 찾을 수 없습니다.');
         }
 
@@ -97,10 +117,11 @@ export async function GET(request: NextRequest) {
             ...quoteResult,
             historical
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as Error;
         const errorDetails = {
-            message: error.message,
-            name: error.name,
+            message: err.message,
+            name: err.name,
             ticker,
             range,
             interval
@@ -110,8 +131,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             error: '주식 정보를 불러오는 데 실패했습니다.',
-            details: error.message,
-            type: error.name
+            details: err.message,
+            type: err.name
         }, { status: 500 });
     }
 }

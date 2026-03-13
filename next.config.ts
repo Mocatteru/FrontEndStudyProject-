@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
      이 옵션에 허용할 기기의 IP 주소를 추가해주면 Next.js가 해당 기기를 "안전한 기기"로 인식합니다.
   */
   experimental: {
-    // @ts-ignore: Next.js 15+ 최신 버전에서 외부 IP 접속(HMR)을 위해 필요한 속성이나, 아직 타입 정의가 반영되지 않았을 수 있음
+    // @ts-expect-error: Next.js 15+ 최신 버전에서 외부 IP 접속(HMR)을 위해 필요한 속성이나, 아직 타입 정의가 반영되지 않았을 수 있음
     allowedDevOrigins: ["10.10.4.71", "localhost:3000"],
   },
 };
