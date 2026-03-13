@@ -17,6 +17,10 @@ interface StockPriceCardProps {
 export default function StockPriceCard({ stockData }: StockPriceCardProps) {
     const isPositive = (stockData?.regularMarketChange ?? 0) >= 0;
 
+    const marketPrice = stockData.regularMarketPrice?.toLocaleString() ?? '0.00';
+    const marketChange = Math.abs(stockData?.regularMarketChange ?? 0).toFixed(2);
+    const marketChangePercent = stockData.regularMarketChangePercent?.toFixed(2) ?? '0.00';
+
     return (
         <div className="p-6 border rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm shadow-xl transition-all hover:bg-black/10 dark:hover:bg-white/10 group">
             <div className="flex justify-between items-start">
@@ -31,14 +35,12 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                 </div>
                 <div className="text-right">
                     <p className="text-4xl font-black tabular-nums">
-                        {stockData.currency === "KRW" ? "" : "$"}
-                        {stockData?.regularMarketPrice?.toLocaleString() ?? '0.00'}
-                        {stockData.currency === "KRW" ? "₩" : ""}
+                        {stockData.currency === "KRW" ? marketPrice + "원" : "$" + marketPrice}
                     </p>
                     <p className={`text-lg font-bold mt-1 flex items-center justify-end gap-1 ${isPositive ? "text-green-500" : "text-red-500"}`}>
                         <span className="text-sm">{isPositive ? "▲" : "▼"}</span>
-                        {Math.abs(stockData?.regularMarketChange ?? 0).toFixed(2)}
-                        <span className="text-sm">({stockData?.regularMarketChangePercent?.toFixed(2)}%)</span>
+                        {marketChange}
+                        <span className="text-sm">({marketChangePercent}%)</span>
                     </p>
                 </div>
             </div>

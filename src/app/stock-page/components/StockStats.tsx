@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Stock } from "@/types/stock";
 
 interface StockStatsProps {
@@ -14,8 +14,8 @@ interface StockStatsProps {
  *   비슷한 패턴의 UI가 반복될 때는 배열을 선언하고 `.map()`을 사용하는 것이 생산성과 유지보수에 좋습니다.
  *   나중에 지표를 추가하거나 순서를 바꿀 때 이 배열만 수정하면 되기 때문이죠!
  */
-export default function StockStats({ stockData }: StockStatsProps) {
-    const stats = [
+const StockStats = React.memo(({ stockData }: StockStatsProps) => {
+    const stats = useMemo(() => [
         // 1. 가격 관련 지표
         { label: '시가 (Open)', value: stockData?.regularMarketOpen?.toLocaleString() },
         { label: '고가 (High)', value: stockData?.regularMarketDayHigh?.toLocaleString() },
@@ -43,13 +43,13 @@ export default function StockStats({ stockData }: StockStatsProps) {
         // 5. 기타 정보
         { label: '거래 통화', value: stockData?.currency },
         { label: '상장 거래소', value: (stockData as any).fullExchangeName || (stockData as any).exchange },
-    ];
+    ], [stockData]);
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {stats.map((item, idx) => (
-                <div 
-                    key={idx} 
+                <div
+                    key={idx}
                     className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-all"
                 >
                     <span className="text-sm text-gray-400 font-medium">{item.label}</span>
@@ -58,4 +58,6 @@ export default function StockStats({ stockData }: StockStatsProps) {
             ))}
         </div>
     );
-}
+});
+
+export default StockStats;
