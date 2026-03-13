@@ -35,30 +35,28 @@ export default function StockPage() {
     const minuteOptions = PERIOD_OPTIONS.MINUTE;
     const majorOptions = PERIOD_OPTIONS.MAJOR;
 
-    // [학습 포인트: API Response 처리와 메모이제이션]
-    // 서버(api/stock/route.ts)에서 받아온 데이터 구조를 ApexCharts가 요구하는 형태로 변홚합니다.
-    // 실무 개선 제안: 
-    // stockData가 변경되지 않았는데도 컴포넌트가 리렌더링 될 때마다 map 함수가 돌아가 배열을 새로 만듭니다.
-    // 만약 데이터가 수천 개라면 병목이 발생하겠죠? 이 부분도 `useMemo`로 감싸 캐싱하는 것이 좋습니다!
-    // 예: const candleSeries = useMemo(() => [{ ...data.map(...) }], [stockData]);
+    // [학습 포인트: API Response 처리와 메모이제이션 실제 적용!!!]
+    // 문제 원인: 사용자가 검색창에 "A"만 쳐도 (setTicker 동작) 현재 StockPage 컴포넌트 전체가 리렌더링됩니다.
+    // 결과적으로 이 거대한 배열의 map 함수가 키보드를 칠 때마다 다시 실행되고, 새로운 배열 주소값이 Chart에 넘어가며 무거운 차트가 다시 그려집니다.
+    // 해결책: `useMemo`를 사용하여 'stockData.historical' 원본 데이터가 바뀌지 않는 한, 배열을 다시 만들지 않도록 캐싱(Memoization)합니다.
 
     // ApexCharts 캔들차트 데이터 포맷팅
-    const candleSeries = [{
+    const candleSeries = useMemo(() => [{
         name: '시세',
         data: stockData?.historical?.map(d => ({
             x: d.timestamp,
             y: [d.open, d.high, d.low, d.close]
         })) || []
-    }];
+    }], [stockData?.historical]);
 
     // ApexCharts 라인차트 데이터 포맷팅
-    const lineSeries = [{
+    const lineSeries = useMemo(() => [{
         name: '종가',
         data: stockData?.historical?.map(d => ({
             x: d.timestamp,
             y: d.close
         })) || []
-    }];
+    }], [stockData?.historical]);
 
     // 메모이제이션된 차트 옵션
     const chartOptions = useMemo(() => getStockChartOptions(chartType), [chartType]);
