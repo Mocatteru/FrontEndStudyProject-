@@ -1,238 +1,101 @@
 'use client'
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import useStockSync from "@/hooks/useStockSync";
-import dynamic from "next/dynamic";
-import { getMarketStateName, getStockChartOptions, PERIOD_OPTIONS } from "@/types/stock";
+import StockSearch from "./components/StockSearch";
+import StockPriceCard from "./components/StockPriceCard";
+import StockChart from "./components/StockChart";
+import StockStats from "./components/StockStats";
 
 //TODO: 컴포넌트 컨테이너화 하기, 관심주식 목록 구현하기, 최근 검색목록 리스팅하기
 
-// ApexCharts는 window 객체를 사용하므로 SSR(Server Side Rendering)을 비활성화하여 불러옵니다.
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
-
+/**
+ * [StockPage - 메인 페이지 컴포넌트]
+ * 
+ * [Senior's Architecture Tips]
+ * 1. 복잡성 분리: 거대했던 파일을 기능별 컴포넌트로 쪼개어 가독성을 높였습니다.
+ * 2. 상태 응집도: 개별로 관리하던 range, interval을 하나로 묶어 업데이트 시 일관성을 보장합니다.
+ * 3. 관심사 분리(SoC): 페이지는 '데이터의 흐름'만 제어하고, 실제 UI 그리기나 로직은 하위 컴포넌트가 담당합니다.
+ */
 export default function StockPage() {
     const [ticker, setTicker] = useState<string>('');
     const [searchTicker, setSearchTicker] = useState<string>('');
 
-    // [코드 리뷰 & 배드 패턴 방지]
-    // 현재는 Range와 Interval을 개별 useState로 관리하고 있습니다.
-    // 하지만 "5분봉을 보다가 년봉 버튼을 눌렀다"면 range와 interval이 동시에 바뀌어야 합니다.
-    // 이럴 때 setState가 두 번 발생하면 컴포넌트 렌더링도 두 번 발생할 여지가 있습니다.(React 18의 batching 렌더링 덕분에 지금은 큰 무리가 없긴 합니다).
-    // 실무 개선 제안: `const [chartConfig, setChartConfig] = useState({ range: '6mo', interval: '1d' })` 처럼 
-    // 관련된 상태들은 하나의 객체로 묶어 관리하는 것이 훨씬 응집도(Cohesion)가 높고 안전한 패턴입니다.
-    const [range, setRange] = useState('6mo');
-    const [interval, setInterval] = useState('1d');
-    const [chartType, setChartType] = useState<'line' | 'candlestick'>('candlestick');
+    // [학습 포인트: 상태 그룹화 (State Grouping)]
+    // 서로 같이 바뀌어야 하는 데이터들은 하나의 객체로 묶어 관리하는 것이 좋습니다.
+    // '5분봉' 선택 시 range='5d', interval='5m'이 동시에 바뀌어야 하므로 한 번의 setState로 처리합니다.
+    const [chartConfig, setChartConfig] = useState({
+        range: '6mo',
+        interval: '1d'
+    });
 
-    const { stockData, isError, isLoading } = useStockSync(searchTicker, range, interval);
+    const { stockData, isError, isLoading } = useStockSync(
+        searchTicker,
+        chartConfig.range,
+        chartConfig.interval
+    );
 
+    // 검색 실행 로직
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        setSearchTicker(ticker.toUpperCase());
+        setSearchTicker(ticker.trim().toUpperCase());
     };
 
-    const [showMinuteMenu, setShowMinuteMenu] = useState(false);
-
-    // 기간 선택 옵션들 (공통 상수 사용)
-    const minuteOptions = PERIOD_OPTIONS.MINUTE;
-    const majorOptions = PERIOD_OPTIONS.MAJOR;
-
-    // [학습 포인트: API Response 처리와 메모이제이션 실제 적용!!!]
-    // 문제 원인: 사용자가 검색창에 "A"만 쳐도 (setTicker 동작) 현재 StockPage 컴포넌트 전체가 리렌더링됩니다.
-    // 결과적으로 이 거대한 배열의 map 함수가 키보드를 칠 때마다 다시 실행되고, 새로운 배열 주소값이 Chart에 넘어가며 무거운 차트가 다시 그려집니다.
-    // 해결책: `useMemo`를 사용하여 'stockData.historical' 원본 데이터가 바뀌지 않는 한, 배열을 다시 만들지 않도록 캐싱(Memoization)합니다.
-
-    // ApexCharts 캔들차트 데이터 포맷팅
-    const candleSeries = useMemo(() => [{
-        name: '시세',
-        data: stockData?.historical?.map(d => ({
-            x: d.timestamp,
-            y: [d.open, d.high, d.low, d.close]
-        })) || []
-    }], [stockData?.historical]);
-
-    // ApexCharts 라인차트 데이터 포맷팅
-    const lineSeries = useMemo(() => [{
-        name: '종가',
-        data: stockData?.historical?.map(d => ({
-            x: d.timestamp,
-            y: d.close
-        })) || []
-    }], [stockData?.historical]);
-
-    // 메모이제이션된 차트 옵션
-    const chartOptions = useMemo(() => getStockChartOptions(chartType), [chartType]);
+    // 차트 설정 변경 (하위 컴포넌트에서 호출됨)
+    const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
+        setChartConfig({ range: newRange, interval: newInterval });
+    }, []);
 
     return (
-        <div className="p-6 space-y-6">
-            <h2 className="text-3xl font-bold">주식 종목 검색</h2>
+        <div className="p-6 space-y-8 max-w-7xl mx-auto">
+            <header className="space-y-2">
+                <h1 className="text-4xl font-extrabold tracking-tight">Stock Dashboard</h1>
+                <p className="text-gray-500 dark:text-gray-400">실시간 주가 정보와 기술적 차트를 분석해보세요.</p>
+            </header>
 
-            {/* 검색창 UI */}
-            <form onSubmit={handleSearch} className="flex gap-2">
-                <input
-                    type="text"
-                    value={ticker}
-                    onChange={(e) => setTicker(e.target.value)}
-                    placeholder="종목 코드 입력 (예: AAPL, TSLA)"
-                    className="p-2 border rounded-lg dark:bg-gray-800 dark:border-white/10 flex-1 lg:flex-none lg:w-64"
-                />
-                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-colors">검색</button>
-            </form>
+            {/* 검색 섹션 */}
+            <StockSearch
+                ticker={ticker}
+                setTicker={setTicker}
+                onSearch={handleSearch}
+            />
 
             <hr className="border-white/10" />
 
-            {/* 결과 출력 UI */}
+            {/* 로딩 상태 UI */}
             {isLoading && (
-                <div className="flex justify-center p-20">
+                <div className="flex flex-col items-center justify-center p-20 space-y-4">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                    <p className="text-gray-400 animate-pulse">데이터를 불러오는 중입니다...</p>
                 </div>
             )}
-            {isError && <p className="text-red-500 bg-red-500/10 p-4 rounded-lg">정보를 찾을 수 없습니다. (정확한 티커를 입력했는지 확인해 주세요)</p>}
 
-            {stockData && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    {/* 주요 시세 카드 */}
-                    <div className="p-6 border rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm shadow-xl transition-all hover:bg-black/10 dark:hover:bg-white/10">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h3 className="text-2xl font-bold tracking-tight">
-                                    {stockData?.longName || stockData?.shortName || 'Unknown'}
-                                    <span className="ml-2 text-gray-400 font-medium">{stockData?.symbol}</span>
-                                </h3>
-                                <p className="text-sm text-gray-400 mt-1">시장 상태: <span className="text-blue-400 font-semibold">{getMarketStateName(stockData?.marketState)}</span></p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-4xl font-black">${stockData?.regularMarketPrice?.toLocaleString() ?? '0.00'}</p>
-                                <p className={`text-lg font-bold mt-1 ${(stockData?.regularMarketChange ?? 0) >= 0 ? "text-green-500" : "text-red-500"}`}>
-                                    {(stockData?.regularMarketChange ?? 0) >= 0 ? "▲" : "▼"}
-                                    {Math.abs(stockData?.regularMarketChange ?? 0).toFixed(2)}
-                                    ({stockData?.regularMarketChangePercent?.toFixed(2)}%)
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+            {/* 에러 상태 UI */}
+            {isError && (
+                <div className="text-red-500 bg-red-500/10 p-6 rounded-2xl border border-red-500/20 animate-in fade-in zoom-in-95">
+                    <h3 className="font-bold text-lg mb-1">검색 결과가 없습니다</h3>
+                    <p>정확한 티커(예: AAPL, TSLA)를 입력하셨는지 확인해 주세요.</p>
+                </div>
+            )}
 
-                    {/* 차트 컨트롤러 및 차트 영역 */}
-                    <div className="p-6 border rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm relative">
-                        <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-                            <div className="flex gap-2 bg-black/20 dark:bg-white/10 p-1 rounded-lg">
-                                {/* 
-                                   [분봉 드롭다운 메뉴 원리]
-                                   - 왜 드롭다운을 썼을까?: 1분부터 60분까지 버튼을 다 나열하면 모바일 화면에서 줄바꿈이 일어나 지저분해집니다.
-                                     따라서 '분봉' 하나로 묶고 누를 때만 열리도록(Progressive Disclosure) 개선했습니다.
-                                   - UI 팁: 부모 div에 `relative`를 주고 하위 메뉴에 `absolute`를 주면 레이아웃이 깨지지 않고 메뉴폰 팝업처럼 뜹니다.
-                                */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setShowMinuteMenu(!showMinuteMenu)}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all flex items-center gap-1 ${minuteOptions.some(opt => opt.interval === interval) ? 'bg-blue-500 text-white' : 'hover:bg-white/5 text-gray-400'}`}
-                                    >
-                                        {/* 선택된 분봉이 있으면 그 라벨('5분' 등)을 보여주고, 아니면 기본값 '분봉' 출력 */}
-                                        {minuteOptions.find(opt => opt.interval === interval)?.label || '분봉'}
-                                        <span className={`text-[10px] transition-transform ${showMinuteMenu ? 'rotate-180' : ''}`}>▼</span>
-                                    </button>
+            {/* 결과 출력 섹션 */}
+            {stockData && !isLoading && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    {/* 1. 시세 요약 카드 */}
+                    <StockPriceCard stockData={stockData} />
 
-                                    {showMinuteMenu && (
-                                        <div className="absolute top-full left-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                            <div className="grid grid-cols-2 p-2 gap-1 w-32">
-                                                {minuteOptions.map((opt) => (
-                                                    <button
-                                                        key={opt.interval}
-                                                        onClick={() => {
-                                                            setRange(opt.range);
-                                                            setInterval(opt.interval);
-                                                            setShowMinuteMenu(false);
-                                                        }}
-                                                        className={`px-2 py-1.5 rounded-md text-xs font-medium text-center transition-all ${interval === opt.interval ? 'bg-blue-500 text-white' : 'hover:bg-white/10 text-gray-400'}`}
-                                                    >
-                                                        {opt.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                    {/* 2. 인터랙티브 차트 영역 */}
+                    <StockChart
+                        stockData={stockData}
+                        range={chartConfig.range}
+                        interval={chartConfig.interval}
+                        onConfigChange={handleConfigChange}
+                    />
 
-                                {/* 
-                                   [주요 기간 버튼들 (일, 주, 월, 년)]
-                                   - 분봉과 다르게 이 버튼들은 핵심 지표라서 숨기지 않고 바깥에 그대로 노출합니다. 
-                                */}
-                                {majorOptions.map((opt) => (
-                                    <button
-                                        key={opt.range}
-                                        onClick={() => {
-                                            setRange(opt.range);
-                                            setInterval(opt.interval);
-                                            setShowMinuteMenu(false);
-                                        }}
-                                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${range === opt.range && interval === opt.interval ? 'bg-blue-500 text-white shadow-lg' : 'hover:bg-white/5 text-gray-400'}`}
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="flex gap-2 bg-black/20 dark:bg-white/10 p-1 rounded-lg">
-                                <button
-                                    onClick={() => setChartType('candlestick')}
-                                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${chartType === 'candlestick' ? 'bg-orange-500 text-white' : 'text-gray-400'}`}
-                                >
-                                    캔들
-                                </button>
-                                <button
-                                    onClick={() => setChartType('line')}
-                                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${chartType === 'line' ? 'bg-blue-500 text-white' : 'text-gray-400'}`}
-                                >
-                                    라인
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="h-[400px] w-full">
-                            <Chart
-                                options={chartOptions}
-                                series={chartType === 'candlestick' ? candleSeries : lineSeries}
-                                type={chartType}
-                                height="100%"
-                            />
-                        </div>
-                    </div>
-
-                    {/* 상세 정보 테이블 그리드 (확장 버전) */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {[
-                            // 1. 가격 관련 지표
-                            { label: '시가 (Open)', value: stockData?.regularMarketOpen?.toLocaleString() },
-                            { label: '고가 (High)', value: stockData?.regularMarketDayHigh?.toLocaleString() },
-                            { label: '저가 (Low)', value: stockData?.regularMarketDayLow?.toLocaleString() },
-                            { label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange) ? (stockData.regularMarketPrice - stockData.regularMarketChange).toLocaleString() : null },
-
-                            // 2. 통계 및 볼륨
-                            { label: '거래량 (Volume)', value: stockData?.regularMarketVolume?.toLocaleString() },
-                            { label: '평균 거래량 (3M)', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
-                            { label: '시가총액 (Market Cap)', value: stockData?.marketCap ? `$${(stockData.marketCap / 1e9).toFixed(2)}B` : null },
-                            { label: '유통 주식수', value: (stockData as any).sharesOutstanding?.toLocaleString() },
-
-                            // 3. 투자 지표 (PE, EPS 등)
-                            { label: 'P/E Ratio (Trailing)', value: stockData?.trailingPE?.toFixed(2) },
-                            { label: 'P/E Ratio (Forward)', value: stockData?.forwardPE?.toFixed(2) },
-                            { label: 'EPS (TTM)', value: stockData?.epsTrailingTwelveMonths?.toFixed(2) },
-                            { label: '배당 수익률 (Div Yield)', value: (stockData as any).dividendYield ? `${(stockData as any).dividendYield.toFixed(2)}%` : null },
-
-                            // 4. 주가 범위 정보
-                            { label: '52주 최고가', value: stockData?.fiftyTwoWeekHigh?.toLocaleString() },
-                            { label: '52주 최저가', value: stockData?.fiftyTwoWeekLow?.toLocaleString() },
-                            { label: '50일 평균가', value: (stockData as any).fiftyDayAverage?.toLocaleString() },
-                            { label: '200일 평균가', value: (stockData as any).twoHundredDayAverage?.toLocaleString() },
-
-                            // 5. 기타 정보
-                            { label: '거래 통화', value: stockData?.currency },
-                            { label: '상장 거래소', value: (stockData as any).fullExchangeName || (stockData as any).exchange },
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex justify-between p-3 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                <span className="text-sm text-gray-400 font-medium">{item.label}</span>
-                                <span className="text-sm font-bold">{item.value ?? 'N/A'}</span>
-                            </div>
-                        ))}
+                    {/* 3. 상세 지표 통계 그리드 */}
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-bold px-1">상세 지표 (Statistics)</h2>
+                        <StockStats stockData={stockData} />
                     </div>
                 </div>
             )}
