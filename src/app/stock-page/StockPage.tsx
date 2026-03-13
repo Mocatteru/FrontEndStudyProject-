@@ -6,8 +6,12 @@ import StockSearch from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
+import { isInt } from 'radash';
 
 //TODO: 컴포넌트 컨테이너화 하기, 관심주식 목록 구현하기, 최근 검색목록 리스팅하기
+
+const KR_TICKER_SUFFIX = ".KS";
+const KR_TICKER_LENGHT = 6;
 
 /**
  * [StockPage - 메인 페이지 컴포넌트]
@@ -38,7 +42,19 @@ export default function StockPage() {
     // 검색 실행 로직
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        setSearchTicker(ticker.trim().toUpperCase());
+
+        const trimmedTicker = ticker.trim().toUpperCase();
+
+        // [학습 포인트: Radash 활용 유효성 검사]
+        // 한국 주식 코드(6자리 숫자)인지 유추하는 로직입니다.
+        // isInt를 사용하여 변환된 값이 정수인지 안전하게 확인합니다.
+
+        if (trimmedTicker.length === KR_TICKER_LENGHT && isInt(Number(trimmedTicker))
+        ) {
+            setSearchTicker(`${trimmedTicker}${KR_TICKER_SUFFIX}`);
+        } else {
+            setSearchTicker(trimmedTicker);
+        }
     };
 
     // 차트 설정 변경 (하위 컴포넌트에서 호출됨)
@@ -75,6 +91,7 @@ export default function StockPage() {
                 <div className="text-red-500 bg-red-500/10 p-6 rounded-2xl border border-red-500/20 animate-in fade-in zoom-in-95">
                     <h3 className="font-bold text-lg mb-1">검색 결과가 없습니다</h3>
                     <p>정확한 티커(예: AAPL, TSLA)를 입력하셨는지 확인해 주세요.</p>
+                    <p>코스닥을 찾고 계셨나요? 티커 뒤에 .KQ를 붙여주세요. (예: 000000.KQ)</p>
                 </div>
             )}
 
