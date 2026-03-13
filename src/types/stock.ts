@@ -214,3 +214,11 @@ export const PERIOD_OPTIONS = {
         { label: '년', range: 'max', interval: '3mo' },
     ] as ChartPeriodOption[]
 };
+
+export const KR_TICKER_SUFFIX = ".KS";
+export const KR_TICKER_LENGTH = 6;
+
+//화폐 단위 결정하는 포맷 함수입니다.
+export function FormatPriceCurrency(currency: string, marketPrice: string) {
+    return currency === "KRW" ? marketPrice + "원" : "$" + marketPrice
+}

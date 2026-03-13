@@ -7,11 +7,11 @@ import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
 import { isInt } from 'radash';
+import { KR_TICKER_LENGTH, KR_TICKER_SUFFIX } from "@/types/stock";
 
 //TODO: 컴포넌트 컨테이너화 하기, 관심주식 목록 구현하기, 최근 검색목록 리스팅하기
 
-const KR_TICKER_SUFFIX = ".KS";
-const KR_TICKER_LENGHT = 6;
+
 
 /**
  * [StockPage - 메인 페이지 컴포넌트]
@@ -49,7 +49,7 @@ export default function StockPage() {
         // 한국 주식 코드(6자리 숫자)인지 유추하는 로직입니다.
         // isInt를 사용하여 변환된 값이 정수인지 안전하게 확인합니다.
 
-        if (trimmedTicker.length === KR_TICKER_LENGHT && isInt(Number(trimmedTicker))
+        if (trimmedTicker.length === KR_TICKER_LENGTH && isInt(Number(trimmedTicker))
         ) {
             setSearchTicker(`${trimmedTicker}${KR_TICKER_SUFFIX}`);
         } else {

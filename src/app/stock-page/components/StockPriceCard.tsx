@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import { Stock, getMarketStateName } from "@/types/stock";
+import { FormatPriceCurrency, Stock, getMarketStateName } from "@/types/stock";
 
 interface StockPriceCardProps {
     stockData: Stock;
@@ -35,7 +35,7 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                 </div>
                 <div className="text-right">
                     <p className="text-4xl font-black tabular-nums">
-                        {stockData.currency === "KRW" ? marketPrice + "원" : "$" + marketPrice}
+                        {FormatPriceCurrency(stockData.currency, marketPrice)}
                     </p>
                     <p className={`text-lg font-bold mt-1 flex items-center justify-end gap-1 ${isPositive ? "text-green-500" : "text-red-500"}`}>
                         <span className="text-sm">{isPositive ? "▲" : "▼"}</span>
