@@ -5,7 +5,9 @@ import useStockSync from "@/hooks/useStockSync";
 import dynamic from "next/dynamic";
 import { getMarketStateName, getStockChartOptions, PERIOD_OPTIONS } from "@/types/stock";
 
-// ApexCharts는 window 객체를 사용하므로 SSR을 비활성화하여 불러옵니다.
+//TODO: 컴포넌트 컨테이너화 하기, 관심주식 목록 구현하기, 최근 검색목록 리스팅하기
+
+// ApexCharts는 window 객체를 사용하므로 SSR(Server Side Rendering)을 비활성화하여 불러옵니다.
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function StockPage() {
