@@ -190,10 +190,10 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick'): ApexOpt
                 return `
                     <div class="p-3 bg-gray-900 border border-gray-700 rounded-lg shadow-xl text-xs space-y-1">
                         <div class="text-gray-400 mb-2 border-b border-gray-700 pb-1">${dateStr}</div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">시가</span><span class="font-bold text-white">$${o.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">고가</span><span class="font-bold text-white">$${h.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">저가</span><span class="font-bold text-white">$${l.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">종가</span><span class="font-bold text-white">$${c.toFixed(2)}</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-gray-400">시가</span><span class="font-bold text-white">${o.toFixed(2)}</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-gray-400">고가</span><span class="font-bold text-white">${h.toFixed(2)}</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-gray-400">저가</span><span class="font-bold text-white">${l.toFixed(2)}</span></div>
+                        <div class="flex justify-between gap-4"><span class="text-gray-400">종가</span><span class="font-bold text-white">${c.toFixed(2)}</span></div>
                     </div>
                 `;
             } : undefined,

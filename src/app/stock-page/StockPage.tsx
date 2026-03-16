@@ -9,7 +9,6 @@ import StockStats from "./components/StockStats";
 import { isInt } from 'radash';
 import { KR_TICKER_LENGTH, KR_TICKER_SUFFIX } from "@/types/stock";
 
-//TODO: 컴포넌트 컨테이너화 하기, 관심주식 목록 구현하기, 최근 검색목록 리스팅하기
 
 
 
