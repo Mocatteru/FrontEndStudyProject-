@@ -246,5 +246,7 @@ export const KR_TICKER_LENGTH = 6;
 
 //화폐 단위 결정하는 포맷 함수입니다.
 export function FormatPriceCurrency(currency: string, marketPrice: string) {
-    return currency === "KRW" ? marketPrice + "원" : "$" + marketPrice
+    const price = Number(marketPrice.trim());
+    const formatted = isNaN(price) ? marketPrice : price.toLocaleString();
+    return currency === "KRW" ? `${formatted}원` : `$${formatted}`;
 }

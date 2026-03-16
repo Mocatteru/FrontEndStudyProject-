@@ -1,4 +1,4 @@
-import { truncateTitle } from "@/lib/format";
+import { TruncateTitle } from "@/lib/format";
 import { Post } from "@/types/post";
 import React from "react";
 
@@ -17,7 +17,7 @@ function PostItem({ post }: { post: Post }) {
     return (
         <div className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
             <h3 className="font-semibold text-blue-500 dark:text-blue-400">Post #{post.id}</h3>
-            <p className="mt-2 text-gray-700 dark:text-gray-300">{truncateTitle(post.title, 20)}</p>
+            <p className="mt-2 text-gray-700 dark:text-gray-300">{TruncateTitle(post.title, 20)}</p>
         </div>
     )
 }

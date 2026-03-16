@@ -9,7 +9,7 @@
  * @param limit ...를 표시할 길이 
  * @returns string
  */
-export function truncateTitle(title: string, limit: number) {
+export function TruncateTitle(title: string, limit: number) {
     if (!title) return ''; // 예외 처리: 데이터가 없는 경우 빈 문자열 반환 (방어적 프로그래밍)
     return title.length > limit ? `${title.slice(0, limit)}...` : title;
 }
