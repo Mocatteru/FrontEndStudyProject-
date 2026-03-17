@@ -55,11 +55,9 @@ export default function RootLayout({
           <QueryProvider>
             <SidebarProvider>
               <AppSidebar />
-              <SidebarInset>
+              <SidebarInset className="flex flex-col flex-1 px-6 py-6 items-stretch">
                 <Header />
-                <main className="flex-1 px-6 py-6">
-                  {children}
-                </main>
+                {children}
                 <Toast />
               </SidebarInset>
             </SidebarProvider>

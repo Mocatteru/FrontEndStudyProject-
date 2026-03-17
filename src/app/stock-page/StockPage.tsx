@@ -45,7 +45,7 @@ export default function StockPage() {
     }, []);
 
     return (
-        <div className="p-6 space-y-8 max-w-7xl mx-auto">
+        <div className="p-6 space-y-8">
             <header className="space-y-2">
                 <h1 className="text-4xl font-extrabold tracking-tight">Stock Dashboard</h1>
                 <p className="text-gray-500 dark:text-gray-400">실시간 주가 정보와 기술적 차트를 분석해보세요.</p>
