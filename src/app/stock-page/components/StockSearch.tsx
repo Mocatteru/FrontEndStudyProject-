@@ -1,12 +1,9 @@
 'use client'
 
-import React from "react";
+import useStockSearch from "@/hooks/useStockSearch";
+import { useStockStore } from "@/store/useStockStore";
+import React, { useCallback, useState } from "react";
 
-interface StockSearchProps {
-    ticker: string;
-    setTicker: (value: string) => void;
-    onSearch: (e: React.FormEvent) => void;
-}
 
 /**
  * [StockSearch 컴포넌트]
@@ -15,16 +12,36 @@ interface StockSearchProps {
  *   React에서는 input의 value를 state와 동기화하는 '제어 컴포넌트' 패턴을 주로 사용합니다.
  *   이를 통해 입력값 검증(Validation)이나 포맷팅(대문자 변환 등)을 실시간으로 처리하기 용이합니다.
  */
-export default function StockSearch({ ticker, setTicker, onSearch }: StockSearchProps) {
+export default function StockSearch() {
+    const [ticker, setTicker] = useState<string>('');
+    const [isFocused, setIsFocused] = useState<boolean>(false);
+
+    const { handleRecentSearch } = useStockSearch();
+    const { recentSearchList } = useStockStore();
+
+    const pressSearchButton = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+        handleRecentSearch(ticker);
+    }, [ticker, handleRecentSearch])
+
     return (
-        <form onSubmit={onSearch} className="flex gap-2">
+        <form onSubmit={pressSearchButton} className="flex gap-2 relative">
             <input
                 type="text"
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value)}
                 placeholder="종목 코드 입력 (예: NVDA, 005930)"
                 className="p-2 border rounded-lg dark:bg-gray-800 dark:border-white/10 flex-1 lg:flex-none lg:w-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
             />
+            {isFocused ? (
+                <div className="absolute top-full left-0 w-64 z-50 mt-1 bg-background dark:bg-gray-800">
+                    {
+                        recentSearchList.map(v => <div onMouseDown={(e) => e.preventDefault()} onClick={() => handleRecentSearch(v)} key={v}>{v}</div>)
+                    }
+                </div>
+            ) : null}
             <button
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 active:scale-95 transition-all shadow-lg shadow-blue-500/20"

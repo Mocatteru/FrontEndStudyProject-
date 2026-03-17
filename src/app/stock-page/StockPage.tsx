@@ -8,6 +8,7 @@ import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
 import { isInt } from 'radash';
 import { KR_TICKER_LENGTH, KR_TICKER_SUFFIX } from "@/types/stock";
+import { useStockStore } from "@/store/useStockStore";
 
 
 
@@ -21,8 +22,6 @@ import { KR_TICKER_LENGTH, KR_TICKER_SUFFIX } from "@/types/stock";
  * 3. 관심사 분리(SoC): 페이지는 '데이터의 흐름'만 제어하고, 실제 UI 그리기나 로직은 하위 컴포넌트가 담당합니다.
  */
 export default function StockPage() {
-    const [ticker, setTicker] = useState<string>('');
-    const [searchTicker, setSearchTicker] = useState<string>('');
 
     // [학습 포인트: 상태 그룹화 (State Grouping)]
     // 서로 같이 바뀌어야 하는 데이터들은 하나의 객체로 묶어 관리하는 것이 좋습니다.
@@ -31,30 +30,14 @@ export default function StockPage() {
         range: '6mo',
         interval: '1d'
     });
-
+    const { currentTicker } = useStockStore();
     const { stockData, isError, isLoading } = useStockSync(
-        searchTicker,
+        currentTicker,
         chartConfig.range,
         chartConfig.interval
     );
 
-    // 검색 실행 로직
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
 
-        const trimmedTicker = ticker.trim().toUpperCase();
-
-        // [학습 포인트: Radash 활용 유효성 검사]
-        // 한국 주식 코드(6자리 숫자)인지 유추하는 로직입니다.
-        // isInt를 사용하여 변환된 값이 정수인지 안전하게 확인합니다.
-
-        if (trimmedTicker.length === KR_TICKER_LENGTH && isInt(Number(trimmedTicker))
-        ) {
-            setSearchTicker(`${trimmedTicker}${KR_TICKER_SUFFIX}`);
-        } else {
-            setSearchTicker(trimmedTicker);
-        }
-    };
 
     // 차트 설정 변경 (하위 컴포넌트에서 호출됨)
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
@@ -69,11 +52,7 @@ export default function StockPage() {
             </header>
 
             {/* 검색 섹션 */}
-            <StockSearch
-                ticker={ticker}
-                setTicker={setTicker}
-                onSearch={handleSearch}
-            />
+            <StockSearch />
 
             <hr className="border-white/10" />
 

@@ -88,7 +88,7 @@ export default function StockChart({ stockData, range, interval, onConfigChange 
                     {/* 주요 기간 버튼 */}
                     {majorOptions.map((opt) => (
                         <button
-                            key={opt.range}
+                            key={opt.label}
                             onClick={() => {
                                 onConfigChange(opt.range, opt.interval);
                                 setShowMinuteMenu(false);

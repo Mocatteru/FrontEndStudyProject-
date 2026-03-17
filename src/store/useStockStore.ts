@@ -5,8 +5,13 @@ import { persist } from "zustand/middleware"; //  1. 미들웨어 추가
 interface StockState {
     stock: Stock | null,
     currentTicker: string,
-    tickerSearchHistory: string[],
+    recentSearchList: string[],
     stockWatchList: Stock[],
+    setCurrentTicker: (ticker: string) => void,
+    addRecentSearch: (ticker: string) => void,
+    toggleWatchList: (stock: Stock) => void,
+    removeRecentSearch: (ticker: string) => void,
+    clearRecentSearch: () => void,
 
 }
 
@@ -21,14 +26,16 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
         (set) => ({
             stock: null,
             currentTicker: "",
-            tickerSearchHistory: [],
+            recentSearchList: [],
             stockWatchList: [],
 
             // Actions
             setStock: (stock: Stock) => set({ stock }),
-            setCurrentTicker: (ticker: string) => set({ currentTicker: ticker.toUpperCase() }),
+            setCurrentTicker: (ticker: string) => set({
+                currentTicker: ticker.toUpperCase().trim()
+            }),
             addRecentSearch: (ticker: string) => set((state) => ({
-                tickerSearchHistory: [ticker.toUpperCase(), ...state.tickerSearchHistory.filter(t => t !== ticker.toUpperCase())].slice(0, 10)
+                recentSearchList: [ticker.toUpperCase(), ...state.recentSearchList.filter(t => t !== ticker.toUpperCase())].slice(0, 10)
             })),
             toggleWatchList: (stock: Stock) => set((state) => ({
                 stockWatchList: state.stockWatchList.map(m => m.symbol).includes(stock.symbol) ?
@@ -36,10 +43,10 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
 
             })),
             removeRecentSearch: (ticker: string) => set((state) => ({
-                tickerSearchHistory: state.tickerSearchHistory.filter(t => t !== ticker.toUpperCase())
+                recentSearchList: state.recentSearchList.filter(t => t !== ticker.toUpperCase())
             })),
             clearRecentSearch: () => set(() => ({
-                tickerSearchHistory: []
+                recentSearchList: []
             }))
         }),
         {

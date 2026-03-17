@@ -244,9 +244,21 @@ export const PERIOD_OPTIONS = {
 export const KR_TICKER_SUFFIX = ".KS";
 export const KR_TICKER_LENGTH = 6;
 
+export function FormatTickerKR(ticker: string) {
+    if (ticker.length === KR_TICKER_LENGTH) {
+        return ticker.trim().toUpperCase().concat(KR_TICKER_SUFFIX);
+    }
+    return ticker.trim().toUpperCase();
+}
+
 //화폐 단위 결정하는 포맷 함수입니다.
 export function FormatPriceCurrency(currency: string, marketPrice: string) {
     const price = Number(marketPrice.trim());
     const formatted = isNaN(price) ? marketPrice : price.toLocaleString();
     return currency === "KRW" ? `${formatted}원` : `$${formatted}`;
+}
+
+//티커 트림 후 업퍼케이스 포맷 함수입니다.
+export function FormatTicker(ticker: string) {
+    return ticker.toUpperCase().trim();
 }
