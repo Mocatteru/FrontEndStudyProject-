@@ -14,11 +14,12 @@ const geistMono = Geist_Mono({
 
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
-import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/providers/QueryProvider";
-import MainWrapper from "@/components/layout/MainWrapper";
 import Toast from "@/components/common/Toast";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/layout/Sidebar/AppSidebar";
+
 
 export const metadata: Metadata = {
   title: "Frontend Mentorship Admin",
@@ -52,14 +53,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Sidebar />
-            <MainWrapper>
-              <Header />
-              <main className="flex-1 p-8">
-                {children}
-              </main>
-              <Toast />
-            </MainWrapper>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <Header />
+                <main className="flex-1 px-6 py-6">
+                  {children}
+                </main>
+                <Toast />
+              </SidebarInset>
+            </SidebarProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
