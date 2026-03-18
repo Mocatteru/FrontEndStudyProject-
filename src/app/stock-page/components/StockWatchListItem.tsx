@@ -50,7 +50,7 @@ export default function StockWatchListItem({ ticker, name, price, change, change
                     <div className="flex justify-between items-start w-full gap-5 animate-in fade-in zoom-in-95 duration-500">
                         {/* [좌측] 이름 및 티커 영역 */}
                         <div className="flex flex-col gap-2 items-start flex-1 min-w-0 overflow-hidden">
-                            <span className="font-black text-[14px] text-foreground leading-snug text-left whitespace-normal wrap-break-word line-clamp-2 group-hover:text-blue-500 transition-colors">
+                            <span className="font-black text-[14px] text-foreground leading-snug text-left whitespace-normal wrap-break-word line-clamp-3 group-hover:text-blue-500 transition-colors">
                                 {name}
                             </span>
                             <div className="flex items-center gap-2">
