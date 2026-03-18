@@ -13,19 +13,37 @@ interface StockWatchListSidebarProps {
 
 /**
  * [StockWatchListSidebar]
- * 사용자의 관심 종목을 관리하고 보여주는 우측 보조 사이드바입니다.
- * 
- * [Senior's Tip]
- * 1. 정보 노출 전략: 사이드바가 닫혔을 때는 최소한의 인터랙션(Toggle)만 남겨 시각적 노이즈를 줄입니다.
- * 2. 확장성: 데이터가 없을 때의 Empty State와 로딩 상태를 고려하여 구조를 설계했습니다.
+ * - 리팩토링 포인트: Responsive Design (Desktop vs Mobile)
+ *   1. Desktop (md:): 상대적 너비(Relative)를 가지며 아이콘 모드(w-16) 지원
+ *   2. Mobile: 고정 위치(Fixed Overlay)를 가지며 닫힘 시 완전 숨김(w-0)
  */
 export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchListSidebarProps) {
     const { stockWatchList } = useStockStore();
     return (
-        <aside
-            className={cn(
-                "h-full border-l border-black/5 dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-md transition-all duration-500 ease-in-out flex flex-col overflow-hidden shrink-0 z-20",
-                isOpen ? "w-80" : "w-16"
+        <>
+            {/* [Senior] Mobile Backdrop: 모바일에서 사이드바가 열릴 때 배경을 블러 처리하고 클릭 시 닫히도록 구현 */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-40 md:hidden animate-in fade-in duration-300" 
+                    onClick={onToggle}
+                />
+            )}
+            
+            <aside
+                className={cn(
+                "h-full transition-all duration-500 ease-in-out flex flex-col overflow-hidden shrink-0 z-50",
+                "bg-white/95 dark:bg-black/95 backdrop-blur-md border-black/5 dark:border-white/10",
+                
+                // [Desktop Style]
+                "md:relative md:border-l", 
+                isOpen ? "md:w-80" : "md:w-16",
+                
+                // [Mobile Style]
+                "fixed inset-y-0 right-0 shadow-2xl md:shadow-none border-l md:border-none",
+                isOpen ? "w-80" : "w-0 border-none",
+                
+                // [Senior's Tip] 모바일에서 열렸을 때 외부 영역 클릭 방지를 위한 z-index 조정
+                !isOpen && "invisible md:visible"
             )}
         >
             {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 */}
@@ -59,28 +77,29 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
             {/* [2] 사이드바 콘텐츠: 관심 종목 리스트 */}
             <SidebarContent className={cn(
                 "flex-1 overflow-hidden", // 내부 스크롤을 위해 overflow 제어
-                !isOpen && "hidden md:flex flex-col items-center pt-8"
+                !isOpen && "md:flex flex-col items-center pt-8"
             )}>
                 <div className="h-full overflow-y-auto custom-scrollbar p-3">
                     <SidebarGroup className={cn("w-full transition-all duration-500", !isOpen && "px-0")}>
                         <SidebarMenu className={cn("gap-3 transition-all duration-500", !isOpen && "items-center")}>
-                            {isOpen ? (
-                                <>
-                                    {stockWatchList.map(v => (
-                                        <StockWatchListItem key={v.symbol} ticker={v.symbol} name={v.longName || v.shortName || 'N/A'} price={v.regularMarketPrice ?? NaN} change={v.regularMarketChange ?? NaN} changePercent={v.regularMarketChangePercent ?? NaN} isPositive={v.regularMarketChange > 0} currency={v.currency ?? ''} />
-                                    ))}
-                                </>
-                            ) : (
-                                /* 접혔을 때의 미니 아이콘 상태 (선택 사항) */
-                                <div className="flex flex-col gap-6 items-center py-4 text-muted-foreground/20 italic">
-                                    <Star className="size-5" />
-                                    <div className="w-1 h-20 bg-black/5 dark:bg-white/5 rounded-full" />
-                                </div>
-                            )}
+                            {stockWatchList.map(v => (
+                                <StockWatchListItem
+                                    key={v.symbol}
+                                    ticker={v.symbol}
+                                    name={v.longName || v.shortName || 'N/A'}
+                                    price={v.regularMarketPrice ?? NaN}
+                                    change={v.regularMarketChange ?? NaN}
+                                    changePercent={v.regularMarketChangePercent ?? NaN}
+                                    isPositive={v.regularMarketChange > 0}
+                                    currency={v.currency ?? ''}
+                                    isOpen={isOpen} // [Senior] 사이드바 상태를 아이템에 전달
+                                />
+                            ))}
                         </SidebarMenu>
                     </SidebarGroup>
                 </div>
             </SidebarContent>
-        </aside>
+            </aside>
+        </>
     );
 }

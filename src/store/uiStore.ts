@@ -8,16 +8,22 @@ import { create } from "zustand";
  */
 interface UiState {
     isSiderOpen: boolean;
+    isWatchListOpen: boolean; // [Senior] 우측 와치리스트 상태 추가
     userName: string;
     toggleSidebar: () => void;
+    toggleWatchList: () => void; // [Senior] 와치리스트 토글 액션 추가
     setUserName: (userName: string) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
     isSiderOpen: true,
+    isWatchListOpen: false, // 기본값: 닫힘
     userName: "이종현의 프론트엔드",
     toggleSidebar: () => set((state) => ({
         isSiderOpen: !state.isSiderOpen
+    })),
+    toggleWatchList: () => set((state) => ({
+        isWatchListOpen: !state.isWatchListOpen
     })),
     setUserName: (name: string) => set(() => ({
         userName: name

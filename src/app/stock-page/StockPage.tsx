@@ -7,6 +7,7 @@ import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
 import { useStockStore } from "@/store/useStockStore";
+import { useUiStore } from "@/store/uiStore"; // [Senior] UI 전역 스토어 추가
 import StockWatchListSidebar from "./components/StockWatchListSidebar";
 import { TrendingUp, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,13 +22,13 @@ export default function StockPage() {
         interval: '1d'
     });
     const { currentTicker, stockWatchList, toggleWatchList } = useStockStore();
+    const { isWatchListOpen, toggleWatchList: toggleSidebar } = useUiStore(); // [Senior] 전역 상태 사용
+
     const { stockData, isError, isLoading } = useStockSync(
         currentTicker,
         chartConfig.range,
         chartConfig.interval
     );
-
-    const [isWatchListOpen, setIsWatchListOpen] = useState(true);
 
     const isWatchList = stockWatchList.map(v => v.symbol).includes(currentTicker);
 
@@ -82,15 +83,6 @@ export default function StockPage() {
                                     )}
                                 />
                             </Button>
-                            {/* <Button
-                                className={cn(
-                                    "group flex items-center gap-2.5 px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border shadow-lg shrink-0",
-                                    "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 hover:shadow-blue-600/20 active:scale-95 duration-300"
-                                )}
-                            >
-                                <Star className={"size-4 fill-current group-hover:scale-125 transition-all duration-300"} />
-                                <span className="text-[14px]">관심목록 추가</span>
-                            </Button> */}
                         </div>
                     </div>
 
@@ -145,10 +137,10 @@ export default function StockPage() {
                 </div>
             </div>
 
-            {/* [4] 우측 보조 사이드바 */}
+            {/* [4] 우측 보조 사이드바 (전역 상태 사용) */}
             <StockWatchListSidebar
                 isOpen={isWatchListOpen}
-                onToggle={() => setIsWatchListOpen(!isWatchListOpen)}
+                onToggle={toggleSidebar}
             />
         </div>
     );
