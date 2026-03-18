@@ -6,7 +6,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { List } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 export default function Header() {
     const { userName, isWatchListOpen, toggleWatchList } = useUiStore();
     return (
@@ -14,9 +13,6 @@ export default function Header() {
             <div className="flex items-center gap-4 min-w-0">
                 <SidebarTrigger />
                 <div className="h-4 w-px bg-border group-data-[collapsible=icon]:hidden" />
-                <span className="text-sm font-semibold truncate group-data-[collapsible=icon]:block overflow-hidden">
-                    Stock Dashboard
-                </span>
             </div>
 
             <div className="flex items-center gap-4 shrink-0 ml-4">
