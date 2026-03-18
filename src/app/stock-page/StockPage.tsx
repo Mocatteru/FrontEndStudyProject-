@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useStockSync from "@/hooks/useStockSync";
 import StockSearch from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
@@ -8,8 +8,9 @@ import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
 import { useStockStore } from "@/store/useStockStore";
 import StockWatchListSidebar from "./components/StockWatchListSidebar";
-import { TrendingUp, Star } from "lucide-react";
+import { TrendingUp, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 /**
  * [StockPage - 메인 페이지 컴포넌트]
@@ -19,7 +20,7 @@ export default function StockPage() {
         range: '6mo',
         interval: '1d'
     });
-    const { currentTicker } = useStockStore();
+    const { currentTicker, stockWatchList, toggleWatchList } = useStockStore();
     const { stockData, isError, isLoading } = useStockSync(
         currentTicker,
         chartConfig.range,
@@ -28,7 +29,8 @@ export default function StockPage() {
 
     const [isWatchListOpen, setIsWatchListOpen] = useState(true);
 
-    // 차트 설정 변경
+    const isWatchList = stockWatchList.map(v => v.symbol).includes(currentTicker);
+
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
@@ -59,16 +61,36 @@ export default function StockPage() {
                             <StockSearch />
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <button
+                        <div className="flex  items-center gap-3">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => stockData && toggleWatchList(stockData)} // 클릭 시 토글 로직 실행
+                                className={cn(
+                                    "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
+                                    isWatchList
+                                        ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm" // 등록 시: 연한 레드 배경 + 밝은 레드 테두리
+                                        : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20" // 미등록 시: 회색 배경 + 회색 테두리
+                                )}
+                            >
+                                <Heart
+                                    className={cn(
+                                        "size-5 transition-all duration-500 ease-out",
+                                        isWatchList
+                                            ? "fill-current scale-110 text-red-500" // 등록 시: 하트 채움 + 확대
+                                            : "fill-none scale-100" // 미등록 시: 하트 비움
+                                    )}
+                                />
+                            </Button>
+                            {/* <Button
                                 className={cn(
                                     "group flex items-center gap-2.5 px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border shadow-lg shrink-0",
                                     "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 hover:shadow-blue-600/20 active:scale-95 duration-300"
                                 )}
                             >
-                                <Star className="size-4 fill-current group-hover:scale-125 transition-all duration-300" />
+                                <Star className={"size-4 fill-current group-hover:scale-125 transition-all duration-300"} />
                                 <span className="text-[14px]">관심목록 추가</span>
-                            </button>
+                            </Button> */}
                         </div>
                     </div>
 

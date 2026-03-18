@@ -18,14 +18,14 @@ describe('truncateTitle 함수 테스트', () => {
 
 describe('FormatPriceCurrency 함수 테스트', () => {
     it('1000000을 입력하면 1,000,000원 으로 반환해야 한다', () => {
-        expect(FormatPriceCurrency('KRW', "1000000")).toBe('1,000,000원');
+        expect(FormatPriceCurrency('KRW', 1000000)).toBe('1,000,000원');
     });
 
     it('1000을 입력하면 $1,000 으로 반환해야 한다', () => {
-        expect(FormatPriceCurrency('USD', "1000")).toBe('$1,000');
+        expect(FormatPriceCurrency('USD', 1000)).toBe('$1,000');
     });
 
     it('0을 입력하면 $0 으로 반환해야 한다', () => {
-        expect(FormatPriceCurrency("USD", "0 ")).toBe('$0');
+        expect(FormatPriceCurrency("USD", 0)).toBe('$0');
     });
 });

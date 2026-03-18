@@ -17,7 +17,7 @@ interface StockPriceCardProps {
 export default function StockPriceCard({ stockData }: StockPriceCardProps) {
     const isPositive = (stockData?.regularMarketChange ?? 0) >= 0;
 
-    const marketPrice = stockData.regularMarketPrice?.toLocaleString() ?? '0.00';
+    const marketPrice = stockData.regularMarketPrice ?? 0;
     const marketChange = Math.abs(stockData?.regularMarketChange ?? 0).toFixed(2);
     const marketChangePercent = stockData.regularMarketChangePercent?.toFixed(2) ?? '0.00';
 

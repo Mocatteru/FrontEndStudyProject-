@@ -251,11 +251,9 @@ export function FormatTickerKR(ticker: string) {
     return ticker.trim().toUpperCase();
 }
 
-//화폐 단위 결정하는 포맷 함수입니다.
-export function FormatPriceCurrency(currency: string, marketPrice: string) {
-    const price = Number(marketPrice.trim());
-    const formatted = isNaN(price) ? marketPrice : price.toLocaleString();
-    return currency === "KRW" ? `${formatted}원` : `$${formatted}`;
+//화폐 단위 결정 및 포멧팅 하는 포맷 함수입니다.
+export function FormatPriceCurrency(currency: string, marketPrice: number) {
+    return currency === "KRW" ? `${marketPrice.toLocaleString()}원` : `$${marketPrice.toFixed(2).toLocaleString()}`;
 }
 
 //티커 트림 후 업퍼케이스 포맷 함수입니다.
