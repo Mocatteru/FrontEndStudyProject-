@@ -22,7 +22,7 @@ export default function RestDataPage() {
         return <div className="text-red-500">데이터를 불러오는 중 오류가 발생했습니다.</div>
 
     return (
-        <div className="space-y-6" >
+        <div className="p-10 space-y-6" >
             <h2 className="text-3xl font-bold">REST API Posts</h2>
             <button onClick={() => useErrorStore.getState().showError('에러 발생')}>에러버튼</button>
             <div className="grid gap-4 md:grid-cols-2">
