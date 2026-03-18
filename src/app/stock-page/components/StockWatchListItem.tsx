@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { FormatPriceCurrency } from "@/types/stock";
+import { useCallback } from "react";
+import { useStockStore } from "@/store/useStockStore";
 
 interface StockWatchListItemProps {
     ticker: string;
@@ -20,9 +22,16 @@ export default function StockWatchListItem({ ticker, name, price, change, change
     const formattedPrice = FormatPriceCurrency(currency, price);
     const formattedChange = FormatPriceCurrency(currency, Number(marketChange));
 
+    const { setCurrentTicker } = useStockStore();
+
+    const onClickWatchListItem = useCallback(() => {
+        setCurrentTicker(ticker);
+    }, [ticker, setCurrentTicker])
+
     return (
         <SidebarMenuItem className="px-1"> {/* 사이드바 좌우 여백 확보 */}
             <SidebarMenuButton
+                onClick={onClickWatchListItem}
                 className={cn(
                     "h-auto py-6 px-6 rounded-[2.5rem] transition-all duration-300 group relative",
                     "bg-card/40 dark:bg-white/3 backdrop-blur-sm", // 상시 반투명 배경

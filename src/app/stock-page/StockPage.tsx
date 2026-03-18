@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
  */
 export default function StockPage() {
     const [chartConfig, setChartConfig] = useState({
-        range: '6mo',
+        range: '1y',
         interval: '1d'
     });
     const { currentTicker, stockWatchList, toggleWatchList } = useStockStore();

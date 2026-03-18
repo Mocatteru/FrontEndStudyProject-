@@ -51,7 +51,10 @@ export async function GET(request: NextRequest) {
 
         switch (range) {
             case '1d': start.setDate(end.getDate() - 1); break;
+            case '2d': start.setDate(end.getDate() - 2); break; // [Senior] 촘촘한 분봉 조회를 위한 2일 범위 추가
+            case '3d': start.setDate(end.getDate() - 3); break; // [Senior] 촘촘한 분봉 조회를 위한 3일 범위 추가
             case '5d': start.setDate(end.getDate() - 5); break;
+            case '7d': start.setDate(end.getDate() - 7); break; // [Senior] 일주일치 분봉 조회를 위한 범위 추가
             case '1mo': start.setMonth(end.getMonth() - 1); break;
             case '3mo': start.setMonth(end.getMonth() - 3); break;
             case '6mo': start.setMonth(end.getMonth() - 6); break;
@@ -77,7 +80,8 @@ export async function GET(request: NextRequest) {
             const chartResult = await yahoo.chart(ticker, {
                 period1: start,
                 period2: end,
-                interval: interval as "1d" | "5d" | "1mo" | "3mo" | "6mo" | "1y" | "2y" | "5y" | "max",
+                // [Senior] Yahoo API가 허용하는 모든 규격(1m, 2m, 5m, 15m 등)을 안전하게 수용하도록 타입을 확장했습니다.
+                interval: interval as any,
             });
 
             historical = ((chartResult.quotes || []) as {

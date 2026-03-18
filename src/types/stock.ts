@@ -223,21 +223,32 @@ export interface ChartPeriodOption {
 }
 
 export const PERIOD_OPTIONS = {
-    // 분봉: 증권사처럼 분 단위 세분화 (HTS/MTS 사용 경험 반영)
+    /**
+     * [MINUTE Options - 분봉]
+     * - 수정 근거 (Senior's Perspective):
+     *   1. 규격 정규화: Yahoo API에서 지원하지 않는 3m, 10m 단위를 각각 2m, 15m로 수정하였습니다.
+     *   2. 성능 최적화: 초기에 과도한 데이터를 불러오는 것을 방지하기 위해 range를 단기(1d~5d)로 제한하였습니다.
+     */
     MINUTE: [
         { label: '1분', range: '1d', interval: '1m' },
-        { label: '3분', range: '5d', interval: '3m' },
-        { label: '5분', range: '5d', interval: '5m' },
-        { label: '10분', range: '5d', interval: '10m' },
-        { label: '30분', range: '5d', interval: '30m' },
+        { label: '2분', range: '1d', interval: '2m' },   // Yahoo 규격(2m) 반영 및 리소스 절약
+        { label: '5분', range: '1d', interval: '5m' },
+        { label: '15분', range: '2d', interval: '15m' }, // 중기 분봉으로 확장 및 데이터 부하 분산
+        { label: '30분', range: '3d', interval: '30m' },
         { label: '60분', range: '5d', interval: '60m' },
     ] as ChartPeriodOption[],
-    // 주요 기간: 일, 주, 월, 년 단위의 큰 흐름 파악용
+
+    /**
+     * [MAJOR Options - 주요 기간]
+     * - 수정 근거:
+     *   1. 일봉: 전반적인 추세 파악을 위해 표준적인 1년(1y) 범위를 권장합니다.
+     *   2. 주봉: 장기 이평선과 거대 지지 라인을 보기 위해 5년(5y)으로 확장했습니다.
+     */
     MAJOR: [
-        { label: '일', range: '6mo', interval: '1d' },
-        { label: '주', range: '2y', interval: '1wk' },
-        { label: '월', range: 'max', interval: '1mo' },
-        { label: '년', range: 'max', interval: '3mo' },
+        { label: '일', range: '1y', interval: '1d' },    // 실무 차트 분석 기본값 (약 252개 캔들)
+        { label: '주', range: '5y', interval: '1wk' },   // 역사적 고점/저점 파악용
+        { label: '월', range: 'max', interval: '1mo' },  // 전체 히스토리 월봉
+        { label: '분기', range: 'max', interval: '3mo' }, // 거시적 흐름 파악 (년봉 대용)
     ] as ChartPeriodOption[]
 };
 

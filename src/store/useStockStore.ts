@@ -37,6 +37,11 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             addRecentSearch: (ticker: string) => set((state) => ({
                 recentSearchList: [ticker.toUpperCase(), ...state.recentSearchList.filter(t => t !== ticker.toUpperCase())].slice(0, 10)
             })),
+            /**
+             * [TODO: 성능 최적화 - 데이터 정규화]
+             * 관심 종목(Watchlist) 저장 시 historical(차트 데이터) 배열이 함께 저장되어 LocalStorage가 무거워질 수 있습니다.
+             * 추후 historical을 제외하고 필요한 메타데이터만 저장하도록 필터링 로직을 추가하는 것을 권장합니다.
+             */
             toggleWatchList: (stock: Stock) => set((state) => ({
                 stockWatchList: state.stockWatchList.map(m => m.symbol).includes(stock.symbol) ?
                     state.stockWatchList.filter(m => m.symbol !== stock.symbol) : state.stockWatchList.concat(stock)
