@@ -1,31 +1,20 @@
 'use client'
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import useStockSync from "@/hooks/useStockSync";
 import StockSearch from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
-import { isInt } from 'radash';
-import { KR_TICKER_LENGTH, KR_TICKER_SUFFIX } from "@/types/stock";
 import { useStockStore } from "@/store/useStockStore";
-
-
-
+import StockWatchListSidebar from "./components/StockWatchListSidebar";
+import { TrendingUp, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
  * [StockPage - 메인 페이지 컴포넌트]
- * 
- * [Senior's Architecture Tips]
- * 1. 복잡성 분리: 거대했던 파일을 기능별 컴포넌트로 쪼개어 가독성을 높였습니다.
- * 2. 상태 응집도: 개별로 관리하던 range, interval을 하나로 묶어 업데이트 시 일관성을 보장합니다.
- * 3. 관심사 분리(SoC): 페이지는 '데이터의 흐름'만 제어하고, 실제 UI 그리기나 로직은 하위 컴포넌트가 담당합니다.
  */
 export default function StockPage() {
-
-    // [학습 포인트: 상태 그룹화 (State Grouping)]
-    // 서로 같이 바뀌어야 하는 데이터들은 하나의 객체로 묶어 관리하는 것이 좋습니다.
-    // '5분봉' 선택 시 range='5d', interval='5m'이 동시에 바뀌어야 하므로 한 번의 setState로 처리합니다.
     const [chartConfig, setChartConfig] = useState({
         range: '6mo',
         interval: '1d'
@@ -37,63 +26,108 @@ export default function StockPage() {
         chartConfig.interval
     );
 
+    const [isWatchListOpen, setIsWatchListOpen] = useState(true);
 
-
-    // 차트 설정 변경 (하위 컴포넌트에서 호출됨)
+    // 차트 설정 변경
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
 
     return (
-        <div className="p-6 space-y-8">
-            <header className="space-y-2">
-                <h1 className="text-4xl font-extrabold tracking-tight">Stock Dashboard</h1>
-                <p className="text-gray-500 dark:text-gray-400">실시간 주가 정보와 기술적 차트를 분석해보세요.</p>
-            </header>
+        <div className="flex flex-1 min-w-0 h-full overflow-hidden bg-background relative selection:bg-blue-500/20">
+            {/* 메인 섹션 */}
+            <div className="flex-1 flex flex-col min-w-0 h-full border-r border-black/5 dark:border-white/5">
+                {/* 메인 스크롤 가능 구역 */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scroll-smooth">
 
-            {/* 검색 섹션 */}
-            <StockSearch />
+                    {/* [1] 헤더 타이틀 섹션 (스크롤하면 위로 사라짐) */}
+                    <div className="px-10 pt-12 pb-6 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
+                        <div className="flex items-center gap-5">
+                            <div className="p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
+                                <TrendingUp className="size-8 text-blue-500" />
+                            </div>
+                            <div>
+                                <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">Stock Dashboard</h1>
+                                <p className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">Market Analytics Node</p>
+                            </div>
+                        </div>
+                    </div>
 
-            <hr className="border-white/10" />
+                    {/* [2] 스티키 액션 바: 검색창 + 추가 버튼 (상단 고정) */}
+                    <div className="sticky top-0 z-40 justify-between bg-background/95 backdrop-blur-xl px-10 py-5 flex items-center gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm">
+                        <div className="flex-1 max-w-3xl">
+                            <StockSearch />
+                        </div>
 
-            {/* 로딩 상태 UI */}
-            {isLoading && (
-                <div className="flex flex-col items-center justify-center p-20 space-y-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                    <p className="text-gray-400 animate-pulse">데이터를 불러오는 중입니다...</p>
-                </div>
-            )}
+                        <div className="flex items-center gap-3">
+                            <button
+                                className={cn(
+                                    "group flex items-center gap-2.5 px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border shadow-lg shrink-0",
+                                    "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 hover:shadow-blue-600/20 active:scale-95 duration-300"
+                                )}
+                            >
+                                <Star className="size-4 fill-current group-hover:scale-125 transition-all duration-300" />
+                                <span className="text-[14px]">관심목록 추가</span>
+                            </button>
+                        </div>
+                    </div>
 
-            {/* 에러 상태 UI */}
-            {isError && (
-                <div className="text-red-500 bg-red-500/10 p-6 rounded-2xl border border-red-500/20 animate-in fade-in zoom-in-95">
-                    <h3 className="font-bold text-lg mb-1">검색 결과가 없습니다</h3>
-                    <p>정확한 티커(예: AAPL, TSLA)를 입력하셨는지 확인해 주세요.</p>
-                    <p>코스닥을 찾고 계셨나요? 티커 뒤에 .KQ를 붙여주세요. (예: 000000.KQ)</p>
-                </div>
-            )}
+                    {/* [3] 메인 콘텐츠 콘텐츠 영역 */}
+                    <div className="p-10 space-y-12 bg-muted/5 dark:bg-background/20 min-h-screen">
+                        {/* 로딩 상태 UI */}
+                        {isLoading && (
+                            <div className="flex flex-col items-center justify-center py-40 animate-in fade-in duration-700">
+                                <div className="relative">
+                                    <div className="animate-spin rounded-full h-24 w-24 border-b-4 border-blue-500 shadow-2xl shadow-blue-500/20"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <TrendingUp className="size-6 text-blue-500/60 animate-pulse" />
+                                    </div>
+                                </div>
+                                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse italic">Synchronizing Data Nodes</p>
+                            </div>
+                        )}
 
-            {/* 결과 출력 섹션 */}
-            {stockData && !isLoading && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    {/* 1. 시세 요약 카드 */}
-                    <StockPriceCard stockData={stockData} />
+                        {/* 에러 상태 UI */}
+                        {isError && (
+                            <div className="bg-red-500/5 dark:bg-red-500/10 p-12 rounded-[4rem] border border-red-500/20 shadow-2xl shadow-red-500/5 animate-in fade-in zoom-in-95 duration-500 text-center max-w-4xl mx-auto">
+                                <TrendingUp className="size-16 text-red-500/60 rotate-180 mx-auto mb-8 animate-bounce" />
+                                <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase italic">Critical Failure: Invalid Ticker</h3>
+                                <p className="text-muted-foreground font-semibold max-w-lg mx-auto">티커 코드 정보가 우리 노드시스템에 존재하지 않습니다. 정확한 기호를 입력하셨는지 시스템 점검을 부탁드립니다.</p>
+                            </div>
+                        )}
 
-                    {/* 2. 인터랙티브 차트 영역 */}
-                    <StockChart
-                        stockData={stockData}
-                        range={chartConfig.range}
-                        interval={chartConfig.interval}
-                        onConfigChange={handleConfigChange}
-                    />
+                        {/* 결과 출력 섹션 */}
+                        {stockData && !isLoading && (
+                            <div className="space-y-16 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+                                <StockPriceCard stockData={stockData} />
 
-                    {/* 3. 상세 지표 통계 그리드 */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold px-1">상세 지표 (Statistics)</h2>
-                        <StockStats stockData={stockData} />
+                                <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] overflow-hidden shadow-2xl shadow-black/5 dark:shadow-white/5 transition-all hover:shadow-blue-500/10 hover:border-blue-500/20 duration-500">
+                                    <StockChart
+                                        stockData={stockData}
+                                        range={chartConfig.range}
+                                        interval={chartConfig.interval}
+                                        onConfigChange={handleConfigChange}
+                                    />
+                                </div>
+
+                                <div className="space-y-8">
+                                    <div className="flex items-center gap-4 group cursor-pointer w-fit">
+                                        <div className="w-2 h-8 bg-blue-500 rounded-full group-hover:h-12 transition-all duration-500 shadow-xl shadow-blue-500/50" />
+                                        <h2 className="text-3xl font-black tracking-tighter italic uppercase text-foreground/90">Tactical Market Data</h2>
+                                    </div>
+                                    <StockStats stockData={stockData} />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
+
+            {/* [4] 우측 보조 사이드바 */}
+            <StockWatchListSidebar
+                isOpen={isWatchListOpen}
+                onToggle={() => setIsWatchListOpen(!isWatchListOpen)}
+            />
         </div>
-    )
+    );
 }

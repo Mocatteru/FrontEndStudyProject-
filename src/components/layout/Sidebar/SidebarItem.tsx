@@ -2,6 +2,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
+
+//Legacy
 function SidebarItem({ menuItems }: { menuItems: { name: string; href: string }[] }) {
     const pathname = usePathname();
 
