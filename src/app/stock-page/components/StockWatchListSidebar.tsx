@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarMenu } from "@/components/ui/sidebar";
-import { Star, List, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, List, ChevronLeft, ChevronRight, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StockWatchListSidebarProps {
@@ -31,7 +31,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                             onClick={onToggle}
                             className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-all text-muted-foreground hover:text-foreground active:scale-90"
                         >
-                            <ChevronRight className="size-5" />
+                            <Menu className="size-5" />
                         </button>
                     </>
                 ) : (
@@ -39,7 +39,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                         onClick={onToggle}
                         className="p-3 bg-blue-500/10 text-blue-500 rounded-2xl hover:bg-blue-500/20 transition-all active:scale-90 shadow-sm border border-blue-500/10"
                     >
-                        <ChevronLeft className="size-5" />
+                        <Menu className="size-5" />
                     </button>
                 )}
             </SidebarHeader>
@@ -49,12 +49,12 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                 !isOpen && "items-center pt-6"
             )}>
                 <SidebarGroup className={cn("w-full transition-all duration-500", !isOpen && "px-0")}>
-                    {isOpen && (
+                    {/* {isOpen && (
                         <SidebarGroupLabel className="flex items-center gap-2 mb-2 px-2 animate-in fade-in slide-in-from-left-2">
                             <List className="size-3" />
                             <span>Watchlist Summary</span>
                         </SidebarGroupLabel>
-                    )}
+                    )} */}
 
                     <SidebarMenu className={cn("px-2 transition-all duration-500", !isOpen && "px-0 flex flex-col items-center gap-4")}>
                         {isOpen ? (
@@ -64,16 +64,14 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                 <p className="text-[10px] text-muted-foreground/60 mt-1 italic">자주 보는 종목을 추가해보세요!</p>
                             </div>
                         ) : (
-                            <div className="p-2 text-muted-foreground/40 hover:text-blue-500 transition-colors cursor-help">
-                                <List className="size-5" />
-                            </div>
+                            null
                         )}
 
-                        {!isOpen && (
+                        {/* {!isOpen && (
                             <div className="size-10 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-muted-foreground/20 border border-black/5">
                                 <Star className="size-4" />
                             </div>
-                        )}
+                        )} */}
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
