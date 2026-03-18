@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, History, X } from "lucide-react";
 
-export default function StockSearch() {
+export default function StockSearchInput() {
     const [ticker, setTicker] = useState<string>('');
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -34,6 +34,7 @@ export default function StockSearch() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground mr-1" />
                     <Input
                         type="text"
+                        autoComplete="off"
                         value={ticker}
                         onChange={(e) => setTicker(e.target.value)}
                         placeholder="종목 입력 (예: NVDA, 005930)"

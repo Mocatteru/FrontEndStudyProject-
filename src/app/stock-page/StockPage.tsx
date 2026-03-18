@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import useStockSync from "@/hooks/useStockSync";
-import StockSearch from "./components/StockSearch";
+import StockSearchInput from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
 import StockStats from "./components/StockStats";
@@ -59,7 +59,7 @@ export default function StockPage() {
                     {/* [2] 스티키 액션 바: 검색창 + 추가 버튼 (상단 고정) */}
                     <div className="sticky top-0 z-40 justify-between bg-background/95 backdrop-blur-xl px-10 py-5 flex items-center gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm">
                         <div className="flex-1 max-w-3xl">
-                            <StockSearch />
+                            <StockSearchInput />
                         </div>
 
                         <div className="flex  items-center gap-3">
