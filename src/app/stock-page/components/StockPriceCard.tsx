@@ -52,11 +52,13 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
             <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
                 {/* 좌측 정보 영역: flex-1과 min-w-0으로 유연하게 조절 */}
                 <div className="flex-1 min-w-0 space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-2xl sm:text-3xl font-black tracking-tighter group-hover:text-blue-500 transition-all duration-300 truncate">
-                            {stockData?.longName || stockData?.shortName || 'Unknown'}
-                            <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest">{stockData?.symbol}</span>
-                        </h3>
+                    <div className="flex flex-col items-start gap-4">
+                        <div className="w-full">
+                            <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300 whitespace-normal break-words">
+                                {stockData?.longName || stockData?.shortName || 'Unknown'}
+                                <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
+                            </h3>
+                        </div>
 
                         {/* 메모 모달 트리거 */}
                         <Dialog open={open} onOpenChange={setOpen}>
@@ -125,17 +127,17 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                 </div>
 
                 {/* 우측 가격 영역: shrink-0으로 고정 너비 확보 */}
-                <div className="text-right space-y-2 shrink-0 self-start sm:self-center">
-                    <p className="text-3xl pb-4 sm:text-4xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
+                <div className="pb-18 text-right space-y-2 shrink-0 self-start sm:self-center">
+                    <p className="text-3xl pr-2 sm:text-4xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
                         {FormatPriceCurrency(stockData.currency, marketPrice)}
                     </p>
                     <div className={cn(
-                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-base sm:text-lg tabular-nums shadow-sm border",
+                        "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-xl font-black text-base sm:text-lg tabular-nums shadow-sm border",
                         isPositive
                             ? "bg-green-500/10 border-green-500/20 text-green-500"
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                     )}>
-                        <span className="text-sm">{isPositive ? "▲" : "▼"}</span>
+                        <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
                         {marketChange}
                         <span className="text-[11px] opacity-60">({marketChangePercent}%)</span>
                     </div>
