@@ -5,6 +5,8 @@ import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import StockWatchListItem from "./StockWatchListItem";
 import { useStockStore } from "@/store/useStockStore";
+import * as _ from "radash";
+
 interface StockWatchListSidebarProps {
     isOpen: boolean;
     onToggle: () => void;
@@ -80,13 +82,18 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     <div className="h-full overflow-y-auto custom-scrollbar p-3">
                         <SidebarGroup className={cn("w-full transition-all duration-500", !isOpen && "px-0")}>
                             <SidebarMenu className={cn("gap-3 transition-all duration-500", !isOpen && "items-center")}>
-                                {stockWatchList.map((v) => (
-                                    <StockWatchListItem
-                                        key={v.ticker}
-                                        {...v}
-                                        isOpen={isOpen}
-                                    />
-                                ))}
+                                {_.isEmpty(stockWatchList) ?
+                                    (isOpen && <div className="flex items-center justify-center h-full">
+                                        <span className="text-muted-foreground">관심종목이 없습니다</span>
+                                    </div>)
+                                    :
+                                    stockWatchList.map((v) => (
+                                        <StockWatchListItem
+                                            key={v.ticker}
+                                            {...v}
+                                            isOpen={isOpen}
+                                        />
+                                    ))}
                             </SidebarMenu>
                         </SidebarGroup>
                     </div>

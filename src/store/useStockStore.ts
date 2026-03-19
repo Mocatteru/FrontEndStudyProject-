@@ -57,6 +57,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             clearRecentSearch: () => set(() => ({
                 recentSearchList: []
             })),
+            clearStockWatchList: () => set(() => ({
+                stockWatchList: []
+            })),
             updateStockWatchList: (stock: StockWatchListItemProps) => set((state) => ({
                 stockWatchList: state.stockWatchList.map(m => m.ticker === stock.ticker ? stock : m)
             }))
