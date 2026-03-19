@@ -42,9 +42,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                 recentSearchList: [ticker.toUpperCase(), ...state.recentSearchList.filter(t => t !== ticker.toUpperCase())].slice(0, 10)
             })),
             /**
-             * [TODO: 성능 최적화 - 데이터 정규화]
-             * 관심 종목(Watchlist) 저장 시 historical(차트 데이터) 배열이 함께 저장되어 LocalStorage가 무거워질 수 있습니다.
-             * 추후 historical을 제외하고 필요한 메타데이터만 저장하도록 필터링 로직을 추가하는 것을 권장합니다.
+             * [완료: 성능 최적화 - 데이터 정규화 및 선택적 저장]
+             * 1. StockWatchListItemProps를 도입하여 관심종목 저장 시 대용량 historical 데이터를 제외함.
+             * 2. persist 미들웨어의 partialize 옵션을 사용하여 불필요한 원본 stock 데이터가 로컬스토리지에 저장되는 것을 방지함.
              */
             toggleWatchList: (stock: StockWatchListItemProps) => set((state) => ({
                 stockWatchList: state.stockWatchList.map(m => m.ticker).includes(stock.ticker) ?
@@ -63,6 +63,11 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
         }),
         {
             name: "stock-storage",
+            partialize: (state) => ({
+                recentSearchList: state.recentSearchList,
+                stockWatchList: state.stockWatchList,
+                currentTicker: state.currentTicker
+            })
         }
     )
 );
