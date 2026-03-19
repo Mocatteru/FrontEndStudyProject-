@@ -3,6 +3,7 @@
  * - 역할: 주식 데이터의 구조를 정의하여 타입 안정성을 확보합니다.
  * - 장점: 자동 완성 기능과 컴파일 타임의 에러 체크를 통해 런타임 에러를 사전에 방지합니다.
  */
+import { StockWatchListItemProps } from '@/app/stock-page/components/StockWatchListItem';
 import type { ApexOptions } from 'apexcharts';
 export interface Stock {
     // 1. 기본 식별 정보
@@ -263,11 +264,26 @@ export function FormatTickerKR(ticker: string) {
 }
 
 //화폐 단위 결정 및 포멧팅 하는 포맷 함수입니다.
-export function FormatPriceCurrency(currency: string, marketPrice: number) {
-    return currency === "KRW" ? `${marketPrice.toLocaleString()}원` : `$${marketPrice.toFixed(2).toLocaleString()}`;
+export function FormatPriceCurrency(currency: string | undefined, marketPrice: number | undefined) {
+    if (marketPrice === undefined || marketPrice === null || isNaN(marketPrice)) {
+        return "---";
+    }
+    return currency === "KRW" ? `${marketPrice.toLocaleString()}원` : `$${Number(marketPrice.toFixed(2)).toLocaleString()}`;
 }
 
 //티커 트림 후 업퍼케이스 포맷 함수입니다.
 export function FormatTicker(ticker: string) {
     return ticker.toUpperCase().trim();
+}
+
+export function FormatStockWatchListItem(stock: Stock): StockWatchListItemProps {
+    return {
+        ticker: stock.symbol || '',
+        name: stock.longName || stock.shortName || 'N/A',
+        price: stock.regularMarketPrice ?? 0,
+        change: stock.regularMarketChange ?? 0,
+        changePercent: stock.regularMarketChangePercent ?? 0,
+        isPositive: (stock.regularMarketChange ?? 0) > 0,
+        currency: stock.currency ?? '',
+    }
 }

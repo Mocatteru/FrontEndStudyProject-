@@ -12,6 +12,7 @@ import StockWatchListSidebar from "./components/StockWatchListSidebar";
 import { TrendingUp, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FormatStockWatchListItem } from "@/types/stock";
 
 /**
  * [StockPage - 메인 페이지 컴포넌트]
@@ -21,7 +22,7 @@ export default function StockPage() {
         range: '1y',
         interval: '1d'
     });
-    const { currentTicker, stockWatchList, toggleWatchList } = useStockStore();
+    const { currentTicker, stockWatchList, toggleWatchList, updateStockWatchList } = useStockStore();
     const { isWatchListOpen, toggleWatchList: toggleSidebar } = useUiStore(); // [Senior] 전역 상태 사용
 
     const { stockData, isError, isLoading } = useStockSync(
@@ -30,11 +31,17 @@ export default function StockPage() {
         chartConfig.interval
     );
 
-    const isWatchList = stockWatchList.map(v => v.symbol).includes(currentTicker);
+    const isWatchList = stockWatchList.map(v => v.ticker).includes(currentTicker);
 
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
+
+    useEffect(() => {
+        if (stockData) {
+            updateStockWatchList(FormatStockWatchListItem(stockData));
+        }
+    }, [stockData, updateStockWatchList])
 
     return (
         <div className="flex flex-1 min-w-0 h-full overflow-hidden bg-background relative selection:bg-blue-500/20">
@@ -66,7 +73,7 @@ export default function StockPage() {
                             <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => stockData && toggleWatchList(stockData)} // 클릭 시 토글 로직 실행
+                                onClick={() => stockData && toggleWatchList(FormatStockWatchListItem(stockData))} // 클릭 시 토글 로직 실행
                                 className={cn(
                                     "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
                                     isWatchList

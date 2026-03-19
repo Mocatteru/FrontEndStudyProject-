@@ -6,7 +6,7 @@ import { FormatPriceCurrency } from "@/types/stock";
 import { useCallback } from "react";
 import { useStockStore } from "@/store/useStockStore";
 
-interface StockWatchListItemProps {
+export interface StockWatchListItemProps {
     ticker: string;
     name: string;
     price: number;

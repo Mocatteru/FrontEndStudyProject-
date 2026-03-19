@@ -1,16 +1,20 @@
+import { StockWatchListItemProps } from "@/app/stock-page/components/StockWatchListItem";
 import { Stock } from "@/types/stock";
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; //  1. 미들웨어 추가
+
+
 
 interface StockState {
     stock: Stock | null,
     currentTicker: string,
     recentSearchList: string[],
-    stockWatchList: Stock[],
+    stockWatchList: StockWatchListItemProps[],
     setCurrentTicker: (ticker: string) => void,
     addRecentSearch: (ticker: string) => void,
-    toggleWatchList: (stock: Stock) => void,
+    toggleWatchList: (stock: StockWatchListItemProps) => void,
     removeRecentSearch: (ticker: string) => void,
+    updateStockWatchList: (stock: StockWatchListItemProps) => void,
     clearRecentSearch: () => void,
 
 }
@@ -42,9 +46,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
              * 관심 종목(Watchlist) 저장 시 historical(차트 데이터) 배열이 함께 저장되어 LocalStorage가 무거워질 수 있습니다.
              * 추후 historical을 제외하고 필요한 메타데이터만 저장하도록 필터링 로직을 추가하는 것을 권장합니다.
              */
-            toggleWatchList: (stock: Stock) => set((state) => ({
-                stockWatchList: state.stockWatchList.map(m => m.symbol).includes(stock.symbol) ?
-                    state.stockWatchList.filter(m => m.symbol !== stock.symbol) : state.stockWatchList.concat(stock)
+            toggleWatchList: (stock: StockWatchListItemProps) => set((state) => ({
+                stockWatchList: state.stockWatchList.map(m => m.ticker).includes(stock.ticker) ?
+                    state.stockWatchList.filter(m => m.ticker !== stock.ticker) : state.stockWatchList.concat(stock)
 
             })),
             removeRecentSearch: (ticker: string) => set((state) => ({
@@ -52,6 +56,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             })),
             clearRecentSearch: () => set(() => ({
                 recentSearchList: []
+            })),
+            updateStockWatchList: (stock: StockWatchListItemProps) => set((state) => ({
+                stockWatchList: state.stockWatchList.map(m => m.ticker === stock.ticker ? stock : m)
             }))
         }),
         {
