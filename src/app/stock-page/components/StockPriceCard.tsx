@@ -54,7 +54,7 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                 <div className="flex-1 min-w-0 space-y-4">
                     <div className="flex flex-col items-start gap-4">
                         <div className="w-full">
-                            <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300 whitespace-normal break-words">
+                            <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300 whitespace-normal wrap-break-word">
                                 {stockData?.longName || stockData?.shortName || 'Unknown'}
                                 <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                             </h3>
