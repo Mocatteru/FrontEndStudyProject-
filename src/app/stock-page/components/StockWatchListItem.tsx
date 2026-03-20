@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { FormatPriceCurrency } from "@/types/stock";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { useStockStore } from "@/store/useStockStore";
 
 export interface StockWatchListItemProps {
@@ -18,12 +18,13 @@ export interface StockWatchListItemProps {
 }
 
 
-export default function StockWatchListItem({ ticker, name, price, change, changePercent, isPositive, currency, isOpen = true }: StockWatchListItemProps) {
+const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, isPositive, currency, isOpen = true }: StockWatchListItemProps) => {
     const marketChange = Math.abs(change).toFixed(2);
     const formattedPrice = FormatPriceCurrency(currency, price);
     const formattedChange = FormatPriceCurrency(currency, Number(marketChange));
 
-    const { setCurrentTicker } = useStockStore();
+    // [Senior Optimization] Selector를 사용하여 액션만 구독
+    const setCurrentTicker = useStockStore(s => s.setCurrentTicker);
 
     const onClickWatchListItem = useCallback(() => {
         setCurrentTicker(ticker);
@@ -107,4 +108,8 @@ export default function StockWatchListItem({ ticker, name, price, change, change
             </SidebarMenuButton>
         </SidebarMenuItem>
     );
-}
+});
+
+StockWatchListItem.displayName = "StockWatchListItem";
+
+export default StockWatchListItem;

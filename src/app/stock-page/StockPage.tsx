@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import useStockSync from "@/hooks/useStockSync";
 import StockSearchInput from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
@@ -22,8 +22,16 @@ export default function StockPage() {
         range: '1y',
         interval: '1d'
     });
-    const { currentTicker, stockWatchList, toggleWatchList, updateStockWatchList } = useStockStore();
-    const { isWatchListOpen, toggleWatchList: toggleSidebar } = useUiStore(); // [Senior] 전역 상태 사용
+    
+    // [Senior Optimization] Selector를 사용하여 필요한 상태만 구독 (리렌더링 방지)
+    const currentTicker = useStockStore(s => s.currentTicker);
+    const stockWatchList = useStockStore(s => s.stockWatchList);
+    const toggleWatchList = useStockStore(s => s.toggleWatchList);
+    const updateStockWatchList = useStockStore(s => s.updateStockWatchList);
+    
+    // UI 상태도 선택적으로 구독
+    const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
+    const toggleSidebar = useUiStore(s => s.toggleWatchList);
 
     const { stockData, isError, isLoading } = useStockSync(
         currentTicker,
@@ -31,17 +39,22 @@ export default function StockPage() {
         chartConfig.interval
     );
 
-    const isWatchList = stockWatchList.map(v => v.ticker).includes(currentTicker);
+    // [Senior Optimization] useMemo를 통한 연산 최적화
+    const isWatchList = useMemo(() => 
+        stockWatchList.some(v => v.ticker === currentTicker),
+    [stockWatchList, currentTicker]);
 
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
 
+    // [Senior Optimization] 데이터 동기화 시 불필요한 호출 방지
     useEffect(() => {
-        if (stockData) {
+        if (stockData && currentTicker) {
+            // 주식 검색 페이지에 있을 때만 동기화
             updateStockWatchList(FormatStockWatchListItem(stockData));
         }
-    }, [stockData, updateStockWatchList])
+    }, [stockData, currentTicker, updateStockWatchList])
 
     return (
         <div className="flex flex-1 min-w-0 h-full overflow-hidden bg-background relative selection:bg-blue-500/20">

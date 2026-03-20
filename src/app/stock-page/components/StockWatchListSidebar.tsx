@@ -19,7 +19,9 @@ interface StockWatchListSidebarProps {
  *   2. Mobile: 고정 위치(Fixed Overlay)를 가지며 닫힘 시 완전 숨김(w-0)
  */
 export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchListSidebarProps) {
-    const { stockWatchList } = useStockStore();
+    // [Senior Optimization] Selector를 사용하여 필요한 상태만 구독
+    const stockWatchList = useStockStore(s => s.stockWatchList);
+    
     return (
         <>
             {/* [Senior] Mobile Backdrop: 모바일에서 사이드바가 열릴 때 배경을 블러 처리하고 클릭 시 닫히도록 구현 */}

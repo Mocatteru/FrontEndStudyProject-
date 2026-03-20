@@ -64,9 +64,24 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             clearStockWatchList: () => set(() => ({
                 stockWatchList: []
             })),
-            updateStockWatchList: (stock: StockWatchListItemProps) => set((state) => ({
-                stockWatchList: state.stockWatchList.map(m => m.ticker === stock.ticker ? stock : m)
-            })),
+            updateStockWatchList: (stock: StockWatchListItemProps) => set((state) => {
+                const existingIndex = state.stockWatchList.findIndex(m => m.ticker === stock.ticker);
+                if (existingIndex === -1) return state; // 존재하지 않으면 무시
+
+                const existingStock = state.stockWatchList[existingIndex];
+
+                // [Senior Optimization] 실제 데이터(가격, 등락)가 바뀌었을 때만 업데이트
+                const isPriceChanged = existingStock.price !== stock.price;
+                const isChangeChanged = existingStock.changePercent !== stock.changePercent;
+
+                if (!isPriceChanged && !isChangeChanged) {
+                    return state; // 데이터가 같으면 기존 상태 그대로 유지 (리렌더링 방지)
+                }
+
+                const newList = [...state.stockWatchList];
+                newList[existingIndex] = stock;
+                return { stockWatchList: newList };
+            }),
             setStockMemo: (ticker: string, memo: string) => set((state) => {
                 const isExist = state.stockMemo.some(m => m.ticker === ticker);
                 return {
