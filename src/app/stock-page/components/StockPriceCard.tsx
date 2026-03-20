@@ -14,13 +14,15 @@ interface StockPriceCardProps {
 }
 
 function getMarketStateName(state: string | undefined): string {
-    switch (state) {
-        case 'REGULAR': return '정규장';
-        case 'POST': return '장후';
-        case 'PRE': return '장전';
-        case 'CLOSED': return '장마감';
-        default: return '불명';
-    }
+    if (!state) return '불명';
+
+    // [Senior Robust Logic] API 버전에 따라 PREPRE, POSTPOST 등으로 들어오는 변종을 모두 통합 처리합니다.
+    const upperState = state.toUpperCase();
+    if (upperState.includes('REGULAR')) return '정규장';
+    if (upperState.includes('POST')) return '장후';
+    if (upperState.includes('PRE')) return '장전';
+    if (upperState.includes('CLOSED')) return '장마감';
+    return '불명';
 }
 
 const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
