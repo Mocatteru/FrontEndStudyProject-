@@ -3,9 +3,11 @@
 import { SidebarContent, SidebarHeader, SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import StockWatchListItem from "./StockWatchListItem";
+import StockWatchListItem, { StockWatchListItemProps } from "./StockWatchListItem";
 import { useStockStore } from "@/store/useStockStore";
 import * as _ from "radash";
+import { useMemo, useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StockWatchListSidebarProps {
     isOpen: boolean;
@@ -21,7 +23,17 @@ interface StockWatchListSidebarProps {
 export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchListSidebarProps) {
     // [Senior Optimization] Selector를 사용하여 필요한 상태만 구독
     const stockWatchList = useStockStore(s => s.stockWatchList);
-    
+    const [filterMode, setFilterMode] = useState<'ALL' | 'KR' | 'US'>('ALL');
+
+    const filteredList = useMemo(() => {
+        switch (filterMode) {
+            case 'KR': return stockWatchList.filter(v => v.currency === 'KRW');
+            case 'US': return stockWatchList.filter(v => v.currency === 'USD');
+            default: return stockWatchList;
+        }
+    }, [stockWatchList, filterMode]);
+
+
     return (
         <>
             {/* [Senior] Mobile Backdrop: 모바일에서 사이드바가 열릴 때 배경을 블러 처리하고 클릭 시 닫히도록 구현 */}
@@ -51,7 +63,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
             >
                 {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 */}
                 <SidebarHeader className={cn(
-                    "p-6 border-b border-black/5 dark:border-white/10 flex items-center transition-all duration-500",
+                    "p-6 border-b border-black/5 dark:border-white/10 flex items-center transition-all duration-500 shrink-0",
                     isOpen ? "flex-row justify-between h-24" : "flex-col justify-center h-24"
                 )}>
                     {isOpen ? (
@@ -76,30 +88,47 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     )}
                 </SidebarHeader>
 
-                {/* [2] 사이드바 콘텐츠: 관심 종목 리스트 */}
-                <SidebarContent className={cn(
-                    "flex-1 overflow-hidden", // 내부 스크롤을 위해 overflow 제어
-                    !isOpen && "md:flex flex-col items-center pt-8"
-                )}>
-                    <div className="h-full overflow-y-auto custom-scrollbar p-3">
-                        <SidebarGroup className={cn("w-full transition-all duration-500", !isOpen && "px-0")}>
-                            <SidebarMenu className={cn("gap-3 transition-all duration-500", !isOpen && "items-center")}>
-                                {_.isEmpty(stockWatchList) ?
-                                    (isOpen && <div className="flex items-center justify-center h-full">
-                                        <span className="text-muted-foreground">관심종목이 없습니다</span>
-                                    </div>)
-                                    :
-                                    stockWatchList.map((v) => (
-                                        <StockWatchListItem
-                                            key={v.ticker}
-                                            {...v}
-                                            isOpen={isOpen}
-                                        />
-                                    ))}
-                            </SidebarMenu>
-                        </SidebarGroup>
+                {/* /* ... 사이드바 헤더 아래에 배치 ... */}
+                {isOpen && (
+                    <div className="flex-1 min-h-0 px-6 py-4 animate-in fade-in duration-500">
+                        {/* 룰 15 반영: 기본 태그 대신 Tabs 라이브러리 사용 */}
+                        <Tabs
+                            defaultValue="ALL"
+                            value={filterMode}
+                            onValueChange={(val) => setFilterMode(val as 'ALL' | 'KR' | 'US')}
+                            className="flex flex-col h-full"
+                        >
+                            <TabsList className="w-full h-11 bg-black/5 dark:bg-white/5 rounded-2xl p-1 shrink-0">
+                                <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-xs transition-all">전체</TabsTrigger>
+                                <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-xs transition-all">국내</TabsTrigger>
+                                <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-xs transition-all">해외</TabsTrigger>
+                            </TabsList>
+
+                            {/* [Senior Optimization] TabsContent 3개를 쓰는 대신, 단일 영역에서 데이터만 필터링하여 렌더링 (코드 중복 제거) */}
+                            <div className="flex-1 min-h-0 mt-6 overflow-y-auto custom-scrollbar pr-1">
+                                <SidebarGroup className="p-0">
+                                    <SidebarMenu className="gap-4">
+                                        {_.isEmpty(filteredList) ? (
+                                            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 italic">
+                                                    {filterMode === 'ALL' ? '전체' : filterMode === 'KR' ? '국내' : '해외'}주식 관심종목이 없습니다.
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            filteredList.map((v) => (
+                                                <StockWatchListItem
+                                                    key={v.ticker}
+                                                    {...v}
+                                                    isOpen={isOpen}
+                                                />
+                                            ))
+                                        )}
+                                    </SidebarMenu>
+                                </SidebarGroup>
+                            </div>
+                        </Tabs>
                     </div>
-                </SidebarContent>
+                )}
             </aside>
         </>
     );

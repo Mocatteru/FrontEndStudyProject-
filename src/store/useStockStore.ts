@@ -89,7 +89,7 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                         ? state.stockMemo.map(m => m.ticker === ticker ? { ticker, memo } : m)
                         : [...state.stockMemo, { ticker, memo }]
                 };
-            })
+            }),
         }),
         {
             name: "stock-storage",
