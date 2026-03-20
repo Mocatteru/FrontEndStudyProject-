@@ -287,3 +287,4 @@ export function FormatStockWatchListItem(stock: Stock): StockWatchListItemProps 
         currency: stock.currency ?? '',
     }
 }
+

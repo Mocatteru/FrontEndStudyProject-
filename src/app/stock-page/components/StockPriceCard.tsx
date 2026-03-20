@@ -1,84 +1,95 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
-import { FormatPriceCurrency, Stock, getMarketStateName } from "@/types/stock";
+import React, { useState, useMemo, memo } from "react";
+import { Stock, FormatPriceCurrency } from "@/types/stock";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
 import { useStockStore } from "@/store/useStockStore";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { PencilIcon } from "lucide-react";
 
 interface StockPriceCardProps {
     stockData: Stock;
 }
 
-/**
- * [StockPriceCard 컴포넌트]
- * - 역할: 주식의 현재가, 변동폭, 시장 상태 등 핵심 요약 정보를 시각화합니다.
- * - 기능 추가: 메모 기능을 모달로 구현하여 주식별 개인 메모를 저장할 수 있습니다.
- */
-export default function StockPriceCard({ stockData }: StockPriceCardProps) {
-    const { stockMemo, setStockMemo } = useStockStore();
+function getMarketStateName(state: string | undefined): string {
+    switch (state) {
+        case 'REGULAR': return '정규장';
+        case 'POST': return '장후';
+        case 'PRE': return '장전';
+        case 'CLOSED': return '장마감';
+        default: return '불명';
+    }
+}
+
+const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
+    const marketPrice = stockData.regularMarketPrice;
+    const marketChange = stockData.regularMarketChange;
+    const marketChangePercent = stockData.regularMarketChangePercent;
+    const isPositive = (marketChange ?? 0) >= 0;
+
     const [open, setOpen] = useState(false);
+    const [memoInput, setMemoInput] = useState("");
 
-    // 현재 종목의 기존 메모 찾기
-    const currentMemo = stockMemo.find(m => m.ticker === stockData.symbol)?.memo || "";
-    const [memoInput, setMemoInput] = useState(currentMemo);
+    const stockMemo = useStockStore(s => s.stockMemo);
+    const setStockMemo = useStockStore(s => s.setStockMemo);
 
-    // 종목이 바뀔 때마다 입력창 초기화
-    useEffect(() => {
-        setMemoInput(currentMemo);
-    }, [stockData.symbol, currentMemo]);
+    const currentMemo = useMemo(() => {
+        return stockMemo.find(m => m.ticker === stockData.symbol)?.memo || "";
+    }, [stockMemo, stockData.symbol]);
 
-    const isPositive = (stockData?.regularMarketChange ?? 0) >= 0;
-    const marketPrice = stockData.regularMarketPrice ?? 0;
-    const marketChange = Math.abs(stockData?.regularMarketChange ?? 0).toFixed(2);
-    const marketChangePercent = stockData.regularMarketChangePercent?.toFixed(2) ?? '0.00';
+    const handleOpenChange = (isOpen: boolean) => {
+        if (isOpen) {
+            setMemoInput(currentMemo);
+        }
+        setOpen(isOpen);
+    };
 
     const handleSave = () => {
-        setStockMemo(stockData.symbol, memoInput);
+        if (stockData.symbol) {
+            setStockMemo(stockData.symbol, memoInput);
+        }
         setOpen(false);
     };
 
     return (
-        <div className="p-8 border-2 rounded-[3rem] bg-card/40 backdrop-blur-xl shadow-2xl transition-all hover:bg-card/60 group border-black/5 dark:border-white/5">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
-                {/* 좌측 정보 영역: flex-1과 min-w-0으로 유연하게 조절 */}
-                <div className="flex-1 min-w-0 space-y-4">
-                    <div className="flex flex-col items-start gap-4">
-                        <div className="w-full">
-                            <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300 whitespace-normal wrap-break-word">
-                                {stockData?.longName || stockData?.shortName || 'Unknown'}
-                                <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
-                            </h3>
-                        </div>
+        <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-1000" />
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-1000" />
 
-                        {/* 메모 모달 트리거 */}
-                        <Dialog open={open} onOpenChange={setOpen}>
+            <div className="relative flex flex-col sm:flex-row justify-between items-start gap-6">
+                <div className="flex-1 min-w-0 space-y-4">
+                    <div className="flex items-center gap-4 flex-wrap">
+                        <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300">
+                            {stockData?.longName || stockData?.shortName || 'Unknown'}
+                            <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
+                        </h3>
+
+                        {/* [Senior UI Update] 메모 버튼 고도화 */}
+                        <Dialog open={open} onOpenChange={handleOpenChange}>
                             <DialogTrigger
                                 render={
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="rounded-xl h-8 px-2.5 bg-black/5 dark:bg-white/5 hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95"
-                                    />
+                                        className="rounded-xl h-8 px-2.5 bg-black/5 dark:bg-white/5 hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 shrink-0"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <PencilIcon className="size-3.5" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">메모</span>
+                                        </div>
+                                    </Button>
                                 }
-                            >
-                                <Pencil className="size-3.5 mr-1.5" />
-                                <span className="font-bold text-[11px]">메모</span>
-                            </DialogTrigger>
+                            />
                             <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-2xl shadow-2xl rounded-[2.5rem]">
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
-                                        메모
+                                        메모 업데이트
                                     </DialogTitle>
+                                    <DialogDescription className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                                        티커: {stockData.symbol}
+                                    </DialogDescription>
                                 </DialogHeader>
 
                                 <div className="py-2 space-y-4">
@@ -90,10 +101,9 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                                                     setMemoInput(e.target.value);
                                                 }
                                             }}
-                                            placeholder={`${stockData.longName}에 대한 생각을 자유롭게 적어보세요...`}
-                                            className="min-h-[250px] w-full bg-black/5 dark:bg-white/5 border-none rounded-3xl p-6 text-base font-medium resize-none focus-visible:ring-blue-500/20 placeholder:text-muted-foreground/30 break-all overflow-y-auto"
+                                            placeholder={`${stockData.longName}에 대한 전략적 메모를 입력하세요...`}
+                                            className="min-h-[250px] w-full bg-black/5 dark:bg-white/5 border-none rounded-3xl p-6 text-base font-medium resize-none focus-visible:ring-blue-500/20 placeholder:text-muted-foreground/30 break-all overflow-y-auto custom-scrollbar"
                                         />
-                                        {/* 글자수 제한 표시 */}
                                         <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
                                             {memoInput.length} / 500
                                         </div>
@@ -117,7 +127,6 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                         장 상태: <span className="text-foreground/60">{getMarketStateName(stockData?.marketState)}</span>
                     </p>
 
-                    {/* 저장된 메모 섹션: break-all로 텍스트 넘침 방지 */}
                     {currentMemo && (
                         <div className="mt-4 py-2 animate-in fade-in slide-in-from-left-4 duration-500 max-w-full">
                             <p className="text-[16px] font-black text-blue-500/40 uppercase tracking-widest mb-1">메모</p>
@@ -126,23 +135,26 @@ export default function StockPriceCard({ stockData }: StockPriceCardProps) {
                     )}
                 </div>
 
-                {/* 우측 가격 영역: shrink-0으로 고정 너비 확보 */}
-                <div className="pb-18 text-right space-y-2 shrink-0 self-start sm:self-center">
-                    <p className="text-3xl pr-2 sm:text-4xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
+                <div className="text-right space-y-2 shrink-0 self-start sm:self-center">
+                    <p className="text-3xl pb-4 pr-2 sm:text-4xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
                         {FormatPriceCurrency(stockData.currency, marketPrice)}
                     </p>
                     <div className={cn(
-                        "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-xl font-black text-base sm:text-lg tabular-nums shadow-sm border",
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-base sm:text-lg tabular-nums shadow-sm border",
                         isPositive
                             ? "bg-green-500/10 border-green-500/20 text-green-500"
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
-                        {marketChange}
-                        <span className="text-[11px] opacity-60">({marketChangePercent}%)</span>
+                        {marketChange?.toFixed(2)}
+                        <span className="text-[11px] opacity-60">({marketChangePercent?.toFixed(2)}%)</span>
                     </div>
                 </div>
             </div>
         </div>
     );
-}
+});
+
+StockPriceCard.displayName = 'StockPriceCard';
+
+export default StockPriceCard;

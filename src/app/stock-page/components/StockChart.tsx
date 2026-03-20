@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, memo } from "react";
 import dynamic from "next/dynamic";
 import { Stock, getStockChartOptions, PERIOD_OPTIONS } from "@/types/stock";
 
@@ -17,11 +17,9 @@ interface StockChartProps {
 /**
  * [StockChart 컴포넌트]
  * - 역할: 주가 추세를 캔들/라인 차트로 시각화하며, 기간 및 간격 조절 UI를 포함합니다.
- * - 학습 포인트 (State vs Props Relationship):
- *   차트의 '데이터(stockData)'는 부모로부터 받지만, '차트 타입(Line/Candle)'은 
- *   이 컴포넌트 내부에서만 쓰이므로 내부 state로 관리하여 불필요한 부모 리렌더링을 방지합니다. (로컬 상태 최적화)
+ * - [Senior Optimization] React.memo를 적용하여 부모의 상태 변화(예: 사이드바 토글) 시 차트가 다시 그려지는 것을 방지합니다.
  */
-export default function StockChart({ stockData, range, interval, onConfigChange }: StockChartProps) {
+const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockChartProps) => {
     const [chartType, setChartType] = useState<'line' | 'candlestick'>('candlestick');
     const [showMinuteMenu, setShowMinuteMenu] = useState(false);
 
@@ -127,4 +125,8 @@ export default function StockChart({ stockData, range, interval, onConfigChange 
             </div>
         </div>
     );
-}
+});
+
+StockChart.displayName = 'StockChart';
+
+export default StockChart;

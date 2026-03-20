@@ -90,7 +90,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
                 {/* /* ... 사이드바 헤더 아래에 배치 ... */}
                 {isOpen && (
-                    <div className="flex-1 min-h-0 px-6 py-4 animate-in fade-in duration-500">
+                    <div className="flex-1 min-h-0 px-6 pt-4 pb-0 animate-in fade-in duration-500">
                         {/* 룰 15 반영: 기본 태그 대신 Tabs 라이브러리 사용 */}
                         <Tabs
                             defaultValue="ALL"
