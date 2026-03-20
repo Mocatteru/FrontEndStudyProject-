@@ -80,7 +80,7 @@ const StockDashboardContent = memo(({
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-10 duration-1000">
             {/* [Senior Refactor] 스티키 액션 바: stockData 접근을 위해 Dashboard 내부로 이동 */}
-            <div className="sticky top-0 z-40 h-24 bg-background/95 backdrop-blur-xl flex items-center gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm -mx-10 px-10">
+            <div className="sticky top-0 z-40 h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm -mx-10 px-10">
                 <div className="flex-1 max-w-3xl">
                     <StockSearchInput />
                 </div>
