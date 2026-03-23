@@ -44,7 +44,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 y: d.close
             })) || []
         }];
-    }, [stockData?.historical, chartType]);
+    }, [stockData.historical, chartType]);
 
     const chartOptions = useMemo(() => getStockChartOptions(chartType, stockData.currency), [chartType, stockData.currency]);
 

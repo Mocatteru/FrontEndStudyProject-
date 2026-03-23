@@ -80,8 +80,8 @@ export async function GET(request: NextRequest) {
             const chartResult = await yahoo.chart(ticker, {
                 period1: start,
                 period2: end,
-                // [Senior] Yahoo API가 허용하는 모든 규격(1m, 2m, 5m, 15m 등)을 안전하게 수용하도록 타입을 확장했습니다.
-                interval: interval as any,
+                // [Senior] any 대신 string 캐스팅을 사용하여 린트 에러를 방지합니다.
+                interval: interval as "1m" | "2m" | "5m" | "15m" | "30m" | "60m" | "90m" | "1h" | "1d" | "5d" | "1wk" | "1mo" | "3mo",
             });
 
             historical = ((chartResult.quotes || []) as {

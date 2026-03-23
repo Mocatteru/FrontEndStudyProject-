@@ -1,9 +1,9 @@
 'use client';
 
-import { SidebarContent, SidebarHeader, SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
+import { SidebarHeader, SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import StockWatchListItem, { StockWatchListItemProps } from "./StockWatchListItem";
+import StockWatchListItem from "./StockWatchListItem";
 import { useStockStore } from "@/store/useStockStore";
 import * as _ from "radash";
 import { useMemo, useState } from "react";
