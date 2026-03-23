@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { usePostStore } from '@/store/postStore';
@@ -28,6 +28,7 @@ import {
     UserCircle,
     FileText,
 } from "lucide-react";
+import { cn } from '@/lib/utils';
 
 // ─────────────────────────────────────────
 // 메뉴 데이터: 이름, 경로, 아이콘을 함께 정의
@@ -48,8 +49,6 @@ const sidebarData = {
 
 // ─────────────────────────────────────────
 // Tab 키 토글을 담당하는 내부 컴포넌트
-// useSidebar는 SidebarProvider 내부에서만 호출할 수 있으므로
-// AppSidebar 안에서 훅을 사용하는 별도 컴포넌트로 분리합니다.
 // ─────────────────────────────────────────
 function TabKeyToggle() {
     const { toggleSidebar } = useSidebar();
@@ -58,7 +57,6 @@ function TabKeyToggle() {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key !== 'Tab') return;
 
-            // INPUT / TEXTAREA / contentEditable 에서는 원래 동작 유지
             const target = e.target as HTMLElement;
             if (
                 target.tagName === 'INPUT' ||
@@ -74,36 +72,40 @@ function TabKeyToggle() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [toggleSidebar]);
 
-    return null; // UI 없이 동작만 수행
+    return null;
 }
 
 // ─────────────────────────────────────────
 // 메인 사이드바 컴포넌트
 // ─────────────────────────────────────────
 export default function AppSidebar() {
+    // [Senior Pattern] 하이드레이션 에러 방지용 마운트 가드
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     const pathname = usePathname();
     const { userName, userDepartment, userRole } = useUiStore();
     const { postCount } = usePostStore();
 
     return (
         <Sidebar collapsible="icon">
-
-            {/* ── Tab 키 전역 단축키 ── */}
             <TabKeyToggle />
 
-            {/* ── 상단 로고 ── */}
+            {/* ── 상단 로고 및 유저 간략 정보 ── */}
             <SidebarHeader className="px-3 py-3">
-                {/* group-data-[collapsible=icon]:mx-auto : 아이콘 모드에서 DG 박스를 수평 중앙으로 */}
                 <div className="flex items-center gap-3 overflow-hidden group-data-[collapsible=icon]:mx-auto">
                     <div className="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm shadow-sm shadow-blue-600/40">
                         FE
                     </div>
-                    {/* 아이콘 모드 시 숨김 */}
-                    <div className="flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden">
+
+                    <div className={cn(
+                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-opacity duration-300",
+                        !mounted ? "opacity-0" : "opacity-100"
+                    )}>
                         <span className="font-bold text-sm truncate">
                             {userName}
                         </span>
-                        <span className="text-blue-500">{userRole}</span>
+                        <span className="text-blue-500 font-bold text-[11px] uppercase tracking-tight">{userRole}</span>
                         <span className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">
                             {userDepartment}
                         </span>
@@ -113,7 +115,6 @@ export default function AppSidebar() {
 
             <SidebarSeparator />
 
-            {/* ── 메인 네비게이션 ── */}
             <SidebarContent>
                 {sidebarData.navMain.map((group) => (
                     <SidebarGroup key={group.title} className="px-2 py-2">
@@ -124,10 +125,6 @@ export default function AppSidebar() {
                             <SidebarMenu>
                                 {group.items.map((item) => (
                                     <SidebarMenuItem key={item.title}>
-                                        {/*
-                                         * render prop: asChild 대신 Base UI 방식.
-                                         * <Link>로 렌더링되어 클라이언트 사이드 라우팅 유지.
-                                         */}
                                         <SidebarMenuButton
                                             render={<Link href={item.url} />}
                                             isActive={pathname === item.url}
@@ -144,7 +141,6 @@ export default function AppSidebar() {
                     </SidebarGroup>
                 ))}
 
-                {/* ── 통계 카드: 아이콘 모드에서 숨김 ── */}
                 <SidebarGroup className="px-2 group-data-[collapsible=icon]:hidden">
                     <SidebarGroupLabel>통계</SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -155,7 +151,7 @@ export default function AppSidebar() {
                                     Active Posts
                                 </p>
                             </div>
-                            <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                            <span className="text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
                                 {postCount}
                             </span>
                         </div>
@@ -165,7 +161,6 @@ export default function AppSidebar() {
 
             <SidebarSeparator />
 
-            {/* ── 하단 유저 프로필 ── */}
             <SidebarFooter className="p-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -177,7 +172,10 @@ export default function AppSidebar() {
                             <div className="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg bg-linear-to-tr from-blue-500 to-purple-500 shadow-sm">
                                 <UserCircle className="size-5 text-white" />
                             </div>
-                            <div className="grid flex-1 text-left text-sm leading-tight overflow-hidden group-data-[collapsible=icon]:hidden">
+                            <div className={cn(
+                                "grid flex-1 text-left text-sm leading-tight overflow-hidden group-data-[collapsible=icon]:hidden transition-opacity duration-300",
+                                !mounted ? "opacity-0" : "opacity-100"
+                            )}>
                                 <span className="truncate font-semibold">{userName}</span>
                                 <span className="truncate text-xs text-muted-foreground">{userRole}</span>
                             </div>
@@ -186,7 +184,6 @@ export default function AppSidebar() {
                 </SidebarMenu>
             </SidebarFooter>
 
-            {/* 사이드바 우측 드래그/클릭 레일 (토글) */}
             <SidebarRail />
         </Sidebar>
     );

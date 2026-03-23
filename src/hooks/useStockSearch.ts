@@ -1,5 +1,5 @@
 import { useStockStore } from "@/store/useStockStore";
-import { FormatTicker, FormatTickerKR, KR_TICKER_LENGTH, Stock } from "@/types/stock";
+import { FormatStockWatchListItem, FormatTicker, FormatTickerKR, KR_TICKER_LENGTH, Stock } from "@/types/stock";
 import { isEmpty, isEqual } from "radash";
 
 export default function useStockSearch() {
@@ -27,7 +27,7 @@ export default function useStockSearch() {
     }
 
     const handleWatchList = (stock: Stock) => {
-        toggleWatchList(stock);
+        toggleWatchList(FormatStockWatchListItem(stock));
     }
 
     const handleRemoveRecentSearch = (ticker: string) => {

@@ -11,6 +11,7 @@ interface StockState {
     recentSearchList: string[],
     stockWatchList: StockWatchListItemProps[],
     stockMemo: { ticker: string, memo: string }[],
+    setStock: (stock: Stock) => void,
     setCurrentTicker: (ticker: string) => void,
     addRecentSearch: (ticker: string) => void,
     toggleWatchList: (stock: StockWatchListItemProps) => void,

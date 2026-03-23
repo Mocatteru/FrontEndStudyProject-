@@ -1,3 +1,5 @@
+'use client';
+
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -85,7 +87,7 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                                 )}
                             >
                                 {isPositive ? <TrendingUp className="size-3.5 mr-1" /> : <TrendingDown className="size-3.5 mr-1" />}
-                                {changePercent.toFixed(2)}%
+                                {(changePercent ?? 0).toFixed(2)}%
                             </Badge>
                         </div>
                     </div>

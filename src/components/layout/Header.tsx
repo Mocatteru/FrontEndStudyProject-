@@ -1,5 +1,6 @@
-'use client';
+'use client'
 
+import React, { useState, useEffect } from 'react';
 import { useUiStore } from '@/store/uiStore';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -9,12 +10,16 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
+    // [Senior Pattern] 하이드레이션 에러 방지를 위한 마운트 상태 가드
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     const { userName, isWatchListOpen, toggleWatchList, userEmail } = useUiStore();
     const pathname = usePathname();
     const isStockPage = pathname.includes('/stock-page');
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/50 px-8 backdrop-blur-md">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/50 px-8 backdrop-blur-md transition-all duration-500">
             <div className="flex items-center gap-4 min-w-0">
                 <SidebarTrigger />
                 <div className="h-4 w-px bg-border group-data-[collapsible=icon]:hidden" />
@@ -47,12 +52,16 @@ export default function Header() {
                         </>
                     )}
 
-                    <span className="flex flex-row sm:inline-block text-sm font-medium text-muted-foreground whitespace-nowrap">
+                    {/* [Senior] 마운트가 완료되기 전에는 텍스트가 깜빡이지 않도록 투명도 또는 로딩 처리 */}
+                    <div className={cn(
+                        "flex flex-row sm:inline-block text-sm font-medium text-muted-foreground whitespace-nowrap transition-opacity duration-300",
+                        !mounted ? "opacity-0" : "opacity-100"
+                    )}>
                         <div className="flex flex-col">
                             <span className="text-foreground shrink-0 flex-1">{userName}님 로그인 중</span>
-                            <span className="text-muted-foreground shrink-0 flex-1">{userEmail}</span>
+                            <span className="text-muted-foreground shrink-0 flex-1 text-[11px] font-medium">{userEmail}</span>
                         </div>
-                    </span>
+                    </div>
                 </div>
             </div >
         </header >

@@ -146,7 +146,7 @@ export default function StockPage() {
     const stockWatchList = useStockStore(s => s.stockWatchList);
     const toggleWatchList = useStockStore(s => s.toggleWatchList);
     const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
-    const toggleSidebar = useUiStore(s => s.toggleWatchList);
+    const toggleWatchListOpen = useUiStore(s => s.toggleWatchList);
 
     const isWatchList = useMemo(() =>
         stockWatchList.some(v => v.ticker === currentTicker),
@@ -188,7 +188,7 @@ export default function StockPage() {
             </div>
 
             {/* 우측 사이드바 */}
-            <StockWatchListSidebar isOpen={isWatchListOpen} onToggle={toggleSidebar} />
+            <StockWatchListSidebar isOpen={isWatchListOpen} onToggle={toggleWatchListOpen} />
         </div>
     );
 }
