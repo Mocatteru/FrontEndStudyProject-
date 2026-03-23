@@ -78,8 +78,8 @@ export default function SettingPage() {
                     <p className="text-sm font-black tracking-[0.4em] text-blue-500/60 uppercase">종합 설정 관리</p>
                 </div>
 
-                <Button className="rounded-2xl px-12 h-16 font-black tracking-tight shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-xl">
-                    <Save className="mr-3 size-6" />
+                <Button className="rounded-xl px-6 h-11 font-bold tracking-tight shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-sm">
+                    <Save className="mr-2 size-4" />
                     저장하기
                 </Button>
             </header>

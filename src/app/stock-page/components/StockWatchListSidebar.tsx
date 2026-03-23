@@ -110,14 +110,14 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     <SidebarMenu className="gap-4">
                                         {_.isEmpty(filteredList) ? (
                                             <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/30 italic">
+                                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">
                                                     {filterMode === 'ALL' ? '전체' : filterMode === 'KR' ? '국내' : '해외'}주식 관심종목이 없습니다.
                                                 </span>
                                             </div>
                                         ) : (
-                                            filteredList.map((v) => (
+                                            filteredList.map((v, index) => (
                                                 <StockWatchListItem
-                                                    key={v.ticker}
+                                                    key={`${v.ticker}-${index}`}
                                                     {...v}
                                                     isOpen={isOpen}
                                                 />

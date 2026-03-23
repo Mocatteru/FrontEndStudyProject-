@@ -8,7 +8,7 @@ import React from 'react';
 
 export default function HomePage() {
   return (
-    <div className="p-10 space-y-8">
+    <div className="h-full overflow-y-auto custom-scrollbar p-10 space-y-8 animate-in fade-in duration-700">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">대시보드 개요</h2>
         <p className="text-gray-400">현재 시스템 상태 및 프로젝트 학습 진행률입니다.</p>
