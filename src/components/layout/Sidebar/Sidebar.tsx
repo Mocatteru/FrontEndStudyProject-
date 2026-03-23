@@ -22,7 +22,7 @@
 //  *   3. 닫혀있을 때 왼쪽 중앙에 'Peeking' 버튼을 제공하여 쉽게 열 수 있게 합니다.
 //  */
 
-//Legacy Sidebar
+//@@@@@@@@@@@@@@@@@@@@@@@@Legacy Sidebar@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // function Sidebar() {
 //     const { isSiderOpen, toggleSidebar, userName } = useUiStore();
 //     const { postCount } = usePostStore();

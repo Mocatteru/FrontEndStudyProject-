@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 /**
  * [Zustand Store] 글로벌 UI 상태 관리
@@ -10,22 +11,54 @@ interface UiState {
     isSiderOpen: boolean;
     isWatchListOpen: boolean; // [Senior] 우측 와치리스트 상태 추가
     userName: string;
+    userEmail: string;
+    userDepartment: string;
+    userRole: "ADMIN USER" | "USER";
     toggleSidebar: () => void;
     toggleWatchList: () => void; // [Senior] 와치리스트 토글 액션 추가
     setUserName: (userName: string) => void;
+    setUserEmail: (userEmail: string) => void;
+    setUserDepartment: (userDepartment: string) => void;
+    setUserRole: (userRole: "ADMIN USER" | "USER") => void;
 }
 
-export const useUiStore = create<UiState>((set) => ({
-    isSiderOpen: true,
-    isWatchListOpen: false, // 기본값: 닫힘
-    userName: "이종현의 프론트엔드",
-    toggleSidebar: () => set((state) => ({
-        isSiderOpen: !state.isSiderOpen
-    })),
-    toggleWatchList: () => set((state) => ({
-        isWatchListOpen: !state.isWatchListOpen
-    })),
-    setUserName: (name: string) => set(() => ({
-        userName: name
-    })),
-}))
+export const useUiStore = create<UiState>()(
+    persist(
+        (set) => ({
+            isSiderOpen: true,
+            isWatchListOpen: false, // 기본값: 닫힘
+            userName: "이종현의 프론트엔드",
+            userEmail: "[EMAIL_ADDRESS]",
+            userDepartment: "프론트엔드 개발팀",
+            userRole: "ADMIN USER",
+            toggleSidebar: () => set((state) => ({
+                isSiderOpen: !state.isSiderOpen
+            })),
+            toggleWatchList: () => set((state) => ({
+                isWatchListOpen: !state.isWatchListOpen
+            })),
+            setUserName: (name: string) => set(() => ({
+                userName: name
+            })),
+            setUserEmail: (email: string) => set(() => ({
+                userEmail: email
+            })),
+            setUserDepartment: (department: string) => set(() => ({
+                userDepartment: department
+            })),
+            setUserRole: (role: "ADMIN USER" | "USER") => set(() => ({
+                userRole: role
+            })),
+        }),
+        {
+            name: "ui-storage",
+            partialize: (state: UiState) => ({
+                isSiderOpen: state.isSiderOpen,
+                isWatchListOpen: state.isWatchListOpen,
+                userName: state.userName,
+                userEmail: state.userEmail,
+                userDepartment: state.userDepartment,
+                userRole: state.userRole,
+            })
+        }
+    ));

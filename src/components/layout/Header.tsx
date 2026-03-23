@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
-    const { userName, isWatchListOpen, toggleWatchList } = useUiStore();
+    const { userName, isWatchListOpen, toggleWatchList, userEmail } = useUiStore();
     const pathname = usePathname();
     const isStockPage = pathname.includes('/stock-page');
 
@@ -23,7 +23,7 @@ export default function Header() {
             <div className="flex items-center gap-4 shrink-0 ml-4">
                 <div className="flex items-center gap-2">
                     <ThemeToggle />
-                    
+
                     {/* [Senior] 주식 페이지에서만 서브 사이드바 버튼 노출 (모바일 레이아웃 최적화) */}
                     {isStockPage && (
                         <>
@@ -47,11 +47,14 @@ export default function Header() {
                         </>
                     )}
 
-                    <span className="hidden sm:inline-block text-sm font-medium text-muted-foreground whitespace-nowrap">
-                        <span className="text-foreground">{userName}</span>님 로그인 중
+                    <span className="flex flex-row sm:inline-block text-sm font-medium text-muted-foreground whitespace-nowrap">
+                        <div className="flex flex-col">
+                            <span className="text-foreground shrink-0 flex-1">{userName}님 로그인 중</span>
+                            <span className="text-muted-foreground shrink-0 flex-1">{userEmail}</span>
+                        </div>
                     </span>
                 </div>
-            </div>
-        </header>
+            </div >
+        </header >
     );
 }

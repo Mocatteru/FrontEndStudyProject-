@@ -1,10 +1,12 @@
 'use client'
 
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Save } from "lucide-react";
+import { useUiStore } from "@/store/uiStore";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 /**
  * [학습 포인트] SettingItem 컴포넌트
@@ -68,6 +70,23 @@ function SettingSection({
 }
 
 export default function SettingPage() {
+    const { userName, userEmail, userDepartment, userRole, setUserName, setUserEmail, setUserDepartment, setUserRole } = useUiStore();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [userNameInput, setUserNameInput] = useState(userName);
+    const [userEmailInput, setUserEmailInput] = useState(userEmail);
+    const [userDepartmentInput, setUserDepartmentInput] = useState(userDepartment);
+    const [userRoleInput, setUserRoleInput] = useState(userRole);
+
+
+    const pressSaveSettingButton = useCallback(() => {
+        setIsEditing(false)
+        setUserName(userNameInput);
+        setUserEmail(userEmailInput);
+        setUserDepartment(userDepartmentInput);
+        setUserRole(userRoleInput);
+    }, [userNameInput, userEmailInput, userDepartmentInput, userRoleInput, setUserName, setUserEmail, setUserDepartment, setUserRole]);
+
     return (
         <div className="flex flex-col h-full min-h-0 bg-background selection:bg-blue-500/20 overflow-hidden">
 
@@ -78,7 +97,7 @@ export default function SettingPage() {
                     <p className="text-sm font-black tracking-[0.4em] text-blue-500/60 uppercase">종합 설정 관리</p>
                 </div>
 
-                <Button className="rounded-xl px-6 h-11 font-bold tracking-tight shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-sm">
+                <Button disabled={!isEditing} onClick={pressSaveSettingButton} className="rounded-xl px-6 h-11 font-bold tracking-tight shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-sm">
                     <Save className="mr-2 size-4" />
                     저장하기
                 </Button>
@@ -93,19 +112,32 @@ export default function SettingPage() {
                         description="시스템 프로필과 기본 계정 정보를 관리합니다. 모든 변경 사항은 즉시 동기화 노드에 반영됩니다."
                     >
                         <SettingSectionItem label="회원 이름">
-                            <Input placeholder="이름을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                            <Input value={userNameInput} onChange={(e) => { setUserNameInput(e.target.value); setIsEditing(true) }} placeholder="이름을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
                         </SettingSectionItem>
                         <SettingSectionItem label="이메일 주소">
-                            <Input placeholder="example@domain.com" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                            <Input value={userEmailInput} onChange={(e) => { setUserEmailInput(e.target.value); setIsEditing(true) }} placeholder="example@domain.com" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
                         </SettingSectionItem>
                         <SettingSectionItem label="소속 부서">
-                            <Input placeholder="소속 팀명을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                            <Input value={userDepartmentInput} onChange={(e) => { setUserDepartmentInput(e.target.value); setIsEditing(true) }} placeholder="소속 팀명을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
                         </SettingSectionItem>
-                        <SettingSectionItem label="관리자 권한">
-                            <Input placeholder="시니어 개발자" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                        <SettingSectionItem label="직책">
+                            <Select
+                                value={userRoleInput}
+                                onValueChange={(e) => { setUserRoleInput(e as "ADMIN USER" | "USER"); setIsEditing(true) }}
+                            >
+                                <SelectTrigger className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus:ring-blue-500/20 bg-muted/5 font-bold uppercase tracking-tight">
+                                    <SelectValue placeholder="직책 선택" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-2xl border-2 border-black/5 dark:border-white/5 shadow-xl backdrop-blur-xl bg-card/95">
+                                    <SelectItem value="ADMIN USER" className="rounded-xl focus:bg-blue-500/10 focus:text-blue-600 font-bold py-3 transition-colors">관리자 (ADMIN)</SelectItem>
+                                    <SelectItem value="USER" className="rounded-xl focus:bg-blue-500/10 focus:text-blue-600 font-bold py-3 transition-colors">일반 사용자 (USER)</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </SettingSectionItem>
                     </SettingSection>
 
+
+                    {/* MOCK */}
                     <SettingSection
                         title="동기화 엔진"
                         description="주식 시장 데이터의 실시간 동기화 인터벌을 설정합니다. 최적의 주기는 1~5초 사이로 권장됩니다."
@@ -118,6 +150,7 @@ export default function SettingPage() {
                         </SettingSectionItem>
                     </SettingSection>
 
+                    {/* MOCK */}
                     <SettingSection
                         title="알림 인프라"
                         description="시스템 변동 알림 및 주요 이벤트에 대한 푸시 서버 설정을 관리합니다."

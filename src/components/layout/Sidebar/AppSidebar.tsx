@@ -82,7 +82,7 @@ function TabKeyToggle() {
 // ─────────────────────────────────────────
 export default function AppSidebar() {
     const pathname = usePathname();
-    const { userName } = useUiStore();
+    const { userName, userDepartment, userRole } = useUiStore();
     const { postCount } = usePostStore();
 
     return (
@@ -96,15 +96,16 @@ export default function AppSidebar() {
                 {/* group-data-[collapsible=icon]:mx-auto : 아이콘 모드에서 DG 박스를 수평 중앙으로 */}
                 <div className="flex items-center gap-3 overflow-hidden group-data-[collapsible=icon]:mx-auto">
                     <div className="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm shadow-sm shadow-blue-600/40">
-                        DG
+                        FE
                     </div>
                     {/* 아이콘 모드 시 숨김 */}
                     <div className="flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden">
                         <span className="font-bold text-sm truncate">
-                            DevOps <span className="text-blue-500">Admin</span>
+                            {userName}
                         </span>
+                        <span className="text-blue-500">{userRole}</span>
                         <span className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">
-                            Senior Frontend
+                            {userDepartment}
                         </span>
                     </div>
                 </div>
@@ -178,7 +179,7 @@ export default function AppSidebar() {
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight overflow-hidden group-data-[collapsible=icon]:hidden">
                                 <span className="truncate font-semibold">{userName}</span>
-                                <span className="truncate text-xs text-muted-foreground">Admin User</span>
+                                <span className="truncate text-xs text-muted-foreground">{userRole}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
