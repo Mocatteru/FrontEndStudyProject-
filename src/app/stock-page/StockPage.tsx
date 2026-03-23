@@ -150,7 +150,7 @@ export default function StockPage() {
                 <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scroll-smooth">
 
                     {/* [1] 헤더 섹션 (정적) */}
-                    <div className="px-10 pt-12 pb-6 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="px-10 pt-12 pb-0 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
                         <div className="flex items-center gap-5">
                             <div className="p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
                                 <TrendingUp className="size-8 text-blue-500" />
@@ -163,7 +163,7 @@ export default function StockPage() {
                     </div>
 
                     {/* [3] 메인 콘텐츠 영역 (동적 페칭 포함) */}
-                    <div className="p-10 space-y-12 bg-muted/5 dark:bg-background/20 min-h-screen">
+                    <div className="px-10 space-y-12 bg-muted/5 dark:bg-background/20 min-h-screen">
                         <StockDashboardContent
                             currentTicker={currentTicker}
                             chartConfig={chartConfig}
