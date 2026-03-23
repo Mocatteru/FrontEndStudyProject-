@@ -16,7 +16,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 
 import Header from "@/components/layout/Header";
 import QueryProvider from "@/providers/QueryProvider";
-import Toast from "@/components/common/Toast";
+import { Toaster } from "@/components/ui/sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/Sidebar/AppSidebar";
 
@@ -60,9 +60,9 @@ export default function RootLayout({
                 <div className="flex-1 min-w-0 overflow-hidden relative">
                   {children}
                 </div>
-                <Toast />
               </SidebarInset>
             </SidebarProvider>
+            <Toaster position="bottom-right" richColors />
           </QueryProvider>
         </ThemeProvider>
       </body>

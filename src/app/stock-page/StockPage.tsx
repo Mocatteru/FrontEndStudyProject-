@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FormatStockWatchListItem } from "@/types/stock";
 import { StockWatchListItemProps } from "./components/StockWatchListItem";
+import { toast } from "sonner";
 
 /**
  * [Senior Optimization] 
@@ -89,7 +90,18 @@ const StockDashboardContent = memo(({
                     <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => toggleWatchList(FormatStockWatchListItem(stockData))}
+                        onClick={() => {
+                            toggleWatchList(FormatStockWatchListItem(stockData));
+                            if (isWatchList) {
+                                toast.info("관심종목에서 제거되었습니다.", {
+                                    description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
+                                });
+                            } else {
+                                toast.success("관심종목에 추가되었습니다!", {
+                                    description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
+                                });
+                            }
+                        }}
                         className={cn(
                             "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
                             isWatchList ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"

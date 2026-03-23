@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Save } from "lucide-react";
 import { useUiStore } from "@/store/uiStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 /**
  * [학습 포인트] SettingItem 컴포넌트
@@ -85,6 +86,9 @@ export default function SettingPage() {
         setUserEmail(userEmailInput);
         setUserDepartment(userDepartmentInput);
         setUserRole(userRoleInput);
+        toast.success("설정이 성공적으로 저장되었습니다.", {
+            description: "변경사항이 모든 노드에 반영되었습니다."
+        });
     }, [userNameInput, userEmailInput, userDepartmentInput, userRoleInput, setUserName, setUserEmail, setUserDepartment, setUserRole]);
 
     return (
