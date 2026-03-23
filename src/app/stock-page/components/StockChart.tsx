@@ -46,7 +46,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         }];
     }, [stockData?.historical, chartType]);
 
-    const chartOptions = useMemo(() => getStockChartOptions(chartType), [chartType]);
+    const chartOptions = useMemo(() => getStockChartOptions(chartType, stockData.currency), [chartType, stockData.currency]);
 
     return (
         <div className="p-6 border rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm relative transition-all">

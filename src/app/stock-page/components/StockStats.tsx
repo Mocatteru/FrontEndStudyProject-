@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from "react";
-import { Stock } from "@/types/stock";
+import { Stock, FormatPriceCurrency } from "@/types/stock";
 
 interface StockStatsProps {
     stockData: Stock;
@@ -17,28 +17,34 @@ interface StockStatsProps {
 const StockStats = React.memo(({ stockData }: StockStatsProps) => {
     const stats = useMemo(() => [
         // 1. 가격 관련 지표
-        { label: '시가 (Open)', value: stockData?.regularMarketOpen?.toLocaleString() },
-        { label: '고가 (High)', value: stockData?.regularMarketDayHigh?.toLocaleString() },
-        { label: '저가 (Low)', value: stockData?.regularMarketDayLow?.toLocaleString() },
-        { label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange) ? (stockData.regularMarketPrice - stockData.regularMarketChange).toLocaleString() : null },
+        { label: '시가 (Open)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketOpen) },
+        { label: '고가 (High)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayHigh) },
+        { label: '저가 (Low)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayLow) },
+        { label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange) 
+            ? FormatPriceCurrency(stockData.currency, stockData.regularMarketPrice - stockData.regularMarketChange) 
+            : '---' },
 
         // 2. 통계 및 볼륨
         { label: '거래량 (Volume)', value: stockData?.regularMarketVolume?.toLocaleString() },
         { label: '평균 거래량 (3M)', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
-        { label: '시가총액 (Market Cap)', value: stockData?.marketCap ? `$${(stockData.marketCap / 1e9).toFixed(2)}B` : null },
+        { label: '시가총액 (Market Cap)', value: stockData?.marketCap ? (
+            stockData.currency === 'KRW' 
+                ? `${(stockData.marketCap / 1e12).toFixed(1)}조 원` 
+                : `$${(stockData.marketCap / 1e9).toFixed(2)}B`
+        ) : '---' },
         { label: '유통 주식수', value: stockData?.sharesOutstanding?.toLocaleString() },
 
         // 3. 투자 지표 (PE, EPS 등)
-        { label: 'P/E Ratio (Trailing)', value: stockData?.trailingPE?.toFixed(2) },
-        { label: 'P/E Ratio (Forward)', value: stockData?.forwardPE?.toFixed(2) },
-        { label: 'EPS (TTM)', value: stockData?.epsTrailingTwelveMonths?.toFixed(2) },
-        { label: '배당 수익률 (Div Yield)', value: stockData?.dividendYield ? `${stockData.dividendYield.toFixed(2)}%` : null },
+        { label: 'P/E Ratio (Trailing)', value: stockData?.trailingPE?.toFixed(2) ?? '---' },
+        { label: 'P/E Ratio (Forward)', value: stockData?.forwardPE?.toFixed(2) ?? '---' },
+        { label: 'EPS (TTM)', value: stockData?.epsTrailingTwelveMonths?.toFixed(2) ?? '---' },
+        { label: '배당 수익률 (Div Yield)', value: stockData?.dividendYield ? `${stockData.dividendYield.toFixed(2)}%` : '---' },
 
         // 4. 주가 범위 정보
-        { label: '52주 최고가', value: stockData?.fiftyTwoWeekHigh?.toLocaleString() },
-        { label: '52주 최저가', value: stockData?.fiftyTwoWeekLow?.toLocaleString() },
-        { label: '50일 평균가', value: stockData?.fiftyDayAverage?.toLocaleString() },
-        { label: '200일 평균가', value: stockData?.twoHundredDayAverage?.toLocaleString() },
+        { label: '52주 최고가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyTwoWeekHigh) },
+        { label: '52주 최저가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyTwoWeekLow) },
+        { label: '50일 평균가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyDayAverage) },
+        { label: '200일 평균가', value: FormatPriceCurrency(stockData.currency, stockData?.twoHundredDayAverage) },
 
         // 5. 기타 정보
         { label: '거래 통화', value: stockData?.currency },

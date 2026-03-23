@@ -91,7 +91,7 @@ export const getMarketStateName = (state?: string) => {
  *   3. tooltip.custom: 캔들스틱 차트 특성상 시/고/저/종 4가지 값을 한눈에 깔끔하게 보여주기 위해 
  *      기본 틀 대신 사용자 정의 HTML(Tailwind CSS 포함)을 그려주도록 커스텀했습니다.
  */
-export const getStockChartOptions = (chartType: 'line' | 'candlestick'): ApexOptions => {
+export const getStockChartOptions = (chartType: 'line' | 'candlestick', currency?: string): ApexOptions => {
     // 툴팁 등에서 사용되는 ApexCharts 내부 구조를 정의합니다. (ApexOptions 내장 타입을 쓰되, 필요한 부분만 구체화)
     interface ApexChartContext {
         globals: {
@@ -152,9 +152,14 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick'): ApexOpt
             tooltip: { enabled: false }
         },
         yaxis: {
-            tooltip: { enabled: true },
+            tooltip: { 
+                enabled: true,
+            },
             labels: {
-                formatter: (val: number) => `$${val.toFixed(2)}`
+                formatter: (val: number) => {
+                    if (currency === 'KRW') return Math.round(val).toLocaleString();
+                    return `$${val.toFixed(2)}`;
+                }
             }
         },
         grid: {
@@ -188,18 +193,33 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick'): ApexOpt
                     hour: '2-digit', minute: '2-digit'
                 });
 
+                const formatValue = (val: number) => {
+                    if (currency === 'KRW') return `${val.toLocaleString()}원`;
+                    return `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                };
+
+                const getPercentChange = (target: number, base: number) => {
+                    const change = ((target - base) / base) * 100;
+                    const color = change > 0 ? '#ef4444' : change < 0 ? '#3b82f6' : '#9ca3af';
+                    const sign = change > 0 ? '+' : '';
+                    return `<span style="color: ${color}; font-weight: bold; margin-left: 8px;">(${sign}${change.toFixed(2)}%)</span>`;
+                };
+
                 return `
-                    <div class="p-3 bg-gray-900 border border-gray-700 rounded-lg shadow-xl text-xs space-y-1">
-                        <div class="text-gray-400 mb-2 border-b border-gray-700 pb-1">${dateStr}</div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">시가</span><span class="font-bold text-white">${o.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">고가</span><span class="font-bold text-white">${h.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">저가</span><span class="font-bold text-white">${l.toFixed(2)}</span></div>
-                        <div class="flex justify-between gap-4"><span class="text-gray-400">종가</span><span class="font-bold text-white">${c.toFixed(2)}</span></div>
+                    <div class="p-4 bg-gray-900/90 border border-gray-700/50 rounded-2xl shadow-2xl text-[11px] space-y-2 backdrop-blur-md min-w-[200px]">
+                        <div class="text-gray-400 mb-3 border-b border-gray-700 pb-2 font-bold tracking-tight">${dateStr}</div>
+                        <div class="flex justify-between items-center"><span class="text-gray-400">시가</span><span class="text-white">${formatValue(o)}</span></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-400">고가</span><span class="text-white">${formatValue(h)}${getPercentChange(h, o)}</span></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-400">저가</span><span class="text-white">${formatValue(l)}${getPercentChange(l, o)}</span></div>
+                        <div class="flex justify-between items-center py-1 border-t border-gray-700/50 mt-1"><span class="text-gray-400 font-bold">종가</span><span class="text-white font-black">${formatValue(c)}${getPercentChange(c, o)}</span></div>
                     </div>
                 `;
             } : undefined,
             y: {
-                formatter: (val: number) => `$${val.toFixed(2)}`
+                formatter: (val: number) => {
+                    if (currency === 'KRW') return `${val.toLocaleString()}원`;
+                    return `$${val.toFixed(2)}`;
+                }
             }
         }
     };
@@ -263,12 +283,19 @@ export function FormatTickerKR(ticker: string) {
     return ticker.trim().toUpperCase();
 }
 
-//화폐 단위 결정 및 포멧팅 하는 포맷 함수입니다.
-export function FormatPriceCurrency(currency: string | undefined, marketPrice: number | undefined) {
-    if (marketPrice === undefined || marketPrice === null || isNaN(marketPrice)) {
+//화폐 단위 결정 및 포맷팅 하는 포맷 함수입니다.
+export function FormatPriceCurrency(currency: string | undefined, price: number | undefined) {
+    if (price === undefined || price === null || isNaN(price)) {
         return "---";
     }
-    return currency === "KRW" ? `${marketPrice.toLocaleString()}원` : `$${Number(marketPrice.toFixed(2)).toLocaleString()}`;
+
+    const isKRW = currency === "KRW";
+    // 원화는 소수점 없이 반올림하여 정수로 표기, 달러는 소수점 2자리 고정
+    const formattedPrice = isKRW
+        ? Math.round(price).toLocaleString('ko-KR')
+        : price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    return isKRW ? `${formattedPrice}원` : `$${formattedPrice}`;
 }
 
 //티커 트림 후 업퍼케이스 포맷 함수입니다.

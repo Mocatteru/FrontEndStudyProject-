@@ -148,7 +148,9 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
-                        {marketChange?.toFixed(2)}
+                        {stockData.currency === 'KRW' 
+                            ? Math.round(marketChange ?? 0).toLocaleString() 
+                            : marketChange?.toFixed(2)}
                         <span className="text-[11px] opacity-60">({marketChangePercent?.toFixed(2)}%)</span>
                     </div>
                 </div>

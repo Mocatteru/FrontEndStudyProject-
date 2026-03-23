@@ -120,7 +120,7 @@ export default function SettingPage() {
                         <SettingSectionItem label="소속 부서">
                             <Input value={userDepartmentInput} onChange={(e) => { setUserDepartmentInput(e.target.value); setIsEditing(true) }} placeholder="소속 팀명을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
                         </SettingSectionItem>
-                        <SettingSectionItem label="직책">
+                        <SettingSectionItem label="권한">
                             <Select
                                 value={userRoleInput}
                                 onValueChange={(e) => { setUserRoleInput(e as "ADMIN USER" | "USER"); setIsEditing(true) }}
