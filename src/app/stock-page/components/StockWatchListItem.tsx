@@ -7,6 +7,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { FormatPriceCurrency, StockWatchListItemProps } from "@/types/stock";
 import { useCallback, memo } from "react";
 import { useStockStore } from "@/store/useStockStore";
+import { useUiStore } from "@/store/uiStore";
 
 
 const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, isPositive, currency, isOpen = true }: StockWatchListItemProps) => {
@@ -16,10 +17,15 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
 
     // [Senior Optimization] Selector를 사용하여 액션만 구독
     const setCurrentTicker = useStockStore(s => s.setCurrentTicker);
+    const { isWatchListOpen, toggleWatchList } = useUiStore();
 
     const onClickWatchListItem = useCallback(() => {
         setCurrentTicker(ticker);
-    }, [ticker, setCurrentTicker])
+        // 모바일이나 특정 상황에서 관심목록 클릭 시 자동으로 닫히도록 처리 (UX)
+        if (window.innerWidth < 768 && isWatchListOpen) {
+            toggleWatchList();
+        }
+    }, [ticker, setCurrentTicker, isWatchListOpen, toggleWatchList])
 
     return (
         <SidebarMenuItem className="px-1 w-full flex justify-center"> {/* 사이드바 좌우 여백 확보 및 중앙 정렬 */}

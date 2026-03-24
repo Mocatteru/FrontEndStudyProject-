@@ -27,10 +27,10 @@ export const useUiStore = create<UiState>()(
         (set) => ({
             isSiderOpen: true,
             isWatchListOpen: false, // 기본값: 닫힘
-            userName: "이종현의 프론트엔드",
+            userName: "게스트",
             userEmail: "[EMAIL_ADDRESS]",
-            userDepartment: "프론트엔드 개발팀",
-            userRole: "ADMIN USER",
+            userDepartment: "부서 없음",
+            userRole: "USER",
             toggleSidebar: () => set((state) => ({
                 isSiderOpen: !state.isSiderOpen
             })),

@@ -22,8 +22,8 @@ export default function Header() {
     const isStockPage = pathname.includes('/stock-page');
 
     return (
-        <header className="sticky top-0 z-50 flex h-20 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-black/70 px-6 sm:px-10 backdrop-blur-2xl transition-all duration-500 shadow-sm">
-            <div className="flex items-center gap-6 min-w-0">
+        <header className="sticky top-0 z-50 flex h-20 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-black/70 px-4 sm:px-10 backdrop-blur-2xl transition-all duration-500 shadow-sm">
+            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
                 <div className="p-2.5 bg-black/5 dark:bg-white/5 rounded-2xl hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 cursor-pointer border border-transparent hover:border-blue-500/20">
                     <SidebarTrigger />
                 </div>
@@ -38,14 +38,14 @@ export default function Header() {
                 </div>
             </div>
 
-            <div className="flex items-center gap-6 shrink-0 ml-4">
-                <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-6 shrink-0 ml-auto mr-0 sm:mr-0">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <div className="p-1 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 hover:border-blue-500/20 transition-all">
                         <ThemeToggle />
                     </div>
 
                     {isStockPage && (
-                        <>
+                        <div className="flex items-center gap-2">
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -62,13 +62,12 @@ export default function Header() {
                                     isWatchListOpen && "rotate-180"
                                 )} />
                             </Button>
-                            <div className="h-4 w-px bg-border mx-1 md:hidden" />
-                        </>
+                        </div>
                     )}
 
                     {/* [User Profile Card - Premium Update] */}
                     <div className={cn(
-                        "flex items-center gap-4 pl-4 border-l border-black/5 dark:border-white/10 transition-all duration-700",
+                        "flex items-center gap-4 sm:pl-4 sm:border-l border-black/5 dark:border-white/10 transition-all duration-700",
                         !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
                     )}>
                         <div className="hidden sm:flex flex-col items-end text-right">

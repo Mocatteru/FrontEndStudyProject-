@@ -51,44 +51,44 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
                     // [Desktop Style]
                     "md:relative md:border-l",
-                    isOpen ? "md:w-96" : "md:w-20",
+                    isOpen ? "md:w-86" : "md:w-20",
 
                     // [Mobile Style]
                     "fixed inset-y-0 right-0 shadow-2xl md:shadow-none border-l md:border-none",
-                    isOpen ? "w-[85vw] sm:w-96" : "w-0 border-none",
+                    isOpen ? "w-[85vw] sm:w-80" : "w-0 border-none",
 
                     !isOpen && "invisible md:visible"
                 )}
             >
-                {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 - [Premium Update] */}
+                {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 - [Tactical Alignment Update] */}
                 <SidebarHeader className={cn(
-                    "p-8 border-b border-black/5 dark:border-white/5 flex items-center transition-all duration-500 shrink-0",
-                    isOpen ? "flex-row justify-between h-28" : "flex-col justify-center h-28"
+                    "px-8 border-b border-black/5 dark:border-white/5 flex items-center transition-all duration-500 shrink-0",
+                    isOpen ? "flex-row justify-between h-20" : "flex-col justify-center h-20"
                 )}>
                     {isOpen ? (
                         <>
-                            <div className="flex flex-col gap-1 items-start animate-in fade-in slide-in-from-left-4 duration-500">
+                            <div className="flex flex-col gap-0.5 items-start animate-in fade-in slide-in-from-left-4 duration-500">
                                 <div className="flex items-center gap-2">
-                                    <div className="size-1.5 rounded-full bg-yellow-500 animate-pulse" />
-                                    <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">관심 종목 네트워크</span>
+                                    <div className="size-1 rounded-full bg-blue-500 animate-pulse" />
+                                    <span className="text-[9px] font-black tracking-[0.2em] text-muted-foreground/30 uppercase italic">Watchlist</span>
                                 </div>
-                                <h2 className="text-2xl font-black italic uppercase tracking-tighter text-yellow-500 drop-shadow-sm">
+                                <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground/80 drop-shadow-sm">
                                     관심종목
                                 </h2>
                             </div>
                             <button
                                 onClick={onToggle}
-                                className="p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent hover:border-black/5 shadow-sm"
+                                className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent shadow-sm"
                             >
-                                <Menu className="size-5" />
+                                <Menu className="size-4.5" />
                             </button>
                         </>
                     ) : (
                         <button
                             onClick={onToggle}
-                            className="p-4 bg-yellow-500/10 text-yellow-500 rounded-2xl hover:bg-yellow-500/20 transition-all active:scale-95 shadow-xl shadow-yellow-500/10 border border-yellow-500/10"
+                            className="size-11 flex items-center justify-center bg-black/5 dark:bg-white/5 text-muted-foreground/40 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground transition-all active:scale-95 border border-black/5 dark:border-white/5"
                         >
-                            <Menu className="size-6" />
+                            <Menu className="size-5" />
                         </button>
                     )}
                 </SidebarHeader>

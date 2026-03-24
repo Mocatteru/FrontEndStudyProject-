@@ -86,6 +86,14 @@ export default function AppSidebar() {
 
     const pathname = usePathname();
     const { userName, userDepartment, userRole } = useUiStore();
+    const { isMobile, setOpenMobile } = useSidebar();
+
+    // ── 경로 변경 시 모바일 사이드바 자동 닫기 UX ──
+    useEffect(() => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    }, [pathname, isMobile, setOpenMobile]);
 
     return (
         <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl transition-all duration-700">

@@ -170,7 +170,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                     )}
                 </div>
 
-                <div className="text-right space-y-2 shrink-0 self-start sm:self-center">
+                <div className="text-right space-y-2 shrink-0 self-end sm:self-center">
                     <p className="text-3xl pb-4 pr-2 sm:text-4xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
                         {FormatPriceCurrency(stockData.currency, marketPrice)}
                     </p>
