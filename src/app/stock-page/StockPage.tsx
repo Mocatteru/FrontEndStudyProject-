@@ -12,8 +12,7 @@ import StockWatchListSidebar from "./components/StockWatchListSidebar";
 import { TrendingUp, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FormatStockWatchListItem } from "@/types/stock";
-import { StockWatchListItemProps } from "./components/StockWatchListItem";
+import { FormatStockWatchListItem, StockWatchListItemProps } from "@/types/stock";
 import { toast } from "sonner";
 
 /**
@@ -140,21 +139,21 @@ export default function StockPage() {
             <div className="flex-1 flex flex-col min-w-0 h-full border-r border-black/5 dark:border-white/5">
                 <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scroll-smooth">
 
-                    {/* [1] 헤더 섹션 (정적) */}
-                    <div className="px-10 pt-12 pb-0 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
-                        <div className="flex items-center gap-5">
-                            <div className="p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
-                                <TrendingUp className="size-8 text-blue-500" />
+                    {/* [1] 헤더 섹션 (정적) - 모바일 최적화 */}
+                    <div className="px-4 sm:px-10 pt-6 sm:pt-12 pb-0 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
+                        <div className="flex items-center gap-3 sm:gap-5">
+                            <div className="hidden sm:block p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
+                                <TrendingUp className="size-6 sm:size-8 text-blue-500" />
                             </div>
                             <div>
-                                <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">Stock Dashboard</h1>
-                                <p className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">Market Analytics Node</p>
+                                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-foreground leading-tight">Stock Dashboard</h1>
+                                <p className="text-[10px] sm:text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">Market Analytics Node</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* [2] 스티키 액션 바: 이제 데이터와 상관없이 항상 최상위에 유지됩니다. */}
-                    <div className="sticky top-0 z-40 h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-8 px-10">
+                    {/* [2] 스티키 액션 바 - 모바일 패딩 및 높이 축소 */}
+                    <div className="sticky top-0 z-40 h-20 sm:h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-4 sm:mt-8 px-4 sm:px-10">
                         <div className="flex-1 max-w-3xl">
                             <StockSearchInput />
                         </div>
@@ -189,7 +188,7 @@ export default function StockPage() {
                     </div>
 
                     {/* [3] 메인 콘텐츠 영역 (동적 페칭 포함) */}
-                    <div className="px-10 space-y-12 bg-muted/5 dark:bg-background/20 min-h-screen">
+                    <div className="px-4 sm:px-10 pb-24 space-y-8 sm:space-y-12 bg-muted/5 dark:bg-background/20 min-h-screen pt-4 sm:pt-6">
                         <StockDashboardContent
                             currentTicker={currentTicker}
                             chartConfig={chartConfig}

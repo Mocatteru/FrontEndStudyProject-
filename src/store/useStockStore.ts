@@ -1,5 +1,4 @@
-import { StockWatchListItemProps } from "@/app/stock-page/components/StockWatchListItem";
-import { Stock } from "@/types/stock";
+import { StockWatchListItemProps, Stock } from "@/types/stock";
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; //  1. 미들웨어 추가
 

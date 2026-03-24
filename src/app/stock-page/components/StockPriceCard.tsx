@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, memo } from "react";
+import React, { useState, memo } from "react";
 import { Stock, FormatPriceCurrency } from "@/types/stock";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -129,35 +129,46 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
     const isPositive = (marketChange ?? 0) >= 0;
 
     return (
-        <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
+        <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-3xl sm:rounded-[3.5rem] p-5 sm:p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-1000" />
             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-1000" />
 
-            <div className="relative flex flex-col sm:flex-row justify-between items-start gap-6">
-                <div className="flex-1 min-w-0 space-y-4">
-                    <div className="flex items-center gap-4 flex-wrap">
-                        <h3 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight group-hover:text-blue-500 transition-all duration-300">
-                            {stockData?.longName || stockData?.shortName || 'Unknown'}
-                            <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
-                        </h3>
+            <div className="relative flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-6">
+                <div className="flex-1 min-w-0 space-y-4 sm:space-y-6">
+                    <div className="flex items-center gap-6 flex-wrap">
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                                <div className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">자산 정보</span>
+                            </div>
+                            <h3 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none group-hover:text-blue-500 transition-all duration-500">
+                                {stockData?.longName || stockData?.shortName || 'Unknown'}
+                                <span className="ml-3 text-muted-foreground/20 font-black text-xl uppercase tracking-widest inline-block not-italic">{stockData?.symbol}</span>
+                            </h3>
+                        </div>
 
                         {/* 메모 기능: 별도 컴포넌트로 분리하여 리렌더링 범위 한정 */}
-                        <MemoUpdateDialog 
-                            symbol={stockData.symbol}
-                            longName={stockData.longName || ""}
-                            currentMemo={currentMemo}
-                        />
+                        <div className="self-end pb-1">
+                            <MemoUpdateDialog 
+                                symbol={stockData.symbol}
+                                longName={stockData.longName || ""}
+                                currentMemo={currentMemo}
+                            />
+                        </div>
                     </div>
 
-                    <p className="text-[14px] font-bold text-muted-foreground/40 uppercase tracking-[0.3em] flex items-center gap-2">
+                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
                         <span className="size-2 rounded-full bg-blue-500/50 animate-pulse" />
-                        장 상태: <span className="text-foreground/60">{getMarketStateName(stockData?.marketState)}</span>
-                    </p>
+                        <span className="text-[10px] font-black text-muted-foreground/40 tracking-[0.2em]">
+                            장 상태 : <span className="text-foreground/60">{getMarketStateName(stockData?.marketState)}</span>
+                        </span>
+                    </div>
 
                     {currentMemo && (
-                        <div className="mt-4 py-2 animate-in fade-in slide-in-from-left-4 duration-500 max-w-full">
-                            <p className="text-[16px] font-black text-blue-500/40 uppercase tracking-widest mb-1">메모</p>
-                            <p className="text-[14px] font-medium text-foreground/80 leading-relaxed whitespace-pre-wrap break-all">{currentMemo}</p>
+                        <div className="mt-8 p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 animate-in fade-in slide-in-from-left-4 duration-700 max-w-full group/memo relative overflow-hidden">
+                            <div className="absolute -right-4 -top-4 size-16 bg-blue-500/5 rounded-full blur-xl group-hover/memo:bg-blue-500/10 transition-all duration-1000" />
+                            <p className="text-[10px] font-black text-blue-500/40 tracking-[0.2em] mb-3">투자 전략 메모</p>
+                            <p className="text-[15px] font-bold text-foreground/80 leading-relaxed whitespace-pre-wrap break-all">{currentMemo}</p>
                         </div>
                     )}
                 </div>
@@ -169,8 +180,8 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                     <div className={cn(
                         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-base sm:text-lg tabular-nums shadow-sm border",
                         isPositive
-                            ? "bg-green-500/10 border-green-500/20 text-green-500"
-                            : "bg-red-500/10 border-red-500/20 text-red-500"
+                            ? "bg-red-500/10 border-red-500/20 text-red-500"
+                            : "bg-blue-500/10 border-blue-500/20 text-blue-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
                         {stockData.currency === 'KRW' 

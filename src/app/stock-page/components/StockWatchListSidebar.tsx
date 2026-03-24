@@ -46,34 +46,39 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
             <aside
                 className={cn(
-                    "h-full transition-all duration-500 ease-in-out flex flex-col overflow-hidden shrink-0 z-50",
-                    "bg-white/95 dark:bg-black/95 backdrop-blur-md border-black/5 dark:border-white/10",
+                    "h-full transition-all duration-700 ease-in-out flex flex-col overflow-hidden shrink-0 z-50",
+                    "bg-white/80 dark:bg-black/90 backdrop-blur-2xl border-black/5 dark:border-white/5",
 
                     // [Desktop Style]
                     "md:relative md:border-l",
-                    isOpen ? "md:w-80" : "md:w-16",
+                    isOpen ? "md:w-96" : "md:w-20",
 
                     // [Mobile Style]
                     "fixed inset-y-0 right-0 shadow-2xl md:shadow-none border-l md:border-none",
-                    isOpen ? "w-80" : "w-0 border-none",
+                    isOpen ? "w-[85vw] sm:w-96" : "w-0 border-none",
 
-                    // [Senior's Tip] 모바일에서 열렸을 때 외부 영역 클릭 방지를 위한 z-index 조정
                     !isOpen && "invisible md:visible"
                 )}
             >
-                {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 */}
+                {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 - [Premium Update] */}
                 <SidebarHeader className={cn(
-                    "p-6 border-b border-black/5 dark:border-white/10 flex items-center transition-all duration-500 shrink-0",
-                    isOpen ? "flex-row justify-between h-24" : "flex-col justify-center h-24"
+                    "p-8 border-b border-black/5 dark:border-white/5 flex items-center transition-all duration-500 shrink-0",
+                    isOpen ? "flex-row justify-between h-28" : "flex-col justify-center h-28"
                 )}>
                     {isOpen ? (
                         <>
-                            <div className="flex pl-6 items-center gap-3 font-black text-2xl text-yellow-500 animate-in fade-in slide-in-from-left-4">
-                                <span className="uppercase tracking-widest ">관심종목</span>
+                            <div className="flex flex-col gap-1 items-start animate-in fade-in slide-in-from-left-4 duration-500">
+                                <div className="flex items-center gap-2">
+                                    <div className="size-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                                    <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">관심 종목 네트워크</span>
+                                </div>
+                                <h2 className="text-2xl font-black italic uppercase tracking-tighter text-yellow-500 drop-shadow-sm">
+                                    관심종목
+                                </h2>
                             </div>
                             <button
                                 onClick={onToggle}
-                                className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-90 border border-transparent hover:border-black/5"
+                                className="p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent hover:border-black/5 shadow-sm"
                             >
                                 <Menu className="size-5" />
                             </button>
@@ -81,37 +86,38 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     ) : (
                         <button
                             onClick={onToggle}
-                            className="p-3.5 bg-blue-500/10 text-blue-500 rounded-2xl hover:bg-blue-500/20 transition-all active:scale-90 shadow-sm border border-blue-500/10"
+                            className="p-4 bg-yellow-500/10 text-yellow-500 rounded-2xl hover:bg-yellow-500/20 transition-all active:scale-95 shadow-xl shadow-yellow-500/10 border border-yellow-500/10"
                         >
-                            <Menu className="size-5" />
+                            <Menu className="size-6" />
                         </button>
                     )}
                 </SidebarHeader>
 
-                {/* /* ... 사이드바 헤더 아래에 배치 ... */}
+                {/* [2] 탭 및 목록 영역 - [UI consistency] */}
                 {isOpen && (
-                    <div className="flex-1 min-h-0 px-6 pt-4 pb-0 animate-in fade-in duration-500">
-                        {/* 룰 15 반영: 기본 태그 대신 Tabs 라이브러리 사용 */}
+                    <div className="flex-1 min-h-0 px-8 pt-6 pb-0 animate-in fade-in duration-700">
                         <Tabs
                             defaultValue="ALL"
                             value={filterMode}
                             onValueChange={(val) => setFilterMode(val as 'ALL' | 'KR' | 'US')}
                             className="flex flex-col h-full"
                         >
-                            <TabsList className="w-full h-11 bg-black/5 dark:bg-white/5 rounded-2xl p-1 shrink-0">
-                                <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-xs transition-all">전체</TabsTrigger>
-                                <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-xs transition-all">국내</TabsTrigger>
-                                <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-xs transition-all">해외</TabsTrigger>
+                            <TabsList className="w-full h-12 bg-black/5 dark:bg-white/5 rounded-[1.25rem] p-1.5 shrink-0 border border-black/5 dark:border-white/5">
+                                <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">전체</TabsTrigger>
+                                <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">국내</TabsTrigger>
+                                <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">해외</TabsTrigger>
                             </TabsList>
 
-                            {/* [Senior Optimization] TabsContent 3개를 쓰는 대신, 단일 영역에서 데이터만 필터링하여 렌더링 (코드 중복 제거) */}
-                            <div className="flex-1 min-h-0 mt-6 overflow-y-auto custom-scrollbar pr-1">
+                            <div className="flex-1 min-h-0 mt-8 overflow-y-auto custom-scrollbar no-scrollbar pr-1">
                                 <SidebarGroup className="p-0">
-                                    <SidebarMenu className="gap-4">
+                                    <SidebarMenu className="gap-5 pb-10">
                                         {_.isEmpty(filteredList) ? (
-                                            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">
-                                                    {filterMode === 'ALL' ? '전체' : filterMode === 'KR' ? '국내' : '해외'}주식 관심종목이 없습니다.
+                                            <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                                <div className="size-16 rounded-[2.5rem] bg-black/5 dark:bg-white/5 flex items-center justify-center mb-6">
+                                                    <Menu className="size-6 text-muted-foreground/20" />
+                                                </div>
+                                                <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30 leading-relaxed max-w-[180px]">
+                                                    {filterMode === 'ALL' ? '등록된 관심종목이 없습니다' : filterMode === 'KR' ? '국내 관심종목이 없습니다' : '해외 관심종목이 없습니다'}
                                                 </span>
                                             </div>
                                         ) : (
@@ -119,7 +125,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                                 <StockWatchListItem
                                                     key={`${v.ticker}-${index}`}
                                                     {...v}
-                                                    isOpen={isOpen}
+                                                    isOpen={true} // 사이드바가 열려있을 때의 ListItem 디자인 유지
                                                 />
                                             ))
                                         )}

@@ -4,20 +4,9 @@ import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { FormatPriceCurrency } from "@/types/stock";
+import { FormatPriceCurrency, StockWatchListItemProps } from "@/types/stock";
 import { useCallback, memo } from "react";
 import { useStockStore } from "@/store/useStockStore";
-
-export interface StockWatchListItemProps {
-    ticker: string;
-    name: string;
-    price: number;
-    change: number;
-    changePercent: number;
-    isPositive: boolean;
-    currency: string;
-    isOpen?: boolean; // [Senior] 사이드바의 확장/축소 상태를 전달받음
-}
 
 
 const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, isPositive, currency, isOpen = true }: StockWatchListItemProps) => {

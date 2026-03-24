@@ -1,10 +1,16 @@
-/**
- * [Stock Interface]
- * - 역할: 주식 데이터의 구조를 정의하여 타입 안정성을 확보합니다.
- * - 장점: 자동 완성 기능과 컴파일 타임의 에러 체크를 통해 런타임 에러를 사전에 방지합니다.
- */
-import { StockWatchListItemProps } from '@/app/stock-page/components/StockWatchListItem';
 import type { ApexOptions } from 'apexcharts';
+
+export interface StockWatchListItemProps {
+    ticker: string;
+    name: string;
+    price: number;
+    change: number;
+    changePercent: number;
+    isPositive: boolean;
+    currency: string;
+    isOpen?: boolean; // [Senior] 사이드바의 확장/축소 상태를 전달받음
+}
+
 export interface Stock {
     // 1. 기본 식별 정보
     symbol: string;               // 종목 코드 (예: AAPL)
@@ -112,7 +118,15 @@ export const getStockChartOptions = (chartType: 'line' | 'candlestick', currency
     return {
         chart: {
             type: chartType as 'line' | 'candlestick',
-            toolbar: { show: false },
+            // [Mobile & UX Optimization] 모바일 핀치 투 줌을 위해 줌 제스처 활성화
+            toolbar: { 
+                show: false, // 툴바 버튼들은 숨기되 줌 기능은 동작
+            },
+            zoom: { 
+                enabled: true, 
+                type: 'x', 
+                autoScaleYaxis: true // 가로 줌(확대/축소) 시 y축 스케일링 자동 지원
+            },
             background: 'transparent',
             foreColor: '#9ca3af',
             animations: { enabled: true },

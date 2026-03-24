@@ -91,51 +91,65 @@ export default function AppSidebar() {
     const { postCount } = usePostStore();
 
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl transition-all duration-700">
             <TabKeyToggle />
 
-            {/* ── 상단 로고 및 유저 간략 정보 ── */}
-            <SidebarHeader className="px-3 py-3">
-                <div className="flex items-center gap-3 overflow-hidden group-data-[collapsible=icon]:mx-auto">
-                    <div className="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm shadow-sm shadow-blue-600/40">
+            {/* ── 상단 로고 및 유저 간략 정보 - [Tactical Design Update] ── */}
+            <SidebarHeader className="px-5 py-6">
+                <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center transition-all duration-500">
+                    <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-2xl bg-blue-600 text-white font-black text-xs shadow-2xl shadow-blue-600/40 hover:rotate-12 transition-all duration-500 cursor-pointer">
+                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 hover:opacity-100 transition-opacity" />
                         FE
                     </div>
 
                     <div className={cn(
-                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-opacity duration-300",
-                        !mounted ? "opacity-0" : "opacity-100"
+                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-700",
+                        !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
                     )}>
-                        <span className="font-bold text-sm truncate">
-                            {userName}
-                        </span>
-                        <span className="text-blue-500 font-bold text-[11px] uppercase tracking-tight">{userRole}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">
-                            {userDepartment}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                            <span className="font-black text-sm tracking-tighter italic uppercase text-foreground/80">
+                                {userName}
+                            </span>
+                            <div className="size-1 rounded-full bg-blue-500 animate-pulse" />
+                        </div>
+                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] italic">{userRole}</span>
                     </div>
                 </div>
             </SidebarHeader>
 
-            <SidebarSeparator />
+            <SidebarSeparator className="mx-4 opacity-50" />
 
-            <SidebarContent>
+            <SidebarContent className="px-3 py-4 gap-6">
                 {sidebarData.navMain.map((group) => (
-                    <SidebarGroup key={group.title} className="px-2 py-2">
-                        <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+                    <SidebarGroup key={group.title} className="p-0">
+                        <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/30 group-data-[collapsible=icon]:hidden">
                             {group.title}
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
-                            <SidebarMenu>
+                            <SidebarMenu className="gap-2">
                                 {group.items.map((item) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
                                             render={<Link href={item.url} />}
                                             isActive={pathname === item.url}
                                             tooltip={item.title}
-                                            className="gap-3 rounded-lg group-data-[collapsible=icon]:mx-auto"
+                                            className={cn(
+                                                "group/btn relative h-12 gap-4 rounded-[1.25rem] px-4 transition-all duration-500",
+                                                pathname === item.url 
+                                                    ? "bg-blue-500 text-white shadow-xl shadow-blue-500/20 active:scale-95" 
+                                                    : "hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground/50 hover:text-foreground active:scale-95"
+                                            )}
                                         >
-                                            <item.icon className="size-4 shrink-0" />
-                                            <span className="truncate">{item.title}</span>
+                                            <item.icon className={cn(
+                                                "size-4 shrink-0 transition-all duration-500",
+                                                pathname === item.url ? "rotate-12 scale-110" : "group-hover/btn:rotate-12 group-hover/btn:scale-110"
+                                            )} />
+                                            <span className="font-black text-[11px] uppercase tracking-[0.15em] truncate group-data-[collapsible=icon]:hidden italic">
+                                                {item.title}
+                                            </span>
+                                            {pathname === item.url && (
+                                                <div className="absolute left-1.5 w-1 h-4 bg-white/40 rounded-full group-data-[collapsible=icon]:hidden" />
+                                            )}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))}
@@ -144,43 +158,53 @@ export default function AppSidebar() {
                     </SidebarGroup>
                 ))}
 
-                <SidebarGroup className="px-2 group-data-[collapsible=icon]:hidden">
-                    <SidebarGroupLabel>통계</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <div className="mx-1 rounded-lg bg-blue-500/8 dark:bg-blue-500/12 p-3 border border-blue-500/20">
-                            <div className="flex items-center gap-2 mb-1">
-                                <FileText className="size-3 text-blue-500" />
-                                <p className="text-[10px] text-blue-500 font-bold uppercase tracking-wide">
-                                    Active Posts
-                                </p>
+                {/* [Statistics Card - High-End Style] */}
+                <SidebarGroup className="p-0 group-data-[collapsible=icon]:hidden">
+                    <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">통계 요약</SidebarGroupLabel>
+                    <SidebarGroupContent className="px-2">
+                        <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-blue-500/5 to-purple-500/5 p-6 border border-black/5 dark:border-white/5 hover:border-blue-500/20 transition-all duration-700 group/card">
+                            <div className="absolute -right-8 -top-8 size-24 bg-blue-500/5 rounded-full blur-2xl group-hover/card:bg-blue-500/10 transition-all duration-1000" />
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-500/10 rounded-xl">
+                                        <FileText className="size-4 text-blue-500 group-hover/card:rotate-12 transition-transform duration-500" />
+                                    </div>
+                                    <p className="text-[10px] text-blue-500/60 font-black tracking-[0.2em]">
+                                        작성된 게시물
+                                    </p>
+                                </div>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-4xl font-black text-foreground/80 tabular-nums italic tracking-tighter">
+                                        {postCount}
+                                    </span>
+                                    <span className="text-[10px] font-black text-muted-foreground/30">개</span>
+                                </div>
                             </div>
-                            <span className="text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
-                                {postCount}
-                            </span>
                         </div>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarSeparator />
+            <SidebarSeparator className="mx-4 opacity-50" />
 
-            <SidebarFooter className="p-2">
+            <SidebarFooter className="p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             size="lg"
                             tooltip={userName}
-                            className="rounded-lg group-data-[collapsible=icon]:mx-auto"
+                            className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-500 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
                         >
-                            <div className="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg bg-linear-to-tr from-blue-500 to-purple-500 shadow-sm">
-                                <UserCircle className="size-5 text-white" />
+                            <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/20 group-hover:scale-105 transition-all duration-500">
+                                <UserCircle className="size-6 text-white" />
+                                <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-white dark:border-black animate-pulse" />
                             </div>
                             <div className={cn(
-                                "grid flex-1 text-left text-sm leading-tight overflow-hidden group-data-[collapsible=icon]:hidden transition-opacity duration-300",
-                                !mounted ? "opacity-0" : "opacity-100"
+                                "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-700",
+                                !mounted ? "opacity-0 -translate-x-2" : "opacity-100 translate-x-0"
                             )}>
-                                <span className="truncate font-semibold">{userName}</span>
-                                <span className="truncate text-xs text-muted-foreground">{userRole}</span>
+                                <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80 italic">{userName}</span>
+                                <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">{userDepartment}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
