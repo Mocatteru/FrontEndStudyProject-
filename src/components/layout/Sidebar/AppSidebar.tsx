@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { usePostStore } from '@/store/postStore';
@@ -79,9 +79,12 @@ function TabKeyToggle() {
 // 메인 사이드바 컴포넌트
 // ─────────────────────────────────────────
 export default function AppSidebar() {
-    // [Senior Pattern] 하이드레이션 에러 방지용 마운트 가드
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
+    // [Senior Pattern] 하이드레이션 에러 방지를 위해 useSyncExternalStore 기반 가드 사용
+    const mounted = React.useSyncExternalStore(
+        () => () => { }, // 구독 대상 없음
+        () => true,      // 클라이언트 측 Snapshot
+        () => false     // 서버 측 Snapshot
+    );
 
     const pathname = usePathname();
     const { userName, userDepartment, userRole } = useUiStore();

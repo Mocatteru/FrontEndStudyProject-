@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useUiStore } from '@/store/uiStore';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -10,9 +10,12 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
-    // [Senior Pattern] 하이드레이션 에러 방지를 위한 마운트 상태 가드
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
+    // [Senior Pattern] 하이드레이션 에러 방지를 위해 useSyncExternalStore 기반 가드 사용
+    const mounted = React.useSyncExternalStore(
+        () => () => {}, // 구독 대상 없음
+        () => true,      // 클라이언트 측 Snapshot
+        () => false     // 서버 측 Snapshot
+    );
 
     const { userName, isWatchListOpen, toggleWatchList, userEmail } = useUiStore();
     const pathname = usePathname();
