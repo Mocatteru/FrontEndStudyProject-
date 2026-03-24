@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { usePostStore } from '@/store/postStore';
 import { useUiStore } from '@/store/uiStore';
 import {
     Sidebar,
@@ -26,7 +25,6 @@ import {
     TrendingUp,
     Settings,
     UserCircle,
-    FileText,
 } from "lucide-react";
 import { cn } from '@/lib/utils';
 
@@ -88,7 +86,6 @@ export default function AppSidebar() {
 
     const pathname = usePathname();
     const { userName, userDepartment, userRole } = useUiStore();
-    const { postCount } = usePostStore();
 
     return (
         <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl transition-all duration-700">
@@ -97,11 +94,6 @@ export default function AppSidebar() {
             {/* ── 상단 로고 및 유저 간략 정보 - [Tactical Design Update] ── */}
             <SidebarHeader className="px-5 py-6">
                 <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center transition-all duration-500">
-                    <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-2xl bg-blue-600 text-white font-black text-xs shadow-2xl shadow-blue-600/40 hover:rotate-12 transition-all duration-500 cursor-pointer">
-                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 hover:opacity-100 transition-opacity" />
-                        FE
-                    </div>
-
                     <div className={cn(
                         "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-700",
                         !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
@@ -135,8 +127,8 @@ export default function AppSidebar() {
                                             tooltip={item.title}
                                             className={cn(
                                                 "group/btn relative h-12 gap-4 rounded-[1.25rem] px-4 transition-all duration-500",
-                                                pathname === item.url 
-                                                    ? "bg-blue-500 text-white shadow-xl shadow-blue-500/20 active:scale-95" 
+                                                pathname === item.url
+                                                    ? "bg-blue-500 text-white shadow-xl shadow-blue-500/20 active:scale-95"
                                                     : "hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground/50 hover:text-foreground active:scale-95"
                                             )}
                                         >
@@ -157,32 +149,6 @@ export default function AppSidebar() {
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ))}
-
-                {/* [Statistics Card - High-End Style] */}
-                <SidebarGroup className="p-0 group-data-[collapsible=icon]:hidden">
-                    <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">통계 요약</SidebarGroupLabel>
-                    <SidebarGroupContent className="px-2">
-                        <div className="relative overflow-hidden rounded-[2rem] bg-linear-to-br from-blue-500/5 to-purple-500/5 p-6 border border-black/5 dark:border-white/5 hover:border-blue-500/20 transition-all duration-700 group/card">
-                            <div className="absolute -right-8 -top-8 size-24 bg-blue-500/5 rounded-full blur-2xl group-hover/card:bg-blue-500/10 transition-all duration-1000" />
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-500/10 rounded-xl">
-                                        <FileText className="size-4 text-blue-500 group-hover/card:rotate-12 transition-transform duration-500" />
-                                    </div>
-                                    <p className="text-[10px] text-blue-500/60 font-black tracking-[0.2em]">
-                                        작성된 게시물
-                                    </p>
-                                </div>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-foreground/80 tabular-nums italic tracking-tighter">
-                                        {postCount}
-                                    </span>
-                                    <span className="text-[10px] font-black text-muted-foreground/30">개</span>
-                                </div>
-                            </div>
-                        </div>
-                    </SidebarGroupContent>
-                </SidebarGroup>
             </SidebarContent>
 
             <SidebarSeparator className="mx-4 opacity-50" />

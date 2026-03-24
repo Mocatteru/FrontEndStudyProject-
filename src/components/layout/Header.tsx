@@ -28,7 +28,7 @@ export default function Header() {
                     <SidebarTrigger />
                 </div>
                 <div className="hidden sm:block h-6 w-px bg-black/5 dark:bg-white/10" />
-                
+
                 {/* [Senior] 현재 경로 힌트 추가 */}
                 <div className="hidden lg:flex flex-col">
                     <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30 leading-none mb-1">현재 위치</span>
@@ -72,13 +72,8 @@ export default function Header() {
                         !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
                     )}>
                         <div className="hidden sm:flex flex-col items-end text-right">
-                            <span className="text-[13px] font-black tracking-tight text-foreground leading-none mb-1 group-hover:text-blue-500 transition-colors uppercase italic">{userName}</span>
+                            <span className="text-[13px] font-black tracking-tight text-foreground leading-none mb-1 group-hover:text-blue-500 transition-colors uppercase italic">{userName}님 로그인 중</span>
                             <span className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase">{userEmail}</span>
-                        </div>
-                        <div className="size-11 rounded-2xl bg-linear-to-br from-blue-500 to-purple-600 p-0.5 shadow-lg shadow-blue-500/20 hover:scale-110 active:scale-95 transition-all duration-500 cursor-pointer">
-                            <div className="w-full h-full rounded-[0.85rem] bg-white dark:bg-black flex items-center justify-center font-black text-xs text-blue-500 uppercase tracking-tighter italic">
-                                {userName?.substring(0, 2)}
-                            </div>
                         </div>
                     </div>
                 </div>

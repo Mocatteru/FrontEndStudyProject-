@@ -19,14 +19,14 @@ interface StockPriceCardProps {
  * 타이핑 상태(memoInput)를 이곳에 고립시켜, 글자를 입력할 때
  * 메인 주가 정보인 StockPriceCard 전체가 리렌더링되는 것을 원천 차단합니다.
  */
-const MemoUpdateDialog = memo(({ 
-    symbol, 
-    longName, 
-    currentMemo 
-}: { 
-    symbol: string, 
-    longName: string, 
-    currentMemo: string 
+const MemoUpdateDialog = memo(({
+    symbol,
+    longName,
+    currentMemo
+}: {
+    symbol: string,
+    longName: string,
+    currentMemo: string
 }) => {
     // [변수명 유지] 기존 변수명을 그대로 사용합니다.
     const [open, setOpen] = useState(false);
@@ -119,7 +119,7 @@ function getMarketStateName(state: string | undefined): string {
 
 const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
     // 특정 티커의 메모 데이터만 효율적으로 구독
-    const currentMemo = useStockStore(s => 
+    const currentMemo = useStockStore(s =>
         s.stockMemo.find(m => m.ticker === stockData.symbol)?.memo || ""
     );
 
@@ -137,10 +137,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                 <div className="flex-1 min-w-0 space-y-4 sm:space-y-6">
                     <div className="flex items-center gap-6 flex-wrap">
                         <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2">
-                                <div className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30">자산 정보</span>
-                            </div>
+
                             <h3 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none group-hover:text-blue-500 transition-all duration-500">
                                 {stockData?.longName || stockData?.shortName || 'Unknown'}
                                 <span className="ml-3 text-muted-foreground/20 font-black text-xl uppercase tracking-widest inline-block not-italic">{stockData?.symbol}</span>
@@ -149,7 +146,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
 
                         {/* 메모 기능: 별도 컴포넌트로 분리하여 리렌더링 범위 한정 */}
                         <div className="self-end pb-1">
-                            <MemoUpdateDialog 
+                            <MemoUpdateDialog
                                 symbol={stockData.symbol}
                                 longName={stockData.longName || ""}
                                 currentMemo={currentMemo}
@@ -184,8 +181,8 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             : "bg-blue-500/10 border-blue-500/20 text-blue-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
-                        {stockData.currency === 'KRW' 
-                            ? Math.round(marketChange ?? 0).toLocaleString() 
+                        {stockData.currency === 'KRW'
+                            ? Math.round(marketChange ?? 0).toLocaleString()
                             : marketChange?.toFixed(2)}
                         <span className="text-[11px] opacity-60">({marketChangePercent?.toFixed(2)}%)</span>
                     </div>

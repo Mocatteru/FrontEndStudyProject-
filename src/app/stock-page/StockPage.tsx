@@ -101,7 +101,7 @@ const StockDashboardContent = memo(({
             <div className="space-y-8">
                 <div className="flex items-center gap-4 group cursor-pointer w-fit">
                     <div className="w-2 h-8 bg-blue-500 rounded-full group-hover:h-12 transition-all duration-500 shadow-xl shadow-blue-500/50" />
-                    <h2 className="text-3xl font-black tracking-tighter italic uppercase text-foreground/90">Tactical Market Data</h2>
+                    <h2 className="text-3xl font-black tracking-tighter uppercase text-foreground/90">세부사항</h2>
                 </div>
                 <StockStats stockData={stockData} />
             </div>
