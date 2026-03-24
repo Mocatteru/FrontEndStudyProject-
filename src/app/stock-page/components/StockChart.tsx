@@ -226,14 +226,26 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             }
 
             const coordinate = seriesRef.current.priceToCoordinate(chartType === 'candlestick' ? (data as CandlestickData<Time>).close : (data as LineData<Time>).value);
-            let shiftedCoordinate = param.point.x + 20;
-            if (shiftedCoordinate > chartContainerRef.current.clientWidth - 180) {
-                shiftedCoordinate = param.point.x - 180;
+            let shiftedX = param.point.x + 20;
+            // 우측 튀어나감 방지
+            if (shiftedX > chartContainerRef.current.clientWidth - 180) {
+                shiftedX = param.point.x - 180;
             }
-            let shiftedY = coordinate ? coordinate - 40 : param.point.y;
-            if (shiftedY < 0) shiftedY = 10;
 
-            toolTip.style.left = shiftedCoordinate + 'px';
+            let shiftedY = coordinate ? coordinate - 40 : param.point.y;
+
+            // 상단 튀어나감 방지
+            if (shiftedY < 10) {
+                shiftedY = 10;
+            }
+
+            // 하단 튀어나감 방지 (툴팁이 잘리지 않도록 동적으로 계산)
+            const maxTop = chartContainerRef.current.clientHeight - toolTip.clientHeight - 10;
+            if (shiftedY > maxTop) {
+                shiftedY = maxTop;
+            }
+
+            toolTip.style.left = shiftedX + 'px';
             toolTip.style.top = shiftedY + 'px';
             toolTip.style.opacity = '1';
             toolTip.style.pointerEvents = 'none';
