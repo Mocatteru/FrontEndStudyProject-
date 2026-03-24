@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, memo } from "react";
+import React, { useState, useMemo, memo } from "react";
 import { Stock, FormatPriceCurrency } from "@/types/stock";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,26 +15,27 @@ interface StockPriceCardProps {
 
 /** 
  * [Senior Optimization] 
- * MemoUpdateDialog를 별도 컴포넌트로 분리하여 
- * 다이얼로그 내부의 타이핑 상태(memoInput)가 주가 카드(StockPriceCard) 전체를 
- * 리렌더링시키지 않도록 격리합니다.
+ * 메모 업데이트 전용 다이얼로그 컴포넌트.
+ * 타이핑 상태(memoInput)를 이곳에 고립시켜, 글자를 입력할 때
+ * 메인 주가 정보인 StockPriceCard 전체가 리렌더링되는 것을 원천 차단합니다.
  */
-const MemoUpdateDialog = memo(({
-    symbol,
-    longName,
-    initialMemo
-}: {
-    symbol: string,
-    longName: string,
-    initialMemo: string
+const MemoUpdateDialog = memo(({ 
+    symbol, 
+    longName, 
+    currentMemo 
+}: { 
+    symbol: string, 
+    longName: string, 
+    currentMemo: string 
 }) => {
+    // [변수명 유지] 기존 변수명을 그대로 사용합니다.
     const [open, setOpen] = useState(false);
     const [memoInput, setMemoInput] = useState("");
     const setStockMemo = useStockStore(s => s.setStockMemo);
 
     const handleOpenChange = (isOpen: boolean) => {
         if (isOpen) {
-            setMemoInput(initialMemo);
+            setMemoInput(currentMemo);
         }
         setOpen(isOpen);
     };
@@ -62,7 +63,8 @@ const MemoUpdateDialog = memo(({
                     </Button>
                 }
             />
-            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-xl shadow-2xl rounded-[2.5rem]">
+            {/* backdrop-blur 성능을 위해 xl -> md로 부드럽게 조정 */}
+            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-md shadow-2xl rounded-[2.5rem] animate-in zoom-in-95 duration-200">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
                         메모 업데이트
@@ -116,19 +118,15 @@ function getMarketStateName(state: string | undefined): string {
 }
 
 const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
+    // 특정 티커의 메모 데이터만 효율적으로 구독
+    const currentMemo = useStockStore(s => 
+        s.stockMemo.find(m => m.ticker === stockData.symbol)?.memo || ""
+    );
+
     const marketPrice = stockData.regularMarketPrice;
     const marketChange = stockData.regularMarketChange;
     const marketChangePercent = stockData.regularMarketChangePercent;
     const isPositive = (marketChange ?? 0) >= 0;
-
-    /** 
-     * [Senior Optimization] 
-     * 특정 티커의 메모만 선택적으로 구독(Selector)하여 
-     * 다른 주식의 메모가 변경될 때 이 카드가 불필요하게 리렌더링되는 것을 방지합니다.
-     */
-    const currentMemo = useStockStore(s =>
-        s.stockMemo.find(m => m.ticker === stockData.symbol)?.memo || ""
-    );
 
     return (
         <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
@@ -143,10 +141,11 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                         </h3>
 
-                        <MemoUpdateDialog
+                        {/* 메모 기능: 별도 컴포넌트로 분리하여 리렌더링 범위 한정 */}
+                        <MemoUpdateDialog 
                             symbol={stockData.symbol}
                             longName={stockData.longName || ""}
-                            initialMemo={currentMemo}
+                            currentMemo={currentMemo}
                         />
                     </div>
 
@@ -174,8 +173,8 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
-                        {stockData.currency === 'KRW'
-                            ? Math.round(marketChange ?? 0).toLocaleString()
+                        {stockData.currency === 'KRW' 
+                            ? Math.round(marketChange ?? 0).toLocaleString() 
                             : marketChange?.toFixed(2)}
                         <span className="text-[11px] opacity-60">({marketChangePercent?.toFixed(2)}%)</span>
                     </div>
