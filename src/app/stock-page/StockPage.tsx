@@ -19,8 +19,7 @@ import { toast } from "sonner";
 /**
  * [Senior Optimization] 
  * 주가 데이터가 자주 바뀌는 메인 콘텐츠 영역을 별도 컴포넌트로 분리합니다.
- * 스티키 액션 바를 이 내부로 이동하여 실시간 주가 데이터(stockData)에 접근할 수 있게 함으로써 
- * 관심종목 등록(Heart Button) 기능을 완벽히 지원합니다.
+ * 실시간 주가 데이터(stockData)에 대한 로직만 담당하도록 범위를 좁혔습니다.
  */
 interface StockDashboardContentProps {
     currentTicker: string;
@@ -76,42 +75,19 @@ const StockDashboardContent = memo(({
         );
     }
 
-    if (!stockData) return null;
+    // [Bug Fix] stockData가 없을 때도 검색창은 유지되어야 하므로, 
+    // 하단 상세 UI만 조건부로 렌더링하거나 부모에서 처리합니다.
+    if (!stockData) {
+        return (
+            <div className="flex flex-col items-center justify-center py-40 opacity-40">
+                <TrendingUp className="size-12 mb-4 text-muted-foreground/20" />
+                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">검색어를 입력하여 데이터를 조회하세요</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-10 duration-1000">
-            {/* [Senior Refactor] 스티키 액션 바: stockData 접근을 위해 Dashboard 내부로 이동 */}
-            <div className="sticky top-0 z-40 h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm -mx-10 px-10">
-                <div className="flex-1 max-w-3xl">
-                    <StockSearchInput />
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                            toggleWatchList(FormatStockWatchListItem(stockData));
-                            if (isWatchList) {
-                                toast.info("관심종목에서 제거되었습니다.", {
-                                    description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
-                                });
-                            } else {
-                                toast.success("관심종목에 추가되었습니다!", {
-                                    description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
-                                });
-                            }
-                        }}
-                        className={cn(
-                            "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
-                            isWatchList ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
-                        )}
-                    >
-                        <Heart className={cn("size-5 transition-all duration-500", isWatchList ? "fill-current scale-110 text-red-500" : "fill-none")} />
-                    </Button>
-                </div>
-            </div>
-
             <StockPriceCard stockData={stockData} />
 
             <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] overflow-hidden shadow-2xl shadow-black/5 dark:shadow-white/5 transition-all hover:shadow-blue-500/10 hover:border-blue-500/20 duration-500">
@@ -156,6 +132,9 @@ export default function StockPage() {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
 
+    // [Bug Fix] stockData를 직접 조회하여 하트 버튼 상태를 관리하기 위해 별도의 싱크 로직 필요
+    const { stockData } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
+
     return (
         <div className="flex flex-1 min-w-0 h-full overflow-hidden bg-background relative selection:bg-blue-500/20">
             <div className="flex-1 flex flex-col min-w-0 h-full border-r border-black/5 dark:border-white/5">
@@ -171,6 +150,41 @@ export default function StockPage() {
                                 <h1 className="text-4xl font-black tracking-tighter text-foreground leading-tight">Stock Dashboard</h1>
                                 <p className="text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">Market Analytics Node</p>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* [2] 스티키 액션 바: 이제 데이터와 상관없이 항상 최상위에 유지됩니다. */}
+                    <div className="sticky top-0 z-40 h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-8 px-10">
+                        <div className="flex-1 max-w-3xl">
+                            <StockSearchInput />
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            {/* stockData가 있을 때만 하트 버튼 노출 */}
+                            {stockData && (
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => {
+                                        toggleWatchList(FormatStockWatchListItem(stockData));
+                                        if (isWatchList) {
+                                            toast.info("관심종목에서 제거되었습니다.", {
+                                                description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
+                                            });
+                                        } else {
+                                            toast.success("관심종목에 추가되었습니다!", {
+                                                description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
+                                            });
+                                        }
+                                    }}
+                                    className={cn(
+                                        "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
+                                        isWatchList ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
+                                    )}
+                                >
+                                    <Heart className={cn("size-5 transition-all duration-500", isWatchList ? "fill-current scale-110 text-red-500" : "fill-none")} />
+                                </Button>
+                            )}
                         </div>
                     </div>
 
