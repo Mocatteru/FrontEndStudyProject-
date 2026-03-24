@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, memo } from "react";
+import React, { useState, memo } from "react";
 import { Stock, FormatPriceCurrency } from "@/types/stock";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,100 @@ interface StockPriceCardProps {
     stockData: Stock;
 }
 
+/** 
+ * [Senior Optimization] 
+ * MemoUpdateDialog를 별도 컴포넌트로 분리하여 
+ * 다이얼로그 내부의 타이핑 상태(memoInput)가 주가 카드(StockPriceCard) 전체를 
+ * 리렌더링시키지 않도록 격리합니다.
+ */
+const MemoUpdateDialog = memo(({
+    symbol,
+    longName,
+    initialMemo
+}: {
+    symbol: string,
+    longName: string,
+    initialMemo: string
+}) => {
+    const [open, setOpen] = useState(false);
+    const [memoInput, setMemoInput] = useState("");
+    const setStockMemo = useStockStore(s => s.setStockMemo);
+
+    const handleOpenChange = (isOpen: boolean) => {
+        if (isOpen) {
+            setMemoInput(initialMemo);
+        }
+        setOpen(isOpen);
+    };
+
+    const handleSave = () => {
+        if (symbol) {
+            setStockMemo(symbol, memoInput);
+        }
+        setOpen(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogTrigger
+                render={
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-xl h-8 px-2.5 bg-black/5 dark:bg-white/5 hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 shrink-0"
+                    >
+                        <div className="flex items-center gap-2">
+                            <PencilIcon className="size-3.5" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">메모</span>
+                        </div>
+                    </Button>
+                }
+            />
+            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-xl shadow-2xl rounded-[2.5rem]">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
+                        메모 업데이트
+                    </DialogTitle>
+                    <DialogDescription className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                        티커: {symbol}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="py-2 space-y-4">
+                    <div className="relative">
+                        <Textarea
+                            value={memoInput}
+                            onChange={(e) => {
+                                if (e.target.value.length <= 500) {
+                                    setMemoInput(e.target.value);
+                                }
+                            }}
+                            placeholder={`${longName}에 대한 전략적 메모를 입력하세요...`}
+                            className="min-h-[250px] w-full bg-black/5 dark:bg-white/5 border-none rounded-3xl p-6 text-base font-medium resize-none focus-visible:ring-blue-500/20 placeholder:text-muted-foreground/30 break-all overflow-y-auto custom-scrollbar"
+                        />
+                        <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                            {memoInput.length} / 500
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end p-0">
+                        <Button
+                            onClick={handleSave}
+                            className="h-14 px-10 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 bg-blue-500 hover:bg-blue-600 transition-all active:scale-95"
+                        >
+                            저장하기
+                        </Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+});
+
+MemoUpdateDialog.displayName = 'MemoUpdateDialog';
+
 function getMarketStateName(state: string | undefined): string {
     if (!state) return '불명';
-
-    // [Senior Robust Logic] API 버전에 따라 PREPRE, POSTPOST 등으로 들어오는 변종을 모두 통합 처리합니다.
     const upperState = state.toUpperCase();
     if (upperState.includes('REGULAR')) return '정규장';
     if (upperState.includes('POST')) return '장후';
@@ -31,29 +121,14 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
     const marketChangePercent = stockData.regularMarketChangePercent;
     const isPositive = (marketChange ?? 0) >= 0;
 
-    const [open, setOpen] = useState(false);
-    const [memoInput, setMemoInput] = useState("");
-
-    const stockMemo = useStockStore(s => s.stockMemo);
-    const setStockMemo = useStockStore(s => s.setStockMemo);
-
-    const currentMemo = useMemo(() => {
-        return stockMemo.find(m => m.ticker === stockData.symbol)?.memo || "";
-    }, [stockMemo, stockData.symbol]);
-
-    const handleOpenChange = (isOpen: boolean) => {
-        if (isOpen) {
-            setMemoInput(currentMemo);
-        }
-        setOpen(isOpen);
-    };
-
-    const handleSave = () => {
-        if (stockData.symbol) {
-            setStockMemo(stockData.symbol, memoInput);
-        }
-        setOpen(false);
-    };
+    /** 
+     * [Senior Optimization] 
+     * 특정 티커의 메모만 선택적으로 구독(Selector)하여 
+     * 다른 주식의 메모가 변경될 때 이 카드가 불필요하게 리렌더링되는 것을 방지합니다.
+     */
+    const currentMemo = useStockStore(s =>
+        s.stockMemo.find(m => m.ticker === stockData.symbol)?.memo || ""
+    );
 
     return (
         <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
@@ -68,60 +143,11 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             <span className="ml-2 text-muted-foreground/30 font-medium text-lg uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                         </h3>
 
-                        {/* [Senior UI Update] 메모 버튼 고도화 */}
-                        <Dialog open={open} onOpenChange={handleOpenChange}>
-                            <DialogTrigger
-                                render={
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="rounded-xl h-8 px-2.5 bg-black/5 dark:bg-white/5 hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 shrink-0"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <PencilIcon className="size-3.5" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">메모</span>
-                                        </div>
-                                    </Button>
-                                }
-                            />
-                            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-2xl shadow-2xl rounded-[2.5rem]">
-                                <DialogHeader>
-                                    <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
-                                        메모 업데이트
-                                    </DialogTitle>
-                                    <DialogDescription className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
-                                        티커: {stockData.symbol}
-                                    </DialogDescription>
-                                </DialogHeader>
-
-                                <div className="py-2 space-y-4">
-                                    <div className="relative">
-                                        <Textarea
-                                            value={memoInput}
-                                            onChange={(e) => {
-                                                if (e.target.value.length <= 500) {
-                                                    setMemoInput(e.target.value);
-                                                }
-                                            }}
-                                            placeholder={`${stockData.longName}에 대한 전략적 메모를 입력하세요...`}
-                                            className="min-h-[250px] w-full bg-black/5 dark:bg-white/5 border-none rounded-3xl p-6 text-base font-medium resize-none focus-visible:ring-blue-500/20 placeholder:text-muted-foreground/30 break-all overflow-y-auto custom-scrollbar"
-                                        />
-                                        <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
-                                            {memoInput.length} / 500
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-end p-0">
-                                        <Button
-                                            onClick={handleSave}
-                                            className="h-14 px-10 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 bg-blue-500 hover:bg-blue-600 transition-all active:scale-95"
-                                        >
-                                            저장하기
-                                        </Button>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
+                        <MemoUpdateDialog
+                            symbol={stockData.symbol}
+                            longName={stockData.longName || ""}
+                            initialMemo={currentMemo}
+                        />
                     </div>
 
                     <p className="text-[14px] font-bold text-muted-foreground/40 uppercase tracking-[0.3em] flex items-center gap-2">
@@ -148,8 +174,8 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                     )}>
                         <span className="text-xs">{isPositive ? "▲" : "▼"}</span>
-                        {stockData.currency === 'KRW' 
-                            ? Math.round(marketChange ?? 0).toLocaleString() 
+                        {stockData.currency === 'KRW'
+                            ? Math.round(marketChange ?? 0).toLocaleString()
                             : marketChange?.toFixed(2)}
                         <span className="text-[11px] opacity-60">({marketChangePercent?.toFixed(2)}%)</span>
                     </div>
