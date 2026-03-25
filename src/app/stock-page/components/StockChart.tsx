@@ -45,15 +45,27 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 horzLines: { color: '#374151', style: 2 },
             },
             localization: {
+                // [Senior Fix] 툴팁 및 X축 라벨의 시간 변환 로직을 일관성 있게 통일 (Unix Timestamp 초 단위 기반)
                 timeFormatter: (time: Time) => {
                     const d = new Date((time as number) * 1000);
                     return `${d.getFullYear().toString().slice(2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
                 }
             },
             timeScale: {
-                timeVisible: true,        // 일중(분봉) 차트일 경우 시간 표시
+                timeVisible: true,
                 secondsVisible: false,
                 borderColor: '#374151',
+                // [Bug Fix] X축 하단 틱(Tick) 텍스트가 봉 시간과 다르게 나오는 문제를 해결
+                tickMarkFormatter: (time: Time) => {
+                    const d = new Date((time as number) * 1000);
+                    // 분봉일 경우 시간을, 일봉 이상일 경우 날짜를 우선적으로 보여줌
+                    const hours = String(d.getHours()).padStart(2, '0');
+                    const minutes = String(d.getMinutes()).padStart(2, '0');
+                    if (hours === '00' && minutes === '00') {
+                        return `${String(d.getMonth() + 1)}/${String(d.getDate())}`;
+                    }
+                    return `${hours}:${minutes}`;
+                },
             },
             rightPriceScale: {
                 borderColor: '#374151',
