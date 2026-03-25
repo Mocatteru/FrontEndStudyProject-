@@ -47,7 +47,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
             <aside
                 className={cn(
-                    "h-full transition-all duration-700 ease-in-out flex flex-col overflow-hidden shrink-0 z-50",
+                    "h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden shrink-0 z-50",
                     "bg-white/80 dark:bg-black/90 backdrop-blur-2xl border-black/5 dark:border-white/5",
 
                     // [Desktop Style]
@@ -63,7 +63,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
             >
                 {/* [1] 사이드바 헤더: 타이틀 및 토글 버튼 - [Tactical Alignment Update] */}
                 <SidebarHeader className={cn(
-                    "px-8 border-b border-black/5 dark:border-white/5 flex items-center transition-all duration-500 shrink-0",
+                    "px-8 border-b border-black/5 dark:border-white/5 flex items-center transition-all duration-300 shrink-0",
                     isOpen ? "flex-row justify-between h-20" : "flex-col justify-center h-20"
                 )}>
                     {isOpen ? (

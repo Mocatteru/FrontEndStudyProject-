@@ -96,14 +96,14 @@ export default function AppSidebar() {
     }, [pathname, isMobile, setOpenMobile]);
 
     return (
-        <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl transition-all duration-700">
+        <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl transition-all duration-300">
             <TabKeyToggle />
 
             {/* ── 상단 로고 및 유저 간략 정보 - [Tactical Design Update] ── */}
             <SidebarHeader className="px-5 py-6">
-                <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center transition-all duration-500">
+                <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center transition-all duration-300">
                     <div className={cn(
-                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-700",
+                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-300",
                         !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
                     )}>
                         <div className="flex items-center gap-1.5">
@@ -134,14 +134,14 @@ export default function AppSidebar() {
                                             isActive={pathname === item.url}
                                             tooltip={item.title}
                                             className={cn(
-                                                "group/btn relative h-12 gap-4 rounded-[1.25rem] px-4 transition-all duration-500",
+                                                "group/btn relative h-12 gap-4 rounded-[1.25rem] px-4 transition-all duration-300",
                                                 pathname === item.url
                                                     ? "bg-blue-500 text-white shadow-xl shadow-blue-500/20 active:scale-95"
                                                     : "hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground/50 hover:text-foreground active:scale-95"
                                             )}
                                         >
                                             <item.icon className={cn(
-                                                "size-4 shrink-0 transition-all duration-500",
+                                                "size-4 shrink-0 transition-all duration-300",
                                                 pathname === item.url ? "rotate-12 scale-110" : "group-hover/btn:rotate-12 group-hover/btn:scale-110"
                                             )} />
                                             <span className="font-black text-[11px] uppercase tracking-[0.15em] truncate group-data-[collapsible=icon]:hidden italic">
@@ -167,14 +167,14 @@ export default function AppSidebar() {
                         <SidebarMenuButton
                             size="lg"
                             tooltip={userName}
-                            className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-500 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
+                            className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
                         >
-                            <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/20 group-hover:scale-105 transition-all duration-500">
+                            <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
                                 <UserCircle className="size-6 text-white" />
                                 <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-white dark:border-black animate-pulse" />
                             </div>
                             <div className={cn(
-                                "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-700",
+                                "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-300",
                                 !mounted ? "opacity-0 -translate-x-2" : "opacity-100 translate-x-0"
                             )}>
                                 <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80 italic">{userName}</span>

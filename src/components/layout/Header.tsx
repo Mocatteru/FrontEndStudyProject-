@@ -24,9 +24,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 flex h-20 w-full items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/70 dark:bg-black/70 px-4 sm:px-10 backdrop-blur-2xl transition-all duration-500 shadow-sm">
             <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                <div className="p-2.5 bg-black/5 dark:bg-white/5 rounded-2xl hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 cursor-pointer border border-transparent hover:border-blue-500/20">
-                    <SidebarTrigger />
-                </div>
+                <SidebarTrigger className="size-11 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-2xl hover:bg-blue-500/10 hover:text-blue-500 transition-all active:scale-95 border border-transparent hover:border-blue-500/20 shadow-none" />
                 <div className="hidden sm:block h-6 w-px bg-black/5 dark:bg-white/10" />
 
                 {/* [Senior] 현재 경로 힌트 추가 */}
