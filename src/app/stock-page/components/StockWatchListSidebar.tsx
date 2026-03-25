@@ -47,7 +47,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
             <aside
                 className={cn(
-                    "h-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden shrink-0 z-50",
+                    "h-full transition-all duration-300 ease-in-out flex flex-col overflow-hidden shrink-0 z-50",
                     "bg-white/80 dark:bg-black/90 backdrop-blur-2xl border-black/5 dark:border-white/5",
 
                     // [Desktop Style]
