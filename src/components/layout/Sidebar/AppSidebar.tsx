@@ -103,26 +103,26 @@ export default function AppSidebar() {
             <SidebarHeader className="px-5 py-6">
                 <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center transition-all duration-300">
                     <div className={cn(
-                        "flex w-full flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-300",
+                        "flex w-full flex-col gap-1 overflow-hidden group-data-[collapsible=icon]:hidden transition-all duration-300",
                         !mounted ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0"
                     )}>
                         <div className="flex items-center gap-1.5">
-                            <span className="font-black text-sm tracking-tighter italic uppercase text-foreground/80">
+                            <span className="font-black text-sm tracking-tighter italic uppercase text-foreground">
                                 {userName}
                             </span>
                             <div className="size-1 rounded-full bg-blue-500 animate-pulse" />
                         </div>
-                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] italic">{userRole}</span>
+                        <span className="text-[10px] font-black text-blue-500/80 uppercase tracking-[0.2em] italic leading-none">{userRole}</span>
                     </div>
                 </div>
             </SidebarHeader>
 
-            <SidebarSeparator className="mx-4 opacity-50" />
+            <SidebarSeparator className="mx-4 opacity-30" />
 
             <SidebarContent className="px-3 py-4 gap-6">
                 {sidebarData.navMain.map((group) => (
                     <SidebarGroup key={group.title} className="p-0">
-                        <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/30 group-data-[collapsible=icon]:hidden">
+                        <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/60 group-data-[collapsible=icon]:hidden uppercase italic">
                             {group.title}
                         </SidebarGroupLabel>
                         <SidebarGroupContent>

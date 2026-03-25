@@ -203,24 +203,23 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
             if (chartType === 'candlestick') {
                 const candle = data as CandlestickData<Time>;
-
                 toolTip.innerHTML = `
                     <div class="text-[11px] space-y-2">
-                        <div class="text-gray-400 mb-3 border-b border-gray-700 pb-2 font-bold tracking-tight">${dateStr}</div>
-                        <div class="flex justify-between items-center gap-6">
-                            <span class="text-gray-400">시가</span>
-                            <span class="text-white">${formatPrice(candle.open)}</span>
+                        <div class="text-white/70 mb-3 border-b border-white/10 pb-2 font-black tracking-tight uppercase italic">${dateStr}</div>
+                        <div class="flex justify-between items-center gap-8">
+                            <span class="text-white/40 font-bold">OPEN</span>
+                            <span class="text-white font-black">${formatPrice(candle.open)}</span>
                         </div>
-                        <div class="flex justify-between items-center gap-6">
-                            <span class="text-gray-400">고가</span>
-                            <span class="text-white flex items-center justify-end">${formatPrice(candle.high)}${getPercentChange(candle.high, candle.open)}</span>
+                        <div class="flex justify-between items-center gap-8">
+                            <span class="text-white/40 font-bold">HIGH</span>
+                            <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.high)}${getPercentChange(candle.high, candle.open)}</span>
                         </div>
-                        <div class="flex justify-between items-center gap-6">
-                            <span class="text-gray-400">저가</span>
-                            <span class="text-white flex items-center justify-end">${formatPrice(candle.low)}${getPercentChange(candle.low, candle.open)}</span>
+                        <div class="flex justify-between items-center gap-8">
+                            <span class="text-white/40 font-bold">LOW</span>
+                            <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.low)}${getPercentChange(candle.low, candle.open)}</span>
                         </div>
-                        <div class="flex justify-between items-center py-1 border-t border-gray-700/50 mt-1 gap-6">
-                            <span class="text-gray-400 font-bold">종가</span>
+                        <div class="flex justify-between items-center py-1.5 border-t border-white/5 mt-1.5 gap-8">
+                            <span class="text-white/60 font-black italic">CLOSE</span>
                             <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.close)}${getPercentChange(candle.close, candle.open)}</span>
                         </div>
                     </div>
@@ -229,9 +228,9 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 const line = data as LineData<Time>;
                 toolTip.innerHTML = `
                     <div class="text-[11px] space-y-2">
-                        <div class="text-gray-400 mb-3 border-b border-gray-700 pb-2 font-bold tracking-tight">${dateStr}</div>
-                        <div class="flex justify-between items-center gap-6">
-                            <span class="text-gray-400 font-bold">종가</span>
+                        <div class="text-white/70 mb-3 border-b border-white/10 pb-2 font-black tracking-tight uppercase italic">${dateStr}</div>
+                        <div class="flex justify-between items-center gap-8">
+                            <span class="text-white/60 font-black italic">CLOSE</span>
                             <span class="text-white font-black whitespace-nowrap">${formatPrice(line.value)}</span>
                         </div>
                     </div>

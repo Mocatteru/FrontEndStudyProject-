@@ -71,9 +71,9 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                             <div className="flex flex-col gap-0.5 items-start animate-in fade-in slide-in-from-left-4 duration-500">
                                 <div className="flex items-center gap-2">
                                     <div className="size-1 rounded-full bg-blue-500 animate-pulse" />
-                                    <span className="text-[9px] font-black tracking-[0.2em] text-muted-foreground/30 uppercase italic">Watchlist</span>
+                                    <span className="text-[9px] font-black tracking-[0.2em] text-muted-foreground/60 uppercase italic">Watchlist</span>
                                 </div>
-                                <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground/80 drop-shadow-sm">
+                                <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground drop-shadow-sm">
                                     관심종목
                                 </h2>
                             </div>
@@ -87,7 +87,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     ) : (
                         <Button
                             onClick={onToggle}
-                            className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent shadow-sm"
+                            className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground/60 hover:text-foreground active:scale-95 border border-transparent shadow-sm"
                         >
                             <Menu className="size-4.5" />
                         </Button>
@@ -96,28 +96,28 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
                 {/* [2] 탭 및 목록 영역 - [UI consistency] */}
                 {isOpen && (
-                    <div className="flex-1 min-h-0 px-8 pt-6 pb-0 animate-in fade-in duration-700">
+                    <div className="flex-1 min-h-0 px-8 pt-6 pb-0 animate-in fade-in duration-300">
                         <Tabs
                             defaultValue="ALL"
                             value={filterMode}
                             onValueChange={(val) => setFilterMode(val as 'ALL' | 'KR' | 'US')}
                             className="flex flex-col h-full"
                         >
-                            <TabsList className="w-full h-12 bg-black/5 dark:bg-white/5 rounded-[1.25rem] p-1.5 shrink-0 border border-black/5 dark:border-white/5">
-                                <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">전체</TabsTrigger>
-                                <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">국내</TabsTrigger>
-                                <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/40 data-[state=active]:shadow-lg">해외</TabsTrigger>
+                            <TabsList className="w-full h-12 bg-black/5 dark:bg-white/5 rounded-[1.25rem] p-1.5 shrink-0 border border-black/5 dark:border-white/10">
+                                <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg active:scale-95">전체</TabsTrigger>
+                                <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg active:scale-95">국내</TabsTrigger>
+                                <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-[10px] tracking-widest transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg active:scale-95">해외</TabsTrigger>
                             </TabsList>
 
-                            <div className="flex-1 min-h-0 mt-8 overflow-y-auto custom-scrollbar no-scrollbar pr-1">
+                            <div className="flex-1 min-h-0 mt-8 overflow-y-auto custom-scrollbar no-scrollbar pr-1 pb-10">
                                 <SidebarGroup className="p-0">
-                                    <SidebarMenu className="gap-5 pb-10">
+                                    <SidebarMenu className="gap-4">
                                         {_.isEmpty(filteredList) ? (
-                                            <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-                                                <div className="size-16 rounded-[2.5rem] bg-black/5 dark:bg-white/5 flex items-center justify-center mb-6">
-                                                    <Menu className="size-6 text-muted-foreground/20" />
+                                            <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                                <div className="size-20 rounded-[2.5rem] bg-black/5 dark:bg-white/5 flex items-center justify-center mb-6 border border-black/5 dark:border-white/5">
+                                                    <Menu className="size-8 text-muted-foreground/40" />
                                                 </div>
-                                                <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/30 leading-relaxed max-w-[180px]">
+                                                <span className="text-[11px] font-black tracking-[0.1em] text-muted-foreground/60 leading-relaxed max-w-[180px] uppercase italic">
                                                     {filterMode === 'ALL' ? '등록된 관심종목이 없습니다' : filterMode === 'KR' ? '국내 관심종목이 없습니다' : '해외 관심종목이 없습니다'}
                                                 </span>
                                             </div>
