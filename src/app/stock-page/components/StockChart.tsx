@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { Stock, PERIOD_OPTIONS } from "@/types/stock";
 import { cn } from "@/lib/utils";
 import { createChart, ColorType, IChartApi, ISeriesApi, Time, CandlestickData, LineData, CandlestickSeries, LineSeries, MouseEventParams } from "lightweight-charts";
@@ -153,14 +153,20 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
         currentChart.timeScale().fitContent();
 
-        currentChart.subscribeCrosshairMove((param: MouseEventParams) => {
+        const handleCrosshairMove = (param: MouseEventParams) => {
             if (!tooltipRef.current || !chartContainerRef.current || !seriesRef.current) return;
 
             const toolTip = tooltipRef.current;
 
-            if (param.point === undefined || !param.time || param.point.x < 0 || param.point.x > chartContainerRef.current.clientWidth || param.point.y < 0 || param.point.y > chartContainerRef.current.clientHeight) {
+            if (
+                param.point === undefined ||
+                !param.time ||
+                param.point.x < 0 ||
+                param.point.x > chartContainerRef.current.clientWidth ||
+                param.point.y < 0 ||
+                param.point.y > chartContainerRef.current.clientHeight
+            ) {
                 toolTip.style.opacity = '0';
-                toolTip.style.pointerEvents = 'none';
                 return;
             }
 
@@ -178,70 +184,55 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             };
 
-            const getPercentChange = (target: number, base: number) => {
+            const pct = (target: number, base: number) => {
                 const change = ((target - base) / base) * 100;
-                const color = change > 0 ? 'text-red-500' : change < 0 ? 'text-blue-500' : 'text-gray-400';
                 const sign = change > 0 ? '+' : '';
-                return `<span class="${color} font-bold ml-1 text-[10px]">(${sign}${change.toFixed(2)}%)</span>`;
+                const color = change > 0 ? '#ef4444' : change < 0 ? '#3b82f6' : '#9ca3af';
+                return `<span style="color:${color};font-size:10px;font-weight:700;margin-left:4px">(${sign}${change.toFixed(2)}%)</span>`;
             };
 
             if (chartType === 'candlestick') {
-                const candle = data as CandlestickData<Time>;
-                toolTip.innerHTML = `
-                    <div class="text-[11px] space-y-2">
-                        <div class="text-white/70 mb-3 border-b border-white/10 pb-2 font-black tracking-tight uppercase italic">${dateStr}</div>
-                        <div class="flex justify-between items-center gap-8">
-                            <span class="text-white/40 font-bold">시가</span>
-                            <span class="text-white font-black">${formatPrice(candle.open)}</span>
-                        </div>
-                        <div class="flex justify-between items-center gap-8">
-                            <span class="text-white/40 font-bold">고가</span>
-                            <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.high)}${getPercentChange(candle.high, candle.open)}</span>
-                        </div>
-                        <div class="flex justify-between items-center gap-8">
-                            <span class="text-white/40 font-bold">저가</span>
-                            <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.low)}${getPercentChange(candle.low, candle.open)}</span>
-                        </div>
-                        <div class="flex justify-between items-center py-1.5 border-t border-white/5 mt-1.5 gap-8">
-                            <span class="text-white/60 font-black italic">종가</span>
-                            <span class="text-white font-black flex items-center justify-end">${formatPrice(candle.close)}${getPercentChange(candle.close, candle.open)}</span>
-                        </div>
-                    </div>
-                `;
+                const c = data as CandlestickData<Time>;
+                toolTip.innerHTML =
+                    `<div style="font-size:11px">` +
+                    `<div style="color:rgba(255,255,255,0.7);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic;letter-spacing:0.05em">${dateStr}</div>` +
+                    `<div style="display:flex;justify-content:space-between;align-items:center;gap:32px;margin-bottom:6px"><span style="color:rgba(255,255,255,0.4);font-weight:700">시가</span><span style="color:#fff;font-weight:900">${formatPrice(c.open)}</span></div>` +
+                    `<div style="display:flex;justify-content:space-between;align-items:center;gap:32px;margin-bottom:6px"><span style="color:rgba(255,255,255,0.4);font-weight:700">고가</span><span style="color:#fff;font-weight:900">${formatPrice(c.high)}${pct(c.high, c.open)}</span></div>` +
+                    `<div style="display:flex;justify-content:space-between;align-items:center;gap:32px;margin-bottom:6px"><span style="color:rgba(255,255,255,0.4);font-weight:700">저가</span><span style="color:#fff;font-weight:900">${formatPrice(c.low)}${pct(c.low, c.open)}</span></div>` +
+                    `<div style="display:flex;justify-content:space-between;align-items:center;gap:32px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05)"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${formatPrice(c.close)}${pct(c.close, c.open)}</span></div>` +
+                    `</div>`;
             } else {
                 const line = data as LineData<Time>;
-                toolTip.innerHTML = `
-                    <div class="text-[11px] space-y-2">
-                        <div class="text-white/70 mb-3 border-b border-white/10 pb-2 font-black tracking-tight uppercase italic">${dateStr}</div>
-                        <div class="flex justify-between items-center gap-8">
-                            <span class="text-white/60 font-black italic">종가</span>
-                            <span class="text-white font-black whitespace-nowrap">${formatPrice(line.value)}</span>
-                        </div>
-                    </div>
-                `;
+                toolTip.innerHTML =
+                    `<div style="font-size:11px">` +
+                    `<div style="color:rgba(255,255,255,0.7);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic;letter-spacing:0.05em">${dateStr}</div>` +
+                    `<div style="display:flex;justify-content:space-between;align-items:center;gap:32px"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900;white-space:nowrap">${formatPrice(line.value)}</span></div>` +
+                    `</div>`;
             }
 
-            const coordinate = seriesRef.current.priceToCoordinate(chartType === 'candlestick' ? (data as CandlestickData<Time>).close : (data as LineData<Time>).value);
+            const closePrice = chartType === 'candlestick'
+                ? (data as CandlestickData<Time>).close
+                : (data as LineData<Time>).value;
+            const coordinate = seriesRef.current.priceToCoordinate(closePrice);
+
             let shiftedX = param.point.x + 20;
-            if (shiftedX > chartContainerRef.current.clientWidth - 180) {
-                shiftedX = param.point.x - 180;
-            }
+            if (shiftedX > chartContainerRef.current.clientWidth - 180) shiftedX = param.point.x - 180;
 
             let shiftedY = coordinate ? coordinate - 40 : param.point.y;
-            if (shiftedY < 10) {
-                shiftedY = 10;
-            }
-
+            if (shiftedY < 10) shiftedY = 10;
             const maxTop = chartContainerRef.current.clientHeight - toolTip.clientHeight - 10;
-            if (shiftedY > maxTop) {
-                shiftedY = maxTop;
-            }
+            if (shiftedY > maxTop) shiftedY = maxTop;
 
             toolTip.style.left = shiftedX + 'px';
             toolTip.style.top = shiftedY + 'px';
             toolTip.style.opacity = '1';
-            toolTip.style.pointerEvents = 'none';
-        });
+        };
+
+        currentChart.subscribeCrosshairMove(handleCrosshairMove);
+
+        return () => {
+            currentChart.unsubscribeCrosshairMove(handleCrosshairMove);
+        };
 
     }, [stockData, chartType]);
 
