@@ -8,7 +8,7 @@ import { persist } from "zustand/middleware";
  * - 사용법: const { isSiderOpen } = useUiStore();
  */
 interface UiState {
-    isSiderOpen: boolean;
+    isSidebarOpen: boolean;
     isWatchListOpen: boolean; // [Senior] 우측 와치리스트 상태 추가
     userName: string;
     userEmail: string;
@@ -25,14 +25,14 @@ interface UiState {
 export const useUiStore = create<UiState>()(
     persist(
         (set) => ({
-            isSiderOpen: true,
+            isSidebarOpen: true,
             isWatchListOpen: false, // 기본값: 닫힘
             userName: "게스트",
             userEmail: "[EMAIL_ADDRESS]",
             userDepartment: "부서 없음",
             userRole: "USER",
             toggleSidebar: () => set((state) => ({
-                isSiderOpen: !state.isSiderOpen
+                isSidebarOpen: !state.isSidebarOpen
             })),
             toggleWatchList: () => set((state) => ({
                 isWatchListOpen: !state.isWatchListOpen
@@ -53,7 +53,7 @@ export const useUiStore = create<UiState>()(
         {
             name: "ui-storage",
             partialize: (state: UiState) => ({
-                isSiderOpen: state.isSiderOpen,
+                isSidebarOpen: state.isSidebarOpen,
                 isWatchListOpen: state.isWatchListOpen,
                 userName: state.userName,
                 userEmail: state.userEmail,

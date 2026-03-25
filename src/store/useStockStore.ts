@@ -50,11 +50,19 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
              * 1. StockWatchListItemProps를 도입하여 관심종목 저장 시 대용량 historical 데이터를 제외함.
              * 2. persist 미들웨어의 partialize 옵션을 사용하여 불필요한 원본 stock 데이터가 로컬스토리지에 저장되는 것을 방지함.
              */
-            toggleWatchList: (stock: StockWatchListItemProps) => set((state) => ({
-                stockWatchList: state.stockWatchList.map(m => m.ticker).includes(stock.ticker) ?
-                    state.stockWatchList.filter(m => m.ticker !== stock.ticker) : state.stockWatchList.concat(stock)
-
-            })),
+            // [Refactoring: Performance & Defensive Programming]
+            // map() + includes() 대신 some()을 사용하여 단축 평가(Short-circuit evaluation)로 O(N) 순회 성능 최적화
+            // ticker 정보가 유효한지 엣지 케이스 방어 로직 추가
+            toggleWatchList: (stock: StockWatchListItemProps) => set((state) => {
+                if (!stock?.ticker) return state;
+                
+                const isExist = state.stockWatchList.some(m => m.ticker === stock.ticker);
+                return {
+                    stockWatchList: isExist 
+                        ? state.stockWatchList.filter(m => m.ticker !== stock.ticker) 
+                        : [...state.stockWatchList, stock]
+                };
+            }),
             removeRecentSearch: (ticker: string) => set((state) => ({
                 recentSearchList: state.recentSearchList.filter(t => t !== ticker.toUpperCase())
             })),

@@ -150,10 +150,9 @@ export function FormatPriceCurrency(currency: string | undefined, price: number 
     }
 
     const isKRW = currency === "KRW";
-    // 원화는 소수점 없이 반올림하여 정수로 표기, 달러는 소수점 2자리 고정
     const formattedPrice = isKRW
         ? Math.round(price).toLocaleString('ko-KR')
-        : price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        : price.toLocaleString('en-US');
 
     return isKRW ? `${formattedPrice}원` : `$${formattedPrice}`;
 }
@@ -163,7 +162,18 @@ export function FormatTicker(ticker: string) {
     return ticker.toUpperCase().trim();
 }
 
-export function FormatStockWatchListItem(stock: Stock): StockWatchListItemProps {
+export function FormatStockWatchListItem(stock?: Stock | null): StockWatchListItemProps {
+    if (!stock) {
+        return {
+            ticker: 'UNKNOWN',
+            name: '정보 없음',
+            price: 0,
+            change: 0,
+            changePercent: 0,
+            isPositive: false,
+            currency: 'USD'
+        };
+    }
     return {
         ticker: stock.symbol || '',
         name: stock.longName || stock.shortName || 'N/A',

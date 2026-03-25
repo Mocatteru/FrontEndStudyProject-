@@ -1,26 +1,25 @@
 import { TruncateTitle } from "@/lib/format";
 import { Post } from "@/types/post";
 import React from "react";
+import { FileText } from "lucide-react";
 
 /**
  * [컴포넌트 분리] 데이터 리스트의 개별 아이템을 독립된 컴포넌트로 관리합니다.
  * - 장점: 코드 가독성이 좋아지고, 아이템의 스타일이나 로직 변경 시 이 파일만 수정하면 됩니다.
  */
-/**
- * [학습 포인트: React.memo]
- * - 역할: 컴포넌트 자체를 메모이제이션합니다.
- * - 동작: 부모 컴포넌트가 리렌더링되더라도, 이 컴포넌트가 받는 Props(post)가 바뀌지 않았다면 
- *   이전에 그려둔 화면을 그대로 재사용합니다. 
- * - 실무 팁: 리스트 아이템처럼 개수가 많고 자주 그려지는 컴포넌트에 필수입니다.
- */
 function PostItem({ post }: { post: Post }) {
     return (
-        <div className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-            <h3 className="font-semibold text-blue-500 dark:text-blue-400">Post #{post.id}</h3>
-            <p className="mt-2 text-gray-700 dark:text-gray-300">{TruncateTitle(post.title, 20)}</p>
+        <div className="group flex flex-col justify-between rounded-3xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 p-6 hover:bg-black/10 dark:hover:bg-white/10 active:scale-[0.98] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-500/10 rounded-xl group-hover:rotate-6 transition-all duration-300">
+                    <FileText className="size-4 text-blue-500" />
+                </div>
+                <h3 className="font-black tracking-tight text-blue-500 uppercase italic">Post #{post.id}</h3>
+            </div>
+            <p className="text-sm font-semibold text-foreground/80 leading-relaxed tracking-tight group-hover:text-foreground transition-colors">{TruncateTitle(post.title, 35)}</p>
         </div>
     )
 }
 
-// 컴포넌트를 memo로 감싸서 내보냅니다.
-export default React.memo(PostItem); 
+// 컴포넌트를 memo로 감싸서 리렌더링 최적화를 수행합니다.
+export default React.memo(PostItem);
