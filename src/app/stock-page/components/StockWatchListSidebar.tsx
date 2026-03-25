@@ -8,6 +8,7 @@ import { useStockStore } from "@/store/useStockStore";
 import * as _ from "radash";
 import { useMemo, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@base-ui/react";
 
 interface StockWatchListSidebarProps {
     isOpen: boolean;
@@ -51,7 +52,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
                     // [Desktop Style]
                     "md:relative md:border-l",
-                    isOpen ? "md:w-86" : "md:w-20",
+                    isOpen ? "md:w-80" : "md:w-15",
 
                     // [Mobile Style]
                     "fixed inset-y-0 right-0 shadow-2xl md:shadow-none border-l md:border-none",
@@ -76,20 +77,20 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     관심종목
                                 </h2>
                             </div>
-                            <button
+                            <Button
                                 onClick={onToggle}
                                 className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent shadow-sm"
                             >
                                 <Menu className="size-4.5" />
-                            </button>
+                            </Button>
                         </>
                     ) : (
-                        <button
+                        <Button
                             onClick={onToggle}
-                            className="size-11 flex items-center justify-center bg-black/5 dark:bg-white/5 text-muted-foreground/40 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground transition-all active:scale-95 border border-black/5 dark:border-white/5"
+                            className="p-2.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95 border border-transparent shadow-sm"
                         >
-                            <Menu className="size-5" />
-                        </button>
+                            <Menu className="size-4.5" />
+                        </Button>
                     )}
                 </SidebarHeader>
 

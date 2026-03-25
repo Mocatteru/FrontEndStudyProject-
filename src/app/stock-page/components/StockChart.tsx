@@ -114,6 +114,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         if (seriesRef.current) {
             try {
                 currentChart.removeSeries(seriesRef.current);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (e) {
                 // Next.js Dev 환경에서 console.error 호출 시 브라우저에 붉은 에러 오버레이가 출력되므로 조용히 무시(Swallow)합니다.
                 // 이미 언마운트되어 제거되었거나 시점 차이인 경우이므로 무시해도 안전합니다.

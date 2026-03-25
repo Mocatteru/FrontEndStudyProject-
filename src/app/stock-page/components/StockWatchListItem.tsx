@@ -34,8 +34,8 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                 className={cn(
                     "transition-all duration-300 group relative flex items-center justify-center",
                     isOpen
-                        ? "h-auto py-6 px-6 rounded-[2.5rem] w-full"
-                        : "size-12 p-0 rounded-2xl", // 접혔을 때는 정해진 사이즈의 아이콘 형태로 변환
+                        ? "h-auto py-5 px-5 rounded-[2.25rem] w-full"
+                        : "size-11 p-0 rounded-xl", 
                     "bg-card/40 dark:bg-white/3 backdrop-blur-sm",
                     "border border-black/5 dark:border-white/8",
                     "hover:bg-card/80 dark:hover:bg-white/8 hover:border-blue-500/20",
@@ -44,25 +44,25 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                 )}
             >
                 {isOpen ? (
-                    /* [확장 모드] 상세 정보 표시 */
-                    <div className="flex justify-between items-start w-full gap-5 animate-in fade-in zoom-in-95 duration-500">
+                    /* [확장 모드: 0.82배 스케일링] 상세 정보 표시 */
+                    <div className="flex justify-between items-start w-full gap-4.5 animate-in fade-in zoom-in-95 duration-500">
                         {/* [좌측] 이름 및 티커 영역 */}
-                        <div className="flex flex-col gap-2 items-start flex-1 min-w-0 overflow-hidden">
-                            <span className="font-black text-[14px] text-foreground leading-snug text-left whitespace-normal wrap-break-word line-clamp-3 group-hover:text-blue-500 transition-colors">
+                        <div className="flex flex-col gap-1.5 items-start flex-1 min-w-0 overflow-hidden">
+                            <span className="font-black text-[12px] text-foreground leading-[1.3] text-left whitespace-normal wrap-break-word line-clamp-2 group-hover:text-blue-500 transition-colors">
                                 {name}
                             </span>
-                            <div className="flex items-center gap-2">
-                                <div className="size-1.5 rounded-full bg-amber-300 animate-pulse" />
-                                <span className="text-[12px] font-black text-amber-300/80 uppercase tracking-widest shrink-0">
+                            <div className="flex items-center gap-1.5">
+                                <div className="size-1 rounded-full bg-amber-300 animate-pulse" />
+                                <span className="text-[11px] font-black text-amber-300/80 uppercase tracking-widest shrink-0">
                                     {ticker}
                                 </span>
                             </div>
                         </div>
 
                         {/* [우측] 가격 및 등락 지표 */}
-                        <div className="flex flex-col items-end gap-2.5 shrink-0 pt-0.5 min-w-max">
+                        <div className="flex flex-col items-end gap-2 shrink-0 pt-0.5 min-w-max">
                             <div className="flex flex-col items-end gap-0.5">
-                                <span className="font-black text-[15px] tracking-tighter text-foreground leading-none">
+                                <span className="font-black text-[13px] tracking-tighter text-foreground leading-none">
                                     {formattedPrice}
                                 </span>
                                 <span className={cn(
@@ -75,7 +75,7 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                             <Badge
                                 variant="secondary"
                                 className={cn(
-                                    "text-[10px] px-3 py-0.5 h-6 border-none font-black rounded-full transition-all duration-500",
+                                    "text-[9px] px-2.5 py-0.5 h-6 border-none font-black rounded-full transition-all duration-500",
                                     isPositive
                                         ? "bg-red-500/10 text-red-500 dark:bg-red-500/20 group-hover:bg-red-500/30"
                                         : "bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 group-hover:bg-blue-500/30"
