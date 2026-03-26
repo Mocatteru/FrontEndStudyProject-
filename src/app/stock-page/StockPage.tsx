@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useMemo, memo } from "react";
+import { useState, useCallback, useEffect, memo } from "react";
 import useStockSync from "@/hooks/useStockSync";
 import StockSearchInput from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
@@ -12,7 +12,7 @@ import StockWatchListSidebar from "./components/StockWatchListSidebar";
 import { TrendingUp, Heart, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FormatStockWatchListItem } from "@/types/stock";
+import { FormatStockWatchListItem, Stock } from "@/types/stock";
 import { toast } from "sonner";
 
 /**
@@ -24,22 +24,17 @@ interface StockDashboardContentProps {
     currentTicker: string;
     chartConfig: { range: string; interval: string };
     handleConfigChange: (range: string, interval: string) => void;
+    stockData?: Stock | null; // [Optimization] 부모에서 내려주어 useStockSync 중복 호출 제거
+    isLoading: boolean;
+    isError: boolean;
 }
 
-const StockDashboardContent = memo(({
-    currentTicker,
-    chartConfig,
-    handleConfigChange
-}: StockDashboardContentProps) => {
-    const { stockData, isError, isLoading } = useStockSync(
-        currentTicker,
-        chartConfig.range,
-        chartConfig.interval
-    );
-
+const StockDashboardContent = memo((
+    { currentTicker, chartConfig, handleConfigChange, stockData, isLoading, isError }: StockDashboardContentProps
+) => {
     const updateStockWatchList = useStockStore(s => s.updateStockWatchList);
 
-    // 데이터 동기화 시 불필요한 호출 방지
+    // 종목 조회 성공 시 관심목록 데이터 실시간 완치 (데이터 업데이트)
     useEffect(() => {
         if (stockData && currentTicker) {
             updateStockWatchList(FormatStockWatchListItem(stockData));
@@ -114,21 +109,33 @@ export default function StockPage() {
     });
 
     const currentTicker = useStockStore(s => s.currentTicker);
-    const stockWatchList = useStockStore(s => s.stockWatchList);
+    // [Optimization] stockWatchList 전체 구독 대신 선택적 조회
+    const isWatchListItem = useStockStore(s => s.stockWatchList.some(v => v.ticker === s.currentTicker));
     const toggleWatchList = useStockStore(s => s.toggleWatchList);
     const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
     const toggleWatchListOpen = useUiStore(s => s.toggleWatchList);
-
-    const isWatchList = useMemo(() =>
-        stockWatchList.some(v => v.ticker === currentTicker),
-        [stockWatchList, currentTicker]);
 
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
 
-    // [Bug Fix] stockData를 직접 조회하여 하트 버튼 상태를 관리하기 위해 별도의 싱크 로직 필요
-    const { stockData } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
+    // [단일 태스크] useStockSync를 StockPage에서 1회만 호출하여 stockData를 하위 컴포넌트에 prop으로 전달
+    const { stockData, isLoading, isError } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
+
+    // [성능] 인라인 핸들러 제거 - 매 렌더마다 새 함수 생성 방지
+    const handleToggleWatchList = useCallback(() => {
+        if (!stockData) return;
+        toggleWatchList(FormatStockWatchListItem(stockData));
+        if (isWatchListItem) {
+            toast.info("관심종목에서 제거되었습니다.", {
+                description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
+            });
+        } else {
+            toast.success("관심종목에 추가되었습니다!", {
+                description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
+            });
+        }
+    }, [stockData, toggleWatchList, isWatchListItem]);
 
     return (
         <div className="flex flex-1 min-w-0 bg-background relative selection:bg-blue-500/20">
@@ -175,24 +182,15 @@ export default function StockPage() {
                                 <Button
                                     variant="outline"
                                     size="icon"
-                                    onClick={() => {
-                                        toggleWatchList(FormatStockWatchListItem(stockData));
-                                        if (isWatchList) {
-                                            toast.info("관심종목에서 제거되었습니다.", {
-                                                description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
-                                            });
-                                        } else {
-                                            toast.success("관심종목에 추가되었습니다!", {
-                                                description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
-                                            });
-                                        }
-                                    }}
+                                    onClick={handleToggleWatchList}
                                     className={cn(
                                         "size-12 rounded-2xl transition-all duration-300 border-2 overflow-hidden",
-                                        isWatchList ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm" : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
+                                        isWatchListItem
+                                            ? "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500 shadow-sm"
+                                            : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
                                     )}
                                 >
-                                    <Heart className={cn("size-5 transition-all duration-500", isWatchList ? "fill-current scale-110 text-red-500" : "fill-none")} />
+                                    <Heart className={cn("size-5 transition-all duration-500", isWatchListItem ? "fill-current scale-110 text-red-500" : "fill-none")} />
                                 </Button>
                             )}
                         </div>
@@ -204,6 +202,9 @@ export default function StockPage() {
                             currentTicker={currentTicker}
                             chartConfig={chartConfig}
                             handleConfigChange={handleConfigChange}
+                            stockData={stockData}
+                            isLoading={isLoading}
+                            isError={isError}
                         />
                     </div>
                 </div>

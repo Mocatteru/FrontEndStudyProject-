@@ -42,7 +42,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     try {
                         // [리소스 절약] 차트 데이터는 1일치만 불러와 페이로드 최소화
                         const data = await getStockQuote(item.ticker, '1d', '1d');
-                        
+
                         // [Guard 2] 요청 응답 후 즉시 체크 (네트워크 지연 시간 방어)
                         if (!isMounted || !data) return;
 
@@ -65,7 +65,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
         syncWatchList();
 
         return () => { isMounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const filteredList = useMemo(() => {
