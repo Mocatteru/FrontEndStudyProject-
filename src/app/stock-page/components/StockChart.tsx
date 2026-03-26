@@ -8,7 +8,8 @@ import {
     IChartApi, ISeriesApi,
     Time, CandlestickData, LineData,
     CandlestickSeries, LineSeries, HistogramSeries,
-    MouseEventParams, LogicalRange,
+    MouseEventParams, LogicalRange, SeriesMarker,
+    createSeriesMarkers, ISeriesMarkersPluginApi,
 } from "lightweight-charts";
 import { RSI, MACD, SMA } from "technicalindicators";
 import { Button } from "@/components/ui/button";
@@ -122,6 +123,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
     const macdSignalRef = useRef<ISeriesApi<'Line'> | null>(null);
     const macdHistRef = useRef<ISeriesApi<'Histogram'> | null>(null);
     const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
+    const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
 
     // 동기화 lock
     const isSyncing = useRef(false);
@@ -176,7 +178,6 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         );
         chartRefs.current = charts;
 
-        // x축 동기화 (모든 쌍)
         charts.forEach((src, si) => {
             src.timeScale().subscribeVisibleLogicalRangeChange((lr: LogicalRange | null) => {
                 if (isSyncing.current || !lr) return;
@@ -196,6 +197,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             macdSignalRef.current = null;
             macdHistRef.current = null;
             volumeSeriesRef.current = null;
+            markersRef.current = null;
         };
     }, []);
 
@@ -223,6 +225,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         macdSignalRef.current = null;
         macdHistRef.current = null;
         volumeSeriesRef.current = null;
+        markersRef.current = null;
 
         // ── 원본 데이터 정렬 ──────────────────────────────────────────────────
         const isMs = stockData.historical[0].timestamp > 10_000_000_000;
@@ -239,7 +242,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             stockData.currency === 'KRW'
                 ? Math.round(p).toLocaleString('ko-KR') + '원'
                 : '$' + p.toLocaleString('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
-        
+
         const priceFormatConfig = { type: 'custom' as const, formatter: priceFormatter, minMove };
 
         // ── 가격 시리즈 ───────────────────────────────────────────────────────
@@ -366,8 +369,55 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         })));
         volumeSeriesRef.current = volS;
 
-        // ── fitContent 동기화 ─────────────────────────────────────────────────
+        // ── 마커 시스템 초기화 (1회) ──────────────────────────────────────────
+        if (priceSeriesRef.current) {
+            markersRef.current = createSeriesMarkers(priceSeriesRef.current, []);
+        }
+
+        // ── 최고가/최저가 마커 업데이트 로직 ──────────────────────────────
+        const updateVisibleMarkers = (lr: LogicalRange | null) => {
+            if (!lr || !priceSeriesRef.current || !raw.length) return;
+
+            const from = Math.max(0, Math.floor(lr.from));
+            const to = Math.min(raw.length - 1, Math.ceil(lr.to));
+            const visibleBars = raw.slice(from, to + 1);
+            if (!visibleBars.length) return;
+
+            const maxBar = visibleBars.reduce((p, c) => c.high > p.high ? c : p, visibleBars[0]);
+            const minBar = visibleBars.reduce((p, c) => c.low < p.low ? c : p, visibleBars[0]);
+            const currentPrice = stockData.regularMarketPrice || closes[closes.length - 1];
+
+            const markers: SeriesMarker<Time>[] = [
+                {
+                    time: Math.floor(maxBar.timestamp / (isMs ? 1000 : 1)) as Time,
+                    position: 'aboveBar', color: '#ef4444', shape: 'arrowDown',
+                    text: `최고 ${priceFormatter(maxBar.high)} (${((maxBar.high - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                    size: 1,
+                },
+                {
+                    time: Math.floor(minBar.timestamp / (isMs ? 1000 : 1)) as Time,
+                    position: 'belowBar', color: '#3b82f6', shape: 'arrowUp',
+                    text: `최저 ${priceFormatter(minBar.low)} (${((minBar.low - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                    size: 1,
+                }
+            ];
+            if (markersRef.current) {
+                markersRef.current.setMarkers(markers);
+            }
+        };
+
+        // 가시 범위 변경 구독
+        const onVisibleRangeChange = (lr: LogicalRange | null) => updateVisibleMarkers(lr);
+        pChart.timeScale().subscribeVisibleLogicalRangeChange(onVisibleRangeChange);
+
+        // ── fitContent 및 초기 마커 설정 ───────────────────────────────────
         pChart.timeScale().fitContent();
+
+        // fitContent 이후 실제 가시 범위를 가져와 마커 초기화
+        setTimeout(() => {
+            const lr = pChart.timeScale().getVisibleLogicalRange();
+            updateVisibleMarkers(lr);
+        }, 50);
 
         // ── tooltip ───────────────────────────────────────────────────────────
         const handleCrosshair = (param: MouseEventParams) => {
@@ -428,7 +478,10 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         };
 
         pChart.subscribeCrosshairMove(handleCrosshair);
-        return () => { pChart.unsubscribeCrosshairMove(handleCrosshair); };
+        return () => {
+            pChart.unsubscribeCrosshairMove(handleCrosshair);
+            pChart.timeScale().unsubscribeVisibleLogicalRangeChange(onVisibleRangeChange);
+        };
 
     }, [stockData, chartType]);
 
