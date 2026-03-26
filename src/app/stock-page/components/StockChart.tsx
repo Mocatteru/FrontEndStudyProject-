@@ -28,10 +28,10 @@ const DEFAULT_RATIOS = [0.52, 0.16, 0.16, 0.16];
 
 // MA 설정
 const MA_CONFIGS = [
-    { period: 5, color: '#facc15', label: 'MA5' },
-    { period: 20, color: '#a78bfa', label: 'MA20' },
-    { period: 60, color: '#fb923c', label: 'MA60' },
-    { period: 120, color: '#34d399', label: 'MA120' },
+    { period: 5, color: '#facc15', label: 'MA 5' },
+    { period: 20, color: '#a78bfa', label: 'MA 20' },
+    { period: 60, color: '#fb923c', label: 'MA 60' },
+    { period: 120, color: '#34d399', label: 'MA 120' },
 ];
 
 // ─── 차트 공통 옵션 ───────────────────────────────────────────────────────────
@@ -346,214 +346,214 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         macdSignalRef.current = macdSig;
         macdHistRef.current = macdHist;
 
-    // ── 거래량 ────────────────────────────────────────────────────────────
-    const volS = volChart.addSeries(HistogramSeries, {
-        priceScaleId: 'right',
-        priceFormat: { type: 'custom', formatter: fmtVol },
-    });
-    volS.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 }, borderVisible: false });
-    volS.setData(raw.map((d, i) => ({
-        time: times[i],
-        value: d.volume ?? 0,
-        color: d.close >= d.open ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)',
-    })));
-    volumeSeriesRef.current = volS;
+        // ── 거래량 ────────────────────────────────────────────────────────────
+        const volS = volChart.addSeries(HistogramSeries, {
+            priceScaleId: 'right',
+            priceFormat: { type: 'custom', formatter: fmtVol },
+        });
+        volS.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 }, borderVisible: false });
+        volS.setData(raw.map((d, i) => ({
+            time: times[i],
+            value: d.volume ?? 0,
+            color: d.close >= d.open ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)',
+        })));
+        volumeSeriesRef.current = volS;
 
-    // ── fitContent 동기화 ─────────────────────────────────────────────────
-    pChart.timeScale().fitContent();
+        // ── fitContent 동기화 ─────────────────────────────────────────────────
+        pChart.timeScale().fitContent();
 
-    // ── tooltip ───────────────────────────────────────────────────────────
-    const handleCrosshair = (param: MouseEventParams) => {
-        if (!tooltipRef.current || !containerRefs.current[0] || !priceSeriesRef.current) return;
-        const tip = tooltipRef.current;
+        // ── tooltip ───────────────────────────────────────────────────────────
+        const handleCrosshair = (param: MouseEventParams) => {
+            if (!tooltipRef.current || !containerRefs.current[0] || !priceSeriesRef.current) return;
+            const tip = tooltipRef.current;
 
-        if (!param.point || !param.time ||
-            param.point.x < 0 || param.point.x > containerRefs.current[0].clientWidth ||
-            param.point.y < 0 || param.point.y > containerRefs.current[0].clientHeight) {
-            tip.style.opacity = '0'; return;
-        }
+            if (!param.point || !param.time ||
+                param.point.x < 0 || param.point.x > containerRefs.current[0].clientWidth ||
+                param.point.y < 0 || param.point.y > containerRefs.current[0].clientHeight) {
+                tip.style.opacity = '0'; return;
+            }
 
-        const data = param.seriesData.get(priceSeriesRef.current) as CandlestickData<Time> | LineData<Time> | undefined;
-        if (!data) { tip.style.opacity = '0'; return; }
+            const data = param.seriesData.get(priceSeriesRef.current) as CandlestickData<Time> | LineData<Time> | undefined;
+            if (!data) { tip.style.opacity = '0'; return; }
 
-        const d = new Date((param.time as number) * 1000);
-        const dStr = `${String(d.getFullYear()).slice(2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            const d = new Date((param.time as number) * 1000);
+            const dStr = `${String(d.getFullYear()).slice(2)}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-        const pct = (t: number, b: number) => {
-            const ch = ((t - b) / b) * 100;
-            const col = ch > 0 ? '#ef4444' : ch < 0 ? '#3b82f6' : '#9ca3af';
-            return `<span style="color:${col};font-size:10px;font-weight:700;margin-left:4px">(${ch > 0 ? '+' : ''}${ch.toFixed(2)}%)</span>`;
+            const pct = (t: number, b: number) => {
+                const ch = ((t - b) / b) * 100;
+                const col = ch > 0 ? '#ef4444' : ch < 0 ? '#3b82f6' : '#9ca3af';
+                return `<span style="color:${col};font-size:10px;font-weight:700;margin-left:4px">(${ch > 0 ? '+' : ''}${ch.toFixed(2)}%)</span>`;
+            };
+
+            const row = (label: string, val: string, subtle = false) =>
+                `<div style="display:flex;justify-content:space-between;gap:28px;margin-bottom:4px"><span style="color:rgba(255,255,255,${subtle ? '0.3' : '0.4'});font-weight:700">${label}</span><span style="color:#fff;font-weight:900">${val}</span></div>`;
+
+            if (chartType === 'candlestick') {
+                const c = data as CandlestickData<Time>;
+                tip.innerHTML =
+                    `<div style="font-size:11px">` +
+                    `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic">${dStr}</div>` +
+                    row('시가', priceFormatter(c.open)) +
+                    row('고가', `${priceFormatter(c.high)}${pct(c.high, c.open)}`) +
+                    row('저가', `${priceFormatter(c.low)}${pct(c.low, c.open)}`) +
+                    `<div style="display:flex;justify-content:space-between;gap:28px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(c.close)}${pct(c.close, c.open)}</span></div>` +
+                    `</div>`;
+            } else {
+                const l = data as LineData<Time>;
+                tip.innerHTML =
+                    `<div style="font-size:11px">` +
+                    `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic">${dStr}</div>` +
+                    `<div style="display:flex;justify-content:space-between;gap:28px"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(l.value)}</span></div>` +
+                    `</div>`;
+            }
+
+            const closeVal = chartType === 'candlestick' ? (data as CandlestickData<Time>).close : (data as LineData<Time>).value;
+            const coord = priceSeriesRef.current.priceToCoordinate(closeVal);
+            let x = param.point.x + 20;
+            if (x > containerRefs.current[0]!.clientWidth - 185) x = param.point.x - 185;
+            let y = coord ? coord - 40 : param.point.y;
+            if (y < 10) y = 10;
+            const maxY = containerRefs.current[0]!.clientHeight - tip.clientHeight - 10;
+            if (y > maxY) y = maxY;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+            tip.style.opacity = '1';
         };
 
-        const row = (label: string, val: string, subtle = false) =>
-            `<div style="display:flex;justify-content:space-between;gap:28px;margin-bottom:4px"><span style="color:rgba(255,255,255,${subtle ? '0.3' : '0.4'});font-weight:700">${label}</span><span style="color:#fff;font-weight:900">${val}</span></div>`;
+        pChart.subscribeCrosshairMove(handleCrosshair);
+        return () => { pChart.unsubscribeCrosshairMove(handleCrosshair); };
 
-        if (chartType === 'candlestick') {
-            const c = data as CandlestickData<Time>;
-            tip.innerHTML =
-                `<div style="font-size:11px">` +
-                `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic">${dStr}</div>` +
-                row('시가', priceFormatter(c.open)) +
-                row('고가', `${priceFormatter(c.high)}${pct(c.high, c.open)}`) +
-                row('저가', `${priceFormatter(c.low)}${pct(c.low, c.open)}`) +
-                `<div style="display:flex;justify-content:space-between;gap:28px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(c.close)}${pct(c.close, c.open)}</span></div>` +
-                `</div>`;
-        } else {
-            const l = data as LineData<Time>;
-            tip.innerHTML =
-                `<div style="font-size:11px">` +
-                `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic">${dStr}</div>` +
-                `<div style="display:flex;justify-content:space-between;gap:28px"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(l.value)}</span></div>` +
-                `</div>`;
-        }
+    }, [stockData, chartType]);
 
-        const closeVal = chartType === 'candlestick' ? (data as CandlestickData<Time>).close : (data as LineData<Time>).value;
-        const coord = priceSeriesRef.current.priceToCoordinate(closeVal);
-        let x = param.point.x + 20;
-        if (x > containerRefs.current[0]!.clientWidth - 185) x = param.point.x - 185;
-        let y = coord ? coord - 40 : param.point.y;
-        if (y < 10) y = 10;
-        const maxY = containerRefs.current[0]!.clientHeight - tip.clientHeight - 10;
-        if (y > maxY) y = maxY;
-        tip.style.left = x + 'px';
-        tip.style.top = y + 'px';
-        tip.style.opacity = '1';
-    };
+    // ── 패널 비율 변경 시 차트 resize 트리거 ────────────────────────────────
+    const panelHeightsDep = panelHeights.join(',');
+    useEffect(() => {
+        chartRefs.current.forEach(c => c?.applyOptions({}));
+    }, [panelHeightsDep]);
 
-    pChart.subscribeCrosshairMove(handleCrosshair);
-    return () => { pChart.unsubscribeCrosshairMove(handleCrosshair); };
+    return (
+        <div className="p-4 sm:p-8 border-none rounded-[3.5rem] bg-card/40 backdrop-blur-xl relative transition-all w-full overflow-hidden shadow-2xl">
 
-}, [stockData, chartType]);
-
-// ── 패널 비율 변경 시 차트 resize 트리거 ────────────────────────────────
-const panelHeightsDep = panelHeights.join(',');
-useEffect(() => {
-    chartRefs.current.forEach(c => c?.applyOptions({}));
-}, [panelHeightsDep]);
-
-return (
-    <div className="p-4 sm:p-8 border-none rounded-[3.5rem] bg-card/40 backdrop-blur-xl relative transition-all w-full overflow-hidden shadow-2xl">
-
-        {/* ── 헤더 / 컨트롤 ──────────────────────────────────────────── */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
-            <div className="flex flex-col gap-1">
-                <h2 className="text-2xl font-black tracking-tighter text-foreground/80 lowercase italic">Chart</h2>
-                {/* MA 범례 */}
-                <div className="flex items-center gap-3">
-                    {MA_CONFIGS.map(cfg => (
-                        <span key={cfg.label} className="flex items-center gap-1">
-                            <span className="inline-block w-4 h-0.5 rounded" style={{ background: cfg.color }} />
-                            <span className="text-[9px] font-black tracking-widest uppercase" style={{ color: cfg.color }}>{cfg.label}</span>
-                        </span>
-                    ))}
+            {/* ── 헤더 / 컨트롤 ──────────────────────────────────────────── */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-black tracking-tighter text-foreground/80 lowercase italic">Chart</h2>
+                    {/* MA 범례 */}
+                    <div className="flex items-center gap-3">
+                        {MA_CONFIGS.map(cfg => (
+                            <span key={cfg.label} className="flex items-center gap-1">
+                                <span className="inline-block w-4 h-0.5 rounded" style={{ background: cfg.color }} />
+                                <span className="text-[9px] font-black tracking-widest uppercase" style={{ color: cfg.color }}>{cfg.label}</span>
+                            </span>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                {/* 분봉 드롭다운 */}
-                <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/5 dark:border-white/5 shrink-0 z-50">
-                    <Popover>
-                        <PopoverTrigger className={cn(
-                            "inline-flex shrink-0 items-center justify-center rounded-xl border border-transparent text-[10px] font-black uppercase tracking-widest transition-all outline-none select-none h-9 px-4 gap-2",
-                            minuteOptions.some(o => o.interval === interval)
-                                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                : "hover:bg-white/10 text-muted-foreground/40 hover:text-foreground"
-                        )}>
-                            {minuteOptions.find(o => o.interval === interval)?.label || '분봉'}
-                            <ChevronDown className="size-3" />
-                        </PopoverTrigger>
-                        <PopoverContent className="w-32 p-1.5 bg-card/95 backdrop-blur-2xl border-black/10 dark:border-white/10 rounded-2xl shadow-2xl" align="start">
-                            <div className="flex flex-col gap-1">
-                                {minuteOptions.map(opt => (
-                                    <Button key={opt.interval} variant="ghost" size="sm"
-                                        onClick={() => onConfigChange(opt.range, opt.interval)}
-                                        className={cn(
-                                            "w-full justify-start h-9 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all",
-                                            interval === opt.interval
-                                                ? "bg-blue-500 text-white hover:bg-blue-600 shadow-md shadow-blue-500/10"
-                                                : "hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground/60"
-                                        )}>
-                                        {opt.label}
-                                    </Button>
-                                ))}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-
-                    {majorOptions.map(opt => (
-                        <Button key={opt.label} variant="ghost" size="sm"
-                            onClick={() => onConfigChange(opt.range, opt.interval)}
-                            className={cn(
-                                "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                range === opt.range && interval === opt.interval
-                                    ? "bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/20"
+                <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                    {/* 분봉 드롭다운 */}
+                    <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/5 dark:border-white/5 shrink-0 z-50">
+                        <Popover>
+                            <PopoverTrigger className={cn(
+                                "inline-flex shrink-0 items-center justify-center rounded-xl border border-transparent text-[10px] font-black uppercase tracking-widest transition-all outline-none select-none h-9 px-4 gap-2",
+                                minuteOptions.some(o => o.interval === interval)
+                                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
                                     : "hover:bg-white/10 text-muted-foreground/40 hover:text-foreground"
                             )}>
-                            {opt.label}
-                        </Button>
-                    ))}
-                </div>
+                                {minuteOptions.find(o => o.interval === interval)?.label || '분봉'}
+                                <ChevronDown className="size-3" />
+                            </PopoverTrigger>
+                            <PopoverContent className="w-32 p-1.5 bg-card/95 backdrop-blur-2xl border-black/10 dark:border-white/10 rounded-2xl shadow-2xl" align="start">
+                                <div className="flex flex-col gap-1">
+                                    {minuteOptions.map(opt => (
+                                        <Button key={opt.interval} variant="ghost" size="sm"
+                                            onClick={() => onConfigChange(opt.range, opt.interval)}
+                                            className={cn(
+                                                "w-full justify-start h-9 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all",
+                                                interval === opt.interval
+                                                    ? "bg-blue-500 text-white hover:bg-blue-600 shadow-md shadow-blue-500/10"
+                                                    : "hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground/60"
+                                            )}>
+                                            {opt.label}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
 
-                {/* 캔들 / 라인 토글 */}
-                <div className="flex bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/5 dark:border-white/5 shrink-0 ml-auto lg:ml-0 z-40">
-                    <Button variant="ghost" size="sm" onClick={() => setChartType('candlestick')}
-                        className={cn(
-                            "h-9 px-5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500",
-                            chartType === 'candlestick'
-                                ? "bg-red-500 text-white hover:bg-red-600 shadow-xl shadow-red-500/30 border border-red-500/20 scale-105"
-                                : "text-muted-foreground/30 hover:text-muted-foreground"
-                        )}>캔들</Button>
-                    <Button variant="ghost" size="sm" onClick={() => setChartType('line')}
-                        className={cn(
-                            "h-9 px-5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500",
-                            chartType === 'line'
-                                ? "bg-blue-500 text-white hover:bg-blue-600 shadow-xl shadow-blue-500/30 border border-blue-500/20 scale-105"
-                                : "text-muted-foreground/30 hover:text-muted-foreground"
-                        )}>라인</Button>
-                </div>
-            </div>
-        </div>
-
-        {/* ── 차트 패널 영역 ──────────────────────────────────────────── */}
-        <div style={{ height: TOTAL_HEIGHT }} className="w-full flex flex-col select-none">
-            {PANEL_LABELS.map((label, idx) => (
-                <div key={label} className="flex flex-col shrink-0">
-                    {/* 패널 */}
-                    <div style={{ height: panelHeights[idx] }} className="w-full relative">
-                        {/* 라벨 */}
-                        <div className="absolute top-1 left-2 z-10 pointer-events-none">
-                            <span className="text-[8.5px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
-                                {label}
-                            </span>
-                        </div>
-                        {/* 차트 마운트 포인트 */}
-                        <div ref={el => { containerRefs.current[idx] = el; }} className="w-full h-full" />
-                        {/* 가격 차트 tooltip */}
-                        {idx === 0 && (
-                            <div
-                                ref={tooltipRef}
-                                className="absolute z-50 p-4 bg-gray-900/95 border border-gray-700/50 rounded-2xl shadow-2xl backdrop-blur-md opacity-0 transition-opacity duration-150"
-                                style={{ pointerEvents: 'none' }}
-                            />
-                        )}
+                        {majorOptions.map(opt => (
+                            <Button key={opt.label} variant="ghost" size="sm"
+                                onClick={() => onConfigChange(opt.range, opt.interval)}
+                                className={cn(
+                                    "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    range === opt.range && interval === opt.interval
+                                        ? "bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/20"
+                                        : "hover:bg-white/10 text-muted-foreground/40 hover:text-foreground"
+                                )}>
+                                {opt.label}
+                            </Button>
+                        ))}
                     </div>
 
-                    {/* 드래그 핸들 (마지막 패널 제외) */}
-                    {idx < PANEL_COUNT - 1 && (
-                        <div
-                            style={{ height: DIVIDER_H, cursor: 'row-resize' }}
-                            className="w-full flex items-center justify-center group shrink-0 relative"
-                            onMouseDown={onDividerMouseDown(idx)}
-                        >
-                            <div className="absolute inset-0 border-t border-b border-white/5" />
-                            <div className="w-12 h-0.5 rounded-full bg-white/10 group-hover:bg-blue-400/60 transition-colors duration-150 z-10" />
-                        </div>
-                    )}
+                    {/* 캔들 / 라인 토글 */}
+                    <div className="flex bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-black/5 dark:border-white/5 shrink-0 ml-auto lg:ml-0 z-40">
+                        <Button variant="ghost" size="sm" onClick={() => setChartType('candlestick')}
+                            className={cn(
+                                "h-9 px-5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500",
+                                chartType === 'candlestick'
+                                    ? "bg-red-500 text-white hover:bg-red-600 shadow-xl shadow-red-500/30 border border-red-500/20 scale-105"
+                                    : "text-muted-foreground/30 hover:text-muted-foreground"
+                            )}>캔들</Button>
+                        <Button variant="ghost" size="sm" onClick={() => setChartType('line')}
+                            className={cn(
+                                "h-9 px-5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500",
+                                chartType === 'line'
+                                    ? "bg-blue-500 text-white hover:bg-blue-600 shadow-xl shadow-blue-500/30 border border-blue-500/20 scale-105"
+                                    : "text-muted-foreground/30 hover:text-muted-foreground"
+                            )}>라인</Button>
+                    </div>
                 </div>
-            ))}
+            </div>
+
+            {/* ── 차트 패널 영역 ──────────────────────────────────────────── */}
+            <div style={{ height: TOTAL_HEIGHT }} className="w-full flex flex-col select-none">
+                {PANEL_LABELS.map((label, idx) => (
+                    <div key={label} className="flex flex-col shrink-0">
+                        {/* 패널 */}
+                        <div style={{ height: panelHeights[idx] }} className="w-full relative">
+                            {/* 라벨 */}
+                            <div className="absolute top-1 left-2 z-10 pointer-events-none">
+                                <span className="text-[8.5px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                                    {label}
+                                </span>
+                            </div>
+                            {/* 차트 마운트 포인트 */}
+                            <div ref={el => { containerRefs.current[idx] = el; }} className="w-full h-full" />
+                            {/* 가격 차트 tooltip */}
+                            {idx === 0 && (
+                                <div
+                                    ref={tooltipRef}
+                                    className="absolute z-50 p-4 bg-gray-900/95 border border-gray-700/50 rounded-2xl shadow-2xl backdrop-blur-md opacity-0 transition-opacity duration-150"
+                                    style={{ pointerEvents: 'none' }}
+                                />
+                            )}
+                        </div>
+
+                        {/* 드래그 핸들 (마지막 패널 제외) */}
+                        {idx < PANEL_COUNT - 1 && (
+                            <div
+                                style={{ height: DIVIDER_H, cursor: 'row-resize' }}
+                                className="w-full flex items-center justify-center group shrink-0 relative"
+                                onMouseDown={onDividerMouseDown(idx)}
+                            >
+                                <div className="absolute inset-0 border-t border-b border-white/5" />
+                                <div className="w-12 h-0.5 rounded-full bg-white/10 group-hover:bg-blue-400/60 transition-colors duration-150 z-10" />
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
-    </div>
-);
+    );
 });
 
 StockChart.displayName = 'StockChart';

@@ -33,19 +33,23 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
         <>
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-40 md:hidden animate-in fade-in duration-300"
+                    className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-90 md:hidden animate-in fade-in duration-300"
                     onClick={onToggle}
                 />
             )}
 
+            {/* [UX] 본문 레이아웃 점유용 Spacer (md 이상에서만 존재하여 차트가 사이드바에 가려지지 않도록 함) */}
+            <div className={cn(
+                "hidden md:block shrink-0 transition-all duration-300",
+                isOpen ? "w-80" : "w-15"
+            )} />
+
+            {/* 실제 우측 사이드바 (메인 사이드바처럼 화면 전체 높이를 차지하도록 fixed top-0으로 덮음) */}
             <aside
                 className={cn(
-                    "h-full transition-all duration-300 ease-in-out flex flex-col shrink-0 z-50",
-                    "bg-white/80 dark:bg-black/90 backdrop-blur-2xl border-black/5 dark:border-white/5",
-                    "md:relative md:border-l",
-                    isOpen ? "md:w-80" : "md:w-15",
-                    "fixed inset-y-0 right-0 shadow-2xl md:shadow-none border-l md:border-none",
-                    isOpen ? "w-[85vw] sm:w-80" : "w-0 border-none",
+                    "fixed top-0 bottom-0 right-0 h-screen flex flex-col shrink-0 z-100 transition-all duration-300 ease-in-out border-l",
+                    "bg-sidebar backdrop-blur-xl border-sidebar-border shadow-2xl md:shadow-[0_0_15px_rgba(0,0,0,0.1)]",
+                    isOpen ? "w-[85vw] sm:w-80" : "w-0 md:w-15",
                     !isOpen && "invisible md:visible"
                 )}
             >

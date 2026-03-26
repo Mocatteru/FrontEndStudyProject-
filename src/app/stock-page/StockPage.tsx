@@ -12,7 +12,7 @@ import StockWatchListSidebar from "./components/StockWatchListSidebar";
 import { TrendingUp, Heart, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FormatStockWatchListItem, StockWatchListItemProps } from "@/types/stock";
+import { FormatStockWatchListItem } from "@/types/stock";
 import { toast } from "sonner";
 
 /**
@@ -24,16 +24,12 @@ interface StockDashboardContentProps {
     currentTicker: string;
     chartConfig: { range: string; interval: string };
     handleConfigChange: (range: string, interval: string) => void;
-    isWatchList: boolean;
-    toggleWatchList: (stock: StockWatchListItemProps) => void;
 }
 
 const StockDashboardContent = memo(({
     currentTicker,
     chartConfig,
-    handleConfigChange,
-    isWatchList,
-    toggleWatchList
+    handleConfigChange
 }: StockDashboardContentProps) => {
     const { stockData, isError, isLoading } = useStockSync(
         currentTicker,
@@ -135,9 +131,9 @@ export default function StockPage() {
     const { stockData } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
 
     return (
-        <div className="flex flex-1 min-w-0 h-full overflow-hidden bg-background relative selection:bg-blue-500/20">
-            <div className="flex-1 flex flex-col min-w-0 h-full border-r border-black/5 dark:border-white/5">
-                <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar scroll-smooth">
+        <div className="flex flex-1 min-w-0 bg-background relative selection:bg-blue-500/20">
+            <div className="flex-1 flex flex-col min-w-0 border-r border-black/5 dark:border-white/5">
+                <div className="flex-1 scroll-smooth">
 
                     {/* [1] 헤더 섹션 (정적) - 모바일 최적화 */}
                     <div className="px-4 sm:px-10 pt-6 sm:pt-12 pb-0 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
@@ -152,7 +148,7 @@ export default function StockPage() {
                         </div>
                     </div>
 
-                    {/* [2] 스티키 액션 바 - 모바일 패딩 및 높이 축소 */}
+                    {/* [2] 스티키 액션 바 - 주식검색 섹션 무조건 상단 유지 */}
                     <div className="sticky top-0 z-40 h-20 sm:h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-4 sm:mt-8 px-4 sm:px-10">
                         <div className="flex-1 max-w-3xl">
                             <StockSearchInput />
@@ -208,8 +204,6 @@ export default function StockPage() {
                             currentTicker={currentTicker}
                             chartConfig={chartConfig}
                             handleConfigChange={handleConfigChange}
-                            isWatchList={isWatchList}
-                            toggleWatchList={toggleWatchList}
                         />
                     </div>
                 </div>
