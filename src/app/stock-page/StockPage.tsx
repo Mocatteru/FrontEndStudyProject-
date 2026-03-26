@@ -162,21 +162,6 @@ export default function StockPage() {
                         </div>
 
                         <div className="flex items-center gap-2 sm:gap-3">
-                            {/* [Senior UX] 관심목록 사이드바 토글 버튼 (모바일/태블릿용) */}
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={toggleWatchListOpen}
-                                className={cn(
-                                    "md:hidden size-12 rounded-2xl transition-all duration-300 border-2",
-                                    isWatchListOpen
-                                        ? "bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/20"
-                                        : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
-                                )}
-                            >
-                                <List className={cn("size-5 transition-all duration-500", isWatchListOpen ? "rotate-90" : "rotate-0")} />
-                            </Button>
-
                             {/* stockData가 있을 때만 하트 버튼 노출 */}
                             {stockData && (
                                 <Button
@@ -193,6 +178,20 @@ export default function StockPage() {
                                     <Heart className={cn("size-5 transition-all duration-500", isWatchListItem ? "fill-current scale-110 text-red-500" : "fill-none")} />
                                 </Button>
                             )}
+                            {/* [Senior UX] 관심목록 사이드바 토글 버튼 (모바일/태블릿용) */}
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={toggleWatchListOpen}
+                                className={cn(
+                                    "md:hidden size-12 rounded-2xl transition-all duration-300 border-2",
+                                    isWatchListOpen
+                                        ? "bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/20"
+                                        : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground/40 hover:border-black/20"
+                                )}
+                            >
+                                <List className={cn("size-5 transition-all duration-500", isWatchListOpen ? "rotate-90" : "rotate-0")} />
+                            </Button>
                         </div>
                     </div>
 
