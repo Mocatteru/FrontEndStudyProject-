@@ -230,10 +230,17 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         const times = raw.map(d => Math.floor(d.timestamp / (isMs ? 1000 : 1)) as Time);
         const closes = raw.map(d => d.close);
 
+        // [Bug Fix] 페니스탁(1달러 미만)일 경우 소수점 3자리까지 표기하여 미세 등락률 오차 방지
+        const isPennyStock = stockData.currency !== 'KRW' && closes[closes.length - 1] < 1;
+        const fractionDigits = isPennyStock ? 3 : 2;
+        const minMove = isPennyStock ? 0.001 : 0.01;
+
         const priceFormatter = (p: number) =>
             stockData.currency === 'KRW'
                 ? Math.round(p).toLocaleString('ko-KR') + '원'
-                : '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                : '$' + p.toLocaleString('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
+        
+        const priceFormatConfig = { type: 'custom' as const, formatter: priceFormatter, minMove };
 
         // ── 가격 시리즈 ───────────────────────────────────────────────────────
         if (chartType === 'candlestick') {
@@ -241,14 +248,14 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 upColor: '#ef4444', downColor: '#3b82f6',
                 borderVisible: false,
                 wickUpColor: '#ef4444', wickDownColor: '#3b82f6',
-                priceFormat: { type: 'custom', formatter: priceFormatter },
+                priceFormat: priceFormatConfig,
             });
             s.setData(raw.map((d, i) => ({ time: times[i], open: d.open, high: d.high, low: d.low, close: d.close })));
             priceSeriesRef.current = s;
         } else {
             const s = pChart.addSeries(LineSeries, {
                 color: '#3b82f6', lineWidth: 2,
-                priceFormat: { type: 'custom', formatter: priceFormatter },
+                priceFormat: priceFormatConfig,
             });
             s.setData(raw.map((d, i) => ({ time: times[i], value: d.close })));
             priceSeriesRef.current = s;
@@ -266,7 +273,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 priceScaleId: 'right',
                 lastValueVisible: false,
                 priceLineVisible: false,
-                priceFormat: { type: 'custom', formatter: priceFormatter },
+                priceFormat: priceFormatConfig,
             });
             s.setData(maVals.map((v, i) => ({ time: times[offset + i], value: v })));
             maSeriesRefs.current[idx] = s;
