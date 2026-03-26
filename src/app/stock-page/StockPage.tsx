@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback, useEffect, memo } from "react";
-import useStockSync from "@/hooks/useStockSync";
 import StockSearchInput from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
 import StockChart from "./components/StockChart";
@@ -14,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FormatStockWatchListItem, Stock } from "@/types/stock";
 import { toast } from "sonner";
+import { useStockSync } from "@/hooks/useStockSync";
 
 /**
  * [Senior Optimization] 

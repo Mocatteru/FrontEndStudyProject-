@@ -9,6 +9,7 @@ interface StockState {
     currentTicker: string,
     recentSearchList: string[],
     stockWatchList: StockWatchListItemProps[],
+    stockPopularList: StockWatchListItemProps[],
     stockMemo: { ticker: string, memo: string }[],
     setStock: (stock: Stock) => void,
     setCurrentTicker: (ticker: string) => void,
@@ -20,7 +21,7 @@ interface StockState {
     clearRecentSearch: () => void,
     clearStockWatchList: () => void,
     setStockMemo: (ticker: string, memo: string) => void,
-
+    setStockPopularList: (list: StockWatchListItemProps[]) => void,
 }
 
 /**
@@ -36,6 +37,7 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             currentTicker: "",
             recentSearchList: [],
             stockWatchList: [],
+            stockPopularList: [],
             stockMemo: [],
 
             // Actions
@@ -46,6 +48,7 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             addRecentSearch: (ticker: string) => set((state) => ({
                 recentSearchList: [ticker.toUpperCase(), ...state.recentSearchList.filter(t => t !== ticker.toUpperCase())].slice(0, 10)
             })),
+            setStockPopularList: (list: StockWatchListItemProps[]) => set({ stockPopularList: list }),
             /**
              * [완료: 성능 최적화 - 데이터 정규화 및 선택적 저장]
              * 1. StockWatchListItemProps를 도입하여 관심종목 저장 시 대용량 historical 데이터를 제외함.
@@ -56,11 +59,11 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             // ticker 정보가 유효한지 엣지 케이스 방어 로직 추가
             toggleWatchList: (stock: StockWatchListItemProps) => set((state) => {
                 if (!stock?.ticker) return state;
-                
+
                 const isExist = state.stockWatchList.some(m => m.ticker === stock.ticker);
                 return {
-                    stockWatchList: isExist 
-                        ? state.stockWatchList.filter(m => m.ticker !== stock.ticker) 
+                    stockWatchList: isExist
+                        ? state.stockWatchList.filter(m => m.ticker !== stock.ticker)
                         : [...state.stockWatchList, stock]
                 };
             }),
@@ -96,7 +99,7 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                 const updatedList = state.stockWatchList.map(existing => {
                     const found = newItems.find(n => n.ticker === existing.ticker);
                     if (!found) return existing;
-                    
+
                     // 데이터가 실제로 변경되었을 때만 새로운 객체 반환 (Zustand 얕은 비교 최적화)
                     if (existing.price === found.price && existing.changePercent === found.changePercent) {
                         return existing;

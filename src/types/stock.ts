@@ -143,6 +143,15 @@ export function FormatTickerKR(ticker: string) {
     return ticker.trim().toUpperCase();
 }
 
+/**
+ * [Popular Tickers List]
+ * - 사용자 편의를 위해 미리 정의된 주요 인기 종목 리스트입니다.
+ */
+export const POPULAR_TICKERS = [
+    "AAPL", "NVDA", "TSLA", "MSFT", "GOOGL", "AMZN", "SOXL", "TQQQ", "VOO", "PLTR", // US
+    "005930.KS", "000660.KS", "035420.KS", "035720.KS", "005380.KS", "042700.KS", "196170.KQ"// KR (삼성전자, SK하이닉스, 네이버, 카카오)
+];
+
 //화폐 단위 결정 및 포맷팅 하는 포맷 함수입니다.
 export function FormatPriceCurrency(currency: string | undefined, price: number | undefined) {
     if (price === undefined || price === null || isNaN(price)) {
