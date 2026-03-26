@@ -2,7 +2,7 @@
 
 import useStockSearch from "@/hooks/useStockSearch";
 import { useStockStore } from "@/store/useStockStore";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, History, X } from "lucide-react";
@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 export default function StockSearchInput() {
     const [ticker, setTicker] = useState<string>('');
     const [isFocused, setIsFocused] = useState<boolean>(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const { handleRecentSearch, handleRemoveRecentSearch, handleClearRecentSearch } = useStockSearch();
     const { recentSearchList } = useStockStore();
@@ -23,16 +24,27 @@ export default function StockSearchInput() {
             handleRecentSearch(ticker);
             setIsFocused(false);
         }
-    }, [ticker, handleRecentSearch])
+    }, [ticker, handleRecentSearch]);
 
-    const handleSelectHistory = (value: string) => {
+    const handleSelectHistory = useCallback((value: string) => {
         setTicker(value);
         handleRecentSearch(value);
         setIsFocused(false);
-    }
+    }, [handleRecentSearch]);
+
+    // [Practicality] 단순 setTimeout 꼼수 대신 바깥 영역 클릭(Click Outside) 감지로 드롭다운 제어
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsFocused(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
-        <div className="relative w-full max-w-sm group/search">
+        <div ref={containerRef} className="relative w-full max-w-sm group/search">
             <form onSubmit={pressSearchButton} className="flex gap-3 w-full">
                 <div className={cn(
                     "relative flex-1 transition-all duration-500",
@@ -46,7 +58,7 @@ export default function StockSearchInput() {
                         type="text"
                         autoComplete="off"
                         value={ticker}
-                        onChange={(e) => setTicker(e.target.value)}
+                        onChange={(e) => setTicker(e.target.value.toUpperCase())} // 실무: 티커명은 주로 대문자만 입력/표기됨
                         placeholder="종목 입력 (NVDA, 005930...)"
                         className={cn(
                             "pl-11 pr-4 h-12 w-full transition-all duration-500 font-bold",
@@ -55,7 +67,7 @@ export default function StockSearchInput() {
                             "placeholder:text-muted-foreground/50 placeholder:font-black placeholder:uppercase placeholder:tracking-widest placeholder:text-[10px] rounded-2xl"
                         )}
                         onFocus={() => setIsFocused(true)}
-                        onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                    // onBlur setTimeout 제거: Click Outside 로직이 대신 안전하게 처리함
                     />
                 </div>
                 <Button
@@ -81,12 +93,13 @@ export default function StockSearchInput() {
                             variant="ghost"
                             size="sm"
                             className="h-7 px-3 text-[10px] font-black hover:bg-red-500/10 text-red-500 transition-all rounded-full uppercase tracking-tighter"
+                            onMouseDown={(e) => e.preventDefault()} // 포커스 튐 방지
                             onClick={handleClearRecentSearch}
                         >
                             전체 삭제
                         </Button>
                     </div>
-                    
+
                     <ScrollArea className="h-[280px]">
                         <div className="p-4 space-y-1">
                             {recentSearchList.map((v) => (

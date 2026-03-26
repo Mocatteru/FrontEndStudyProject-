@@ -17,14 +17,14 @@ export default function HomePage() {
             <LayoutDashboard className="size-6 text-blue-500" />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tighter uppercase italic drop-shadow-sm text-foreground lowercase">Dashboard</h2>
+            <h2 className="text-3xl font-black tracking-tighter uppercase italic drop-shadow-sm text-foreground">Dashboard</h2>
             <p className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/40 uppercase">Overview & Analytics</p>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center py-20 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5 border-dashed">
           <LayoutDashboard className="size-16 text-muted-foreground/20 mb-6" />
-          <h3 className="text-xl font-black text-foreground/60 tracking-tight mb-2 uppercase italic tracking-widest">Under Construction</h3>
+          <h3 className="text-xl font-black text-foreground/60 mb-2 uppercase italic tracking-widest">Under Construction</h3>
           <p className="text-sm font-bold text-muted-foreground/40 tracking-widest uppercase italic">현재 주요 지표를 연동하고 있습니다.</p>
         </div>
       </div>
