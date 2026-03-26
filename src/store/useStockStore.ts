@@ -16,6 +16,7 @@ interface StockState {
     toggleWatchList: (stock: StockWatchListItemProps) => void,
     removeRecentSearch: (ticker: string) => void,
     updateStockWatchList: (stock: StockWatchListItemProps) => void,
+    updateWatchListBulk: (list: StockWatchListItemProps[]) => void, // [Senior] 백그라운드 일괄 데이터 새로고침 액션
     clearRecentSearch: () => void,
     clearStockWatchList: () => void,
     setStockMemo: (ticker: string, memo: string) => void,
@@ -89,6 +90,20 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                 const newList = [...state.stockWatchList];
                 newList[existingIndex] = stock;
                 return { stockWatchList: newList };
+            }),
+            // [Senior] 티커 기반 벌크 업데이트 - 동기화 중 항목 삭제 등에도 안전하게 티커가 일치하는 것만 업데이트
+            updateWatchListBulk: (newItems: StockWatchListItemProps[]) => set((state) => {
+                const updatedList = state.stockWatchList.map(existing => {
+                    const found = newItems.find(n => n.ticker === existing.ticker);
+                    if (!found) return existing;
+                    
+                    // 데이터가 실제로 변경되었을 때만 새로운 객체 반환 (Zustand 얕은 비교 최적화)
+                    if (existing.price === found.price && existing.changePercent === found.changePercent) {
+                        return existing;
+                    }
+                    return { ...existing, ...found };
+                });
+                return { stockWatchList: updatedList };
             }),
             setStockMemo: (ticker: string, memo: string) => set((state) => {
                 const isExist = state.stockMemo.some(m => m.ticker === ticker);

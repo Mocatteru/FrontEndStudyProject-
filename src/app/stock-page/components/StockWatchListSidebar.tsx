@@ -6,10 +6,13 @@ import { cn } from "@/lib/utils";
 import StockWatchListItem from "./StockWatchListItem";
 import { useStockStore } from "@/store/useStockStore";
 import * as _ from "radash";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getStockQuote } from "@/services/stock.services";
+import { RefreshCw } from "lucide-react";
+import { FormatStockWatchListItem, StockWatchListItemProps } from "@/types/stock";
 
 interface StockWatchListSidebarProps {
     isOpen: boolean;
@@ -18,7 +21,52 @@ interface StockWatchListSidebarProps {
 
 export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchListSidebarProps) {
     const stockWatchList = useStockStore(s => s.stockWatchList);
+    const updateWatchListBulk = useStockStore(s => s.updateWatchListBulk); // [Senior] 벌크 업데이트용 액션 구독
     const [filterMode, setFilterMode] = useState<'ALL' | 'KR' | 'US'>('ALL');
+    const [isSyncing, setIsSyncing] = useState(false); // [Senior] 동기화 중임을 알리는 상태
+
+    // [Senior UX] 기존에 로컬스토리지에 캐시된 관심목록을 마운트 시 동기화 (네트워크 동시성 제어 적용)
+    useEffect(() => {
+        if (!stockWatchList || stockWatchList.length === 0 || isSyncing) return;
+
+        let isMounted = true;
+        const syncWatchList = async () => {
+            setIsSyncing(true);
+            const results: StockWatchListItemProps[] = []; // [Senior] 모든 변경된 종목 데이터를 담아둘 임시 버퍼
+
+            try {
+                // [성능 최적화] radash.parallel를 사용하여 동시 요청 수를 3개로 제한 (서버 부하 및 429 에러 방지)
+                await _.parallel(3, stockWatchList, async (item) => {
+                    // [Guard 1] 요청 시작 전 체크
+                    if (!isMounted) return;
+                    try {
+                        // [리소스 절약] 차트 데이터는 1일치만 불러와 페이로드 최소화
+                        const data = await getStockQuote(item.ticker, '1d', '1d');
+                        
+                        // [Guard 2] 요청 응답 후 즉시 체크 (네트워크 지연 시간 방어)
+                        if (!isMounted || !data) return;
+
+                        // [데이터 일관성] 정규화된 포매터를 사용하여 결과 가공 후 결과 버퍼에 푸시
+                        const updatedItem = FormatStockWatchListItem(data);
+                        results.push({ ...item, ...updatedItem });
+                    } catch (err) {
+                        console.debug("[Sync Failed]", item.ticker, err);
+                    }
+                });
+
+                // [Senior Optimization] 개별 렌더링을 피하고 벌크로 한 번에 상태 업데이트
+                if (isMounted && results.length > 0) {
+                    updateWatchListBulk(results);
+                }
+            } finally {
+                if (isMounted) setIsSyncing(false);
+            }
+        };
+        syncWatchList();
+
+        return () => { isMounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const filteredList = useMemo(() => {
         switch (filterMode) {
@@ -61,8 +109,14 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                         <>
                             <div className="flex flex-col gap-0.5 items-start animate-in fade-in slide-in-from-left-4 duration-500">
                                 <div className="flex items-center gap-2">
-                                    <div className="size-1 rounded-full bg-blue-500 animate-pulse" />
-                                    <span className="text-[9px] font-black tracking-widest text-muted-foreground/60 uppercase italic">Watchlist</span>
+                                    <div className={cn(
+                                        "size-1 rounded-full",
+                                        isSyncing ? "bg-orange-500" : "bg-blue-500 animate-pulse"
+                                    )} />
+                                    <span className="text-[9px] font-black tracking-widest text-muted-foreground/60 uppercase italic">
+                                        {isSyncing ? 'Refreshing...' : 'Watchlist'}
+                                    </span>
+                                    {isSyncing && <RefreshCw className="size-2 text-orange-500 animate-spin" />}
                                 </div>
                                 <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground drop-shadow-sm text-center">
                                     관심종목
