@@ -13,6 +13,8 @@ export function useSidebarSync() {
     const setStockPopularList = useStockStore(s => s.setStockPopularList);
     const [isSyncing, setIsSyncing] = useState(false);
 
+    const currentTicker = useStockStore(s => s.currentTicker);
+
     useEffect(() => {
         let isMounted = true;
 
@@ -53,7 +55,7 @@ export function useSidebarSync() {
         syncSidebarData();
         return () => { isMounted = false; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stockWatchList.length]);
+    }, [stockWatchList.length, currentTicker]);
 
     return { isSyncing };
 }

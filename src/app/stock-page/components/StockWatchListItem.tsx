@@ -16,8 +16,11 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
     const formattedChange = FormatPriceCurrency(currency, Number(marketChange));
 
     // [Senior Optimization] Selector를 사용하여 액션만 구독
+    const currentTicker = useStockStore(s => s.currentTicker);
     const setCurrentTicker = useStockStore(s => s.setCurrentTicker);
     const { isWatchListOpen, toggleWatchList } = useUiStore();
+
+    const isActive = currentTicker === ticker;
 
     const onClickWatchListItem = useCallback(() => {
         setCurrentTicker(ticker);
@@ -36,9 +39,10 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                     isOpen
                         ? "h-auto py-5 px-5 rounded-[2.25rem] w-full"
                         : "size-11 p-0 rounded-xl", 
-                    "bg-card/40 dark:bg-white/3",
-                    "border border-black/5 dark:border-white/8",
-                    "hover:bg-card/80 dark:hover:bg-white/8 hover:border-blue-500/20"
+                    "bg-card/40 dark:bg-white/3 border border-black/5 dark:border-white/8",
+                    "hover:bg-card/80 dark:hover:bg-white/8 hover:border-blue-500/20",
+                    // [Senior] 현재 선택된 종목 하이라이트
+                    isActive && "bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/40"
                 )}
             >
                 {isOpen ? (
