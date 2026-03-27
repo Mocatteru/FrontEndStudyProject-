@@ -42,11 +42,16 @@ const makeChartOpts = (showTimeAxis: boolean): Parameters<typeof createChart>[1]
         textColor: '#6b7280',
     },
     grid: {
-        vertLines: { color: 'rgba(55,65,81,0.4)', style: 2 },
-        horzLines: { color: 'rgba(55,65,81,0.4)', style: 2 },
+        vertLines: { visible: false },
+        horzLines: { visible: false },
     },
     crosshair: { mode: 1 },
-    rightPriceScale: { borderColor: 'rgba(55,65,81,0.6)', autoScale: true },
+    rightPriceScale: {
+        borderColor: 'rgba(55,65,81,0.6)',
+        autoScale: true,
+        borderVisible: true,
+        minimumWidth: 100, // [Senior Update] 넉넉한 너비를 확보하여 모든 수치 표기 시 밀림 없이 정렬
+    },
     leftPriceScale: { visible: false },
     timeScale: {
         visible: showTimeAxis,
@@ -275,13 +280,16 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
         // ── 가격 시리즈 (Candlestick 고정) ───────────────────────────────────
         const isPennyStock = stockData.currency !== 'KRW' && closes[closes.length - 1] < 1;
-        const fractionDigits = isPennyStock ? 3 : 2;
         const minMove = isPennyStock ? 0.001 : 0.01;
 
-        const priceFormatter = (p: number) =>
-            stockData.currency === 'KRW'
-                ? Math.round(p).toLocaleString('ko-KR') + '원'
-                : '$' + p.toLocaleString('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
+        const priceFormatter = (p: number) => {
+            if (stockData.currency === 'KRW') {
+                return Math.round(p).toLocaleString('ko-KR') + '원';
+            }
+            // [Senior Fix] 개별 가격(p)이 1달러 미만일 때만 소수점 3자리까지 표명하여 불필요한 노이즈 제거
+            const digits = p < 1 ? 3 : 2;
+            return '$' + p.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+        }
 
         const priceFormatConfig = { type: 'custom' as const, formatter: priceFormatter, minMove };
 
@@ -312,6 +320,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         const rsiS = rsiChart.addSeries(LineSeries, {
             color: '#c084fc',
             lineWidth: 2,
+            priceScaleId: 'right',
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(1) },
             lastValueVisible: true,
         });
@@ -332,16 +341,16 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
         // ── MACD ──────────────────────────────────────────────────────────────
         const macdL = macdChart.addSeries(LineSeries, {
-            color: '#60a5fa', lineWidth: 2, lastValueVisible: true,
-            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
+            color: '#60a5fa', lineWidth: 2, lastValueVisible: true, priceScaleId: 'right',
+            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(2) },
         });
         const macdSig = macdChart.addSeries(LineSeries, {
             color: '#f87171', lineWidth: 2, lastValueVisible: true, priceScaleId: 'right',
-            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
+            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(2) },
         });
         const macdHist = macdChart.addSeries(HistogramSeries, {
             priceScaleId: 'right',
-            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
+            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(2) },
         });
 
         macdL.setData(macdResults.map(m => ({ time: m.time, value: m.macd })));
@@ -557,7 +566,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                             {idx === 0 && (
                                 <div
                                     ref={tooltipRef}
-                                    className="absolute z-50 p-4 bg-black/10 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-sm opacity-0"
+                                    className="absolute z-50 p-4 bg-slate-900/90 dark:bg-black/60 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-sm opacity-0"
                                     style={{ pointerEvents: 'none' }}
                                 />
                             )}

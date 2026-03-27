@@ -20,18 +20,22 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
         { label: '시가 (Open)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketOpen) },
         { label: '고가 (High)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayHigh) },
         { label: '저가 (Low)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayLow) },
-        { label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange) 
-            ? FormatPriceCurrency(stockData.currency, stockData.regularMarketPrice - stockData.regularMarketChange) 
-            : '---' },
+        {
+            label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange)
+                ? FormatPriceCurrency(stockData.currency, stockData.regularMarketPrice - stockData.regularMarketChange)
+                : '---'
+        },
 
         // 2. 통계 및 볼륨
         { label: '거래량 (Volume)', value: stockData?.regularMarketVolume?.toLocaleString() },
         { label: '평균 거래량 (3M)', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
-        { label: '시가총액 (Market Cap)', value: stockData?.marketCap ? (
-            stockData.currency === 'KRW' 
-                ? `${(stockData.marketCap / 1e12).toFixed(1)}조 원` 
-                : `$${(stockData.marketCap / 1e9).toFixed(2)}B`
-        ) : '---' },
+        {
+            label: '시가총액 (Market Cap)', value: stockData?.marketCap ? (
+                stockData.currency === 'KRW'
+                    ? `${(stockData.marketCap / 1e12).toFixed(1)}조 원`
+                    : `$${(stockData.marketCap / 1e9).toFixed(2)}B`
+            ) : '---'
+        },
         { label: '유통 주식수', value: stockData?.sharesOutstanding?.toLocaleString() },
 
         // 3. 투자 지표 (PE, EPS 등)
@@ -52,11 +56,11 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
     ], [stockData]);
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 bg-white dark:bg-card/10 p-6">
             {stats.map((item, idx) => (
                 <div
                     key={idx}
-                    className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg"
+                    className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                 >
                     <span className="text-sm text-gray-400 font-medium">{item.label}</span>
                     <span className="text-sm font-bold tabular-nums">{item.value ?? 'N/A'}</span>

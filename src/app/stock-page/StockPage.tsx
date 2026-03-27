@@ -138,7 +138,7 @@ export default function StockPage() {
     }, [stockData, toggleWatchList, isWatchListItem]);
 
     return (
-        <div className="flex flex-1 min-w-0 bg-background relative selection:bg-blue-500/20">
+        <div className="flex flex-1 min-w-0 bg-slate-50/30 dark:bg-background relative selection:bg-blue-500/20">
             <div className="flex-1 flex flex-col min-w-0 border-r border-black/5 dark:border-white/5">
                 <div className="flex-1 scroll-smooth">
 
@@ -156,7 +156,7 @@ export default function StockPage() {
                     </div>
 
                     {/* [2] 스티키 액션 바 - 주식검색 섹션 무조건 상단 유지 */}
-                    <div className="sticky top-0 z-40 h-20 sm:h-24 bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-4 sm:mt-8 px-4 sm:px-10">
+                    <div className="sticky top-0 z-40 h-20 sm:h-24 bg-slate-50/80 dark:bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-4 sm:mt-8 px-4 sm:px-10">
                         <div className="flex-1 max-w-3xl">
                             <StockSearchInput />
                         </div>

@@ -96,7 +96,7 @@ export default function AppSidebar() {
     }, [pathname, isMobile, setOpenMobile]);
 
     return (
-        <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/80 backdrop-blur-xl">
+        <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-slate-100/60 dark:bg-black/80 backdrop-blur-xl">
             <TabKeyToggle />
 
             {/* ── 상단 로고 및 유저 간략 정보 - [Tactical Design Update] ── */}
