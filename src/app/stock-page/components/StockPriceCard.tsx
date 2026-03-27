@@ -64,7 +64,7 @@ const MemoUpdateDialog = memo(({
                 }
             />
             {/* backdrop-blur 성능을 위해 xl -> md로 부드럽게 조정 */}
-            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-md shadow-2xl rounded-[2.5rem] animate-in zoom-in-95 duration-200">
+            <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-md shadow-2xl rounded-[2.5rem]">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
                         메모 업데이트
@@ -162,7 +162,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                     </div>
 
                     {currentMemo && (
-                        <div className="mt-8 p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 animate-in fade-in slide-in-from-left-2 duration-300 max-w-full group/memo relative overflow-hidden">
+                        <div className="mt-8 p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 max-w-full group/memo relative overflow-hidden">
                             <div className="absolute -right-4 -top-4 size-16 bg-blue-500/5 rounded-full blur-xl group-hover/memo:bg-blue-500/10 transition-all duration-1000" />
                             <p className="text-[10px] font-black text-blue-500/40 tracking-[0.2em] mb-3">투자 전략 메모</p>
                             <p className="text-[15px] font-bold text-foreground/80 leading-relaxed whitespace-pre-wrap break-all">{currentMemo}</p>

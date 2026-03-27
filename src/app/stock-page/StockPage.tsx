@@ -43,7 +43,7 @@ const StockDashboardContent = memo((
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-40 animate-in fade-in duration-700">
+            <div className="flex flex-col items-center justify-center py-40">
                 <div className="relative">
                     <div className="animate-spin rounded-full h-24 w-24 border-b-4 border-blue-500 shadow-2xl shadow-blue-500/20"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -57,7 +57,7 @@ const StockDashboardContent = memo((
 
     if (isError) {
         return (
-            <div className="bg-red-500/5 dark:bg-red-500/10 p-12 rounded-[4rem] border border-red-500/20 shadow-2xl shadow-red-500/5 animate-in fade-in zoom-in-95 duration-500 text-center max-w-4xl mx-auto">
+            <div className="bg-red-500/5 dark:bg-red-500/10 p-12 rounded-[4rem] border border-red-500/20 shadow-2xl shadow-red-500/5 text-center max-w-4xl mx-auto">
                 <TrendingUp className="size-16 text-red-500/60 rotate-180 mx-auto mb-8 animate-bounce" />
                 <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase italic">Critical Failure: Invalid Ticker</h3>
                 <p className="text-muted-foreground font-semibold max-w-lg mx-auto">티커 코드 정보가 존재하지 않습니다.</p>
@@ -77,7 +77,7 @@ const StockDashboardContent = memo((
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+        <div className="space-y-6">
             <StockPriceCard stockData={stockData} />
 
             <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 transition-all hover:shadow-blue-500/10 hover:border-blue-500/20 duration-500">
@@ -143,7 +143,7 @@ export default function StockPage() {
                 <div className="flex-1 scroll-smooth">
 
                     {/* [1] 헤더 섹션 (정적) - 모바일 최적화 */}
-                    <div className="px-4 sm:px-10 pt-6 sm:pt-12 pb-0 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="px-4 sm:px-10 pt-6 sm:pt-12 pb-0 flex justify-between items-center">
                         <div className="flex items-center gap-3 sm:gap-5">
                             <div className="hidden sm:block p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
                                 <TrendingUp className="size-6 sm:size-8 text-blue-500" />

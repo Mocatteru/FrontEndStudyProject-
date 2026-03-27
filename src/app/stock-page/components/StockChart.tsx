@@ -557,7 +557,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                             {idx === 0 && (
                                 <div
                                     ref={tooltipRef}
-                                    className="absolute z-50 p-4 bg-black/10 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-sm opacity-0 transition-opacity duration-150"
+                                    className="absolute z-50 p-4 bg-black/10 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-sm opacity-0"
                                     style={{ pointerEvents: 'none' }}
                                 />
                             )}

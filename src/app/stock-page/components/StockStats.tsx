@@ -56,7 +56,7 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
             {stats.map((item, idx) => (
                 <div
                     key={idx}
-                    className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-all"
+                    className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg"
                 >
                     <span className="text-sm text-gray-400 font-medium">{item.label}</span>
                     <span className="text-sm font-bold tabular-nums">{item.value ?? 'N/A'}</span>
