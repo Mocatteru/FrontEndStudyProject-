@@ -4,12 +4,13 @@ import React, { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Save } from "lucide-react";
+import { Save, Upload } from "lucide-react";
 import { useUiStore } from "@/store/uiStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useStockStore } from "@/store/useStockStore";
 import { AlertDialogButton } from "@/components/common/AlertDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 /**
  * [학습 포인트] SettingItem 컴포넌트
@@ -119,6 +120,21 @@ export default function SettingPage() {
                         title="사용자 정보"
                         description="시스템 프로필과 기본 계정 정보를 관리합니다. 모든 변경 사항은 즉시 동기화 노드에 반영됩니다."
                     >
+                        <SettingSectionItem label="사용자 프로필 사진">
+                            <div className="flex justify-between items-center px-4 py-2">
+                                <Avatar className="h-24 w-24">
+                                    <AvatarImage src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf4lZX2ZWovlNMo9gsrjDnlFs1GocmrsriYw&s" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                                <Button variant="outline" className="rounded-xl px-6 h-11 font-bold tracking-tight shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-sm">
+                                    <Upload className="mr-2 size-4" />
+                                    사진 업로드
+                                </Button>
+                            </div>
+
+                        </SettingSectionItem>
+                        <SettingSectionItem label=""><></></SettingSectionItem>
+
                         <SettingSectionItem label="회원 이름">
                             <Input value={userNameInput} onChange={(e) => { setUserNameInput(e.target.value); setIsEditing(true) }} placeholder="이름을 입력하세요" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
                         </SettingSectionItem>
