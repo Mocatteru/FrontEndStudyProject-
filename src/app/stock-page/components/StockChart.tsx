@@ -244,12 +244,12 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 macd: m.MACD ?? 0,
                 signal: m.signal ?? 0,
                 histogram: m.histogram ?? 0,
-                color: (m.histogram ?? 0) >= 0 ? 'rgba(239,68,68,0.5)' : 'rgba(59,130,246,0.5)',
+                color: (m.histogram ?? 0) >= 0 ? '#ef4444' : '#3b82f6',
             })),
             volData: raw.map((d, i) => ({
                 time: times[i],
                 value: d.volume ?? 0,
-                color: d.close >= d.open ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)',
+                color: d.close >= d.open ? '#ef4444' : '#3b82f6',
             }))
         };
     }, [stockData]);
