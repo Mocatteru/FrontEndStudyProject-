@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from "react";
 import { Stock, PERIOD_OPTIONS } from "@/types/stock";
 import { cn } from "@/lib/utils";
 import {
@@ -199,10 +199,67 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         };
     }, []);
 
+    // ── [Senior Optimization] 보조지표 연산 전용 메모이제이션 (Rule 13) ──────
+    const indicatorData = useMemo(() => {
+        if (!stockData?.historical?.length) return null;
+
+        const raw = [...stockData.historical].sort((a, b) => a.timestamp - b.timestamp);
+        const closes = raw.map(d => d.close);
+        const isMs = raw[0].timestamp > 10_000_000_000;
+        const times = raw.map(d => Math.floor(d.timestamp / (isMs ? 1000 : 1)) as Time);
+
+        // 1. 이동평균선 (SMA)
+        const maResults = MA_CONFIGS.map(cfg => {
+            const vals = SMA.calculate({ values: closes, period: cfg.period });
+            const offset = closes.length - vals.length;
+            return {
+                label: cfg.label,
+                color: cfg.color,
+                data: vals.map((v, i) => ({ time: times[offset + i], value: v }))
+            };
+        });
+
+        // 2. RSI
+        const rsiRaw = RSI.calculate({ values: closes, period: 14 });
+        const rsiOffset = closes.length - rsiRaw.length;
+        const rsiData = rsiRaw.map((v, i) => ({ time: times[rsiOffset + i], value: v }));
+
+        // 3. MACD
+        const macdRaw = MACD.calculate({
+            values: closes,
+            fastPeriod: 12,
+            slowPeriod: 26,
+            signalPeriod: 9,
+            SimpleMAOscillator: false,
+            SimpleMASignal: false,
+        });
+        const macdOffset = closes.length - macdRaw.length;
+
+        return {
+            raw, times, closes, isMs,
+            maResults,
+            rsiData,
+            macdResults: macdRaw.map((m, i) => ({
+                time: times[macdOffset + i],
+                macd: m.MACD ?? 0,
+                signal: m.signal ?? 0,
+                histogram: m.histogram ?? 0,
+                color: (m.histogram ?? 0) >= 0 ? 'rgba(239,68,68,0.5)' : 'rgba(59,130,246,0.5)',
+            })),
+            volData: raw.map((d, i) => ({
+                time: times[i],
+                value: d.volume ?? 0,
+                color: d.close >= d.open ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)',
+            }))
+        };
+    }, [stockData]);
+
     // ── 데이터 / 시리즈 업데이트 ──────────────────────────────────────────────
     useEffect(() => {
         const [pChart, rsiChart, macdChart, volChart] = chartRefs.current;
-        if (!pChart || !rsiChart || !macdChart || !volChart || !stockData?.historical?.length) return;
+        if (!pChart || !rsiChart || !macdChart || !volChart || !indicatorData) return;
+
+        const { raw, times, closes, isMs, maResults, rsiData, macdResults, volData } = indicatorData;
 
         // 기존 시리즈 정리
         const remove = (chart: IChartApi, s: ISeriesApi<never> | null) => {
@@ -216,22 +273,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         remove(macdChart, macdHistRef.current as ISeriesApi<never>);
         remove(volChart, volumeSeriesRef.current as ISeriesApi<never>);
 
-        priceSeriesRef.current = null;
-        maSeriesRefs.current = [null, null, null, null];
-        rsiSeriesRef.current = null;
-        macdLineRef.current = null;
-        macdSignalRef.current = null;
-        macdHistRef.current = null;
-        volumeSeriesRef.current = null;
-        markersRef.current = null;
-
-        // ── 원본 데이터 정렬 ──────────────────────────────────────────────────
-        const isMs = stockData.historical[0].timestamp > 10_000_000_000;
-        const raw = [...stockData.historical].sort((a, b) => a.timestamp - b.timestamp);
-        const times = raw.map(d => Math.floor(d.timestamp / (isMs ? 1000 : 1)) as Time);
-        const closes = raw.map(d => d.close);
-
-        // [Bug Fix] 페니스탁(1달러 미만)일 경우 소수점 3자리까지 표기하여 미세 등락률 오차 방지
+        // ── 가격 시리즈 (Candlestick 고정) ───────────────────────────────────
         const isPennyStock = stockData.currency !== 'KRW' && closes[closes.length - 1] < 1;
         const fractionDigits = isPennyStock ? 3 : 2;
         const minMove = isPennyStock ? 0.001 : 0.01;
@@ -243,7 +285,6 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
         const priceFormatConfig = { type: 'custom' as const, formatter: priceFormatter, minMove };
 
-        // ── 가격 시리즈 (Candlestick 고정) ───────────────────────────────────
         const s = pChart.addSeries(CandlestickSeries, {
             upColor: '#ef4444', downColor: '#3b82f6',
             borderVisible: false,
@@ -253,76 +294,49 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         s.setData(raw.map((d, i) => ({ time: times[i], open: d.open, high: d.high, low: d.low, close: d.close })));
         priceSeriesRef.current = s;
 
-        // ── 이동평균선 (가격 차트 위에 오버레이) ─────────────────────────────
-        MA_CONFIGS.forEach((cfg, idx) => {
-            const maVals = SMA.calculate({ values: closes, period: cfg.period });
-            const offset = closes.length - maVals.length;
-            if (maVals.length === 0) return;
-
-            const s = pChart.addSeries(LineSeries, {
-                color: cfg.color,
+        // ── 이동평균선 ────────────────────────────────────────────────────────
+        maResults.forEach((res, idx) => {
+            const lineS = pChart.addSeries(LineSeries, {
+                color: res.color,
                 lineWidth: 1,
                 priceScaleId: 'right',
                 lastValueVisible: false,
                 priceLineVisible: false,
                 priceFormat: priceFormatConfig,
             });
-            s.setData(maVals.map((v, i) => ({ time: times[offset + i], value: v })));
-            maSeriesRefs.current[idx] = s;
+            lineS.setData(res.data);
+            maSeriesRefs.current[idx] = lineS;
         });
 
         // ── RSI ───────────────────────────────────────────────────────────────
-        const rsiVals = RSI.calculate({ values: closes, period: 14 });
-        const rsiOffset = closes.length - rsiVals.length;
-
         const rsiS = rsiChart.addSeries(LineSeries, {
             color: '#c084fc',
             lineWidth: 2,
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(1) },
             lastValueVisible: true,
         });
-        rsiS.setData(rsiVals.map((v, i) => ({ time: times[rsiOffset + i], value: v })));
+        rsiS.setData(rsiData);
 
-        // RSI 과매수/과매도 라인
-        const rsiOB = rsiChart.addSeries(LineSeries, {
-            color: 'rgba(239,68,68,0.3)', lineWidth: 1,
-            lineStyle: 2, priceScaleId: 'right',
+        // RSI 과매수/과매도 라인 (배경 점선)
+        const rsiLines = [70, 30].map(val => rsiChart.addSeries(LineSeries, {
+            color: val === 70 ? 'rgba(239,68,68,0.3)' : 'rgba(59,130,246,0.3)',
+            lineWidth: 1, lineStyle: 2, priceScaleId: 'right',
             lastValueVisible: false, priceLineVisible: false,
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(0) },
-        });
-        const rsiOS = rsiChart.addSeries(LineSeries, {
-            color: 'rgba(59,130,246,0.3)', lineWidth: 1,
-            lineStyle: 2, priceScaleId: 'right',
-            lastValueVisible: false, priceLineVisible: false,
-            priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(0) },
-        });
-        if (rsiVals.length > 0) {
-            const firstT = times[rsiOffset];
-            const lastT = times[times.length - 1];
-            rsiOB.setData([{ time: firstT, value: 70 }, { time: lastT, value: 70 }]);
-            rsiOS.setData([{ time: firstT, value: 30 }, { time: lastT, value: 30 }]);
+        }));
+        if (times.length > 0) {
+            rsiLines[0].setData([{ time: times[0], value: 70 }, { time: times[times.length - 1], value: 70 }]);
+            rsiLines[1].setData([{ time: times[0], value: 30 }, { time: times[times.length - 1], value: 30 }]);
         }
         rsiSeriesRef.current = rsiS;
 
         // ── MACD ──────────────────────────────────────────────────────────────
-        const macdResult = MACD.calculate({
-            values: closes,
-            fastPeriod: 12,
-            slowPeriod: 26,
-            signalPeriod: 9,
-            SimpleMAOscillator: false,
-            SimpleMASignal: false,
-        });
-        const macdOffset = closes.length - macdResult.length;
-
         const macdL = macdChart.addSeries(LineSeries, {
-            color: '#60a5fa', lineWidth: 2,
-            lastValueVisible: true,
+            color: '#60a5fa', lineWidth: 2, lastValueVisible: true,
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
         });
         const macdSig = macdChart.addSeries(LineSeries, {
-            color: '#f87171', lineWidth: 2,
-            lastValueVisible: true, priceScaleId: 'right',
+            color: '#f87171', lineWidth: 2, lastValueVisible: true, priceScaleId: 'right',
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
         });
         const macdHist = macdChart.addSeries(HistogramSeries, {
@@ -330,16 +344,9 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(4) },
         });
 
-        macdL.setData(macdResult.map((m, i) => ({ time: times[macdOffset + i], value: m.MACD ?? 0 })));
-        macdSig.setData(macdResult.filter(m => m.signal != null).map((m, i) => {
-            const sigOffset = macdResult.length - macdResult.filter(x => x.signal != null).length;
-            return { time: times[macdOffset + sigOffset + i], value: m.signal as number };
-        }));
-        macdHist.setData(macdResult.map((m, i) => ({
-            time: times[macdOffset + i],
-            value: m.histogram ?? 0,
-            color: (m.histogram ?? 0) >= 0 ? 'rgba(239,68,68,0.5)' : 'rgba(59,130,246,0.5)',
-        })));
+        macdL.setData(macdResults.map(m => ({ time: m.time, value: m.macd })));
+        macdSig.setData(macdResults.map(m => ({ time: m.time, value: m.signal })));
+        macdHist.setData(macdResults.map(m => ({ time: m.time, value: m.histogram, color: m.color })));
 
         macdLineRef.current = macdL;
         macdSignalRef.current = macdSig;
@@ -351,11 +358,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             priceFormat: { type: 'custom', formatter: fmtVol },
         });
         volS.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 }, borderVisible: false });
-        volS.setData(raw.map((d, i) => ({
-            time: times[i],
-            value: d.volume ?? 0,
-            color: d.close >= d.open ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.4)',
-        })));
+        volS.setData(volData);
         volumeSeriesRef.current = volS;
 
         // ── 마커 시스템 초기화 (1회) ──────────────────────────────────────────
@@ -463,7 +466,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             pChart.timeScale().unsubscribeVisibleLogicalRangeChange(onVisibleRangeChange);
         };
 
-    }, [stockData]);
+    }, [stockData, indicatorData]);
 
     // ── 패널 비율 변경 시 차트 resize 트리거 ────────────────────────────────
     const panelHeightsDep = panelHeights.join(',');

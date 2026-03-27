@@ -56,7 +56,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
             <aside
                 className={cn(
                     "fixed top-0 bottom-0 right-0 h-screen flex flex-col shrink-0 z-100 transition-all duration-300 ease-in-out border-l overflow-hidden",
-                    "bg-sidebar backdrop-blur-xl border-sidebar-border shadow-2xl md:shadow-[0_0_15px_rgba(0,0,0,0.1)]",
+                    "bg-sidebar backdrop-blur-md border-sidebar-border shadow-xl md:shadow-[0_0_15px_rgba(0,0,0,0.1)]",
                     isOpen ? "w-[85vw] sm:w-80" : "w-0 md:w-15",
                     !isOpen && "invisible md:visible"
                 )}

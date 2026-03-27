@@ -80,7 +80,7 @@ const StockDashboardContent = memo((
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-10 duration-1000">
             <StockPriceCard stockData={stockData} />
 
-            <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] overflow-hidden shadow-2xl shadow-black/5 dark:shadow-white/5 transition-all hover:shadow-blue-500/10 hover:border-blue-500/20 duration-500">
+            <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-[3.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 transition-all hover:shadow-blue-500/10 hover:border-blue-500/20 duration-500">
                 <StockChart
                     stockData={stockData}
                     range={chartConfig.range}

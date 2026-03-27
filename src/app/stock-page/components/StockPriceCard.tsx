@@ -129,7 +129,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
     const isPositive = (marketChange ?? 0) >= 0;
 
     return (
-        <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-3xl sm:rounded-[3.5rem] p-5 sm:p-8 shadow-2xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-700 overflow-hidden">
+        <div className="group relative bg-card border-2 border-black/5 dark:border-white/5 rounded-3xl sm:rounded-[3.5rem] p-5 sm:p-8 shadow-xl shadow-black/5 dark:shadow-white/5 hover:shadow-blue-500/10 hover:border-blue-500/20 transition-all duration-500 overflow-hidden">
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-1000" />
             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-1000" />
 
@@ -162,7 +162,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                     </div>
 
                     {currentMemo && (
-                        <div className="mt-8 p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 animate-in fade-in slide-in-from-left-4 duration-700 max-w-full group/memo relative overflow-hidden">
+                        <div className="mt-8 p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 animate-in fade-in slide-in-from-left-2 duration-300 max-w-full group/memo relative overflow-hidden">
                             <div className="absolute -right-4 -top-4 size-16 bg-blue-500/5 rounded-full blur-xl group-hover/memo:bg-blue-500/10 transition-all duration-1000" />
                             <p className="text-[10px] font-black text-blue-500/40 tracking-[0.2em] mb-3">투자 전략 메모</p>
                             <p className="text-[15px] font-bold text-foreground/80 leading-relaxed whitespace-pre-wrap break-all">{currentMemo}</p>

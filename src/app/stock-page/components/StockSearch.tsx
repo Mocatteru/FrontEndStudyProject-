@@ -83,7 +83,7 @@ export default function StockSearchInput() {
 
             {/* 최근 검색기록 드롭다운 - [Shadcn-First Refactoring] */}
             {isFocused && recentSearchList.length > 0 && (
-                <div className="absolute top-full left-0 w-full z-50 mt-4 bg-card/95 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-2xl rounded-3xl animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 overflow-hidden">
+                <div className="absolute top-full left-0 w-full z-50 mt-4 bg-card/95 backdrop-blur-md border border-black/5 dark:border-white/10 shadow-xl rounded-3xl animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 overflow-hidden">
                     <div className="flex items-center justify-between px-7 py-5 border-b border-black/5 dark:border-white/5">
                         <div className="flex items-center gap-2">
                             <div className="size-1.5 bg-blue-500 rounded-full animate-pulse" />
