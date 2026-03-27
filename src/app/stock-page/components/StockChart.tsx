@@ -440,11 +440,11 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             const c = data as CandlestickData<Time>;
             tip.innerHTML =
                 `<div style="font-size:11px">` +
-                `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900;font-style:italic">${dStr}</div>` +
+                `<div style="color:rgba(255,255,255,0.7);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:900">${dStr}</div>` +
                 row('시가', priceFormatter(c.open)) +
                 row('고가', `${priceFormatter(c.high)}${pct(c.high, c.open)}`) +
                 row('저가', `${priceFormatter(c.low)}${pct(c.low, c.open)}`) +
-                `<div style="display:flex;justify-content:space-between;gap:28px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.6);font-weight:900;font-style:italic">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(c.close)}${pct(c.close, c.open)}</span></div>` +
+                `<div style="display:flex;justify-content:space-between;gap:28px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.06)"><span style="color:rgba(255,255,255,0.6);font-weight:900">종가</span><span style="color:#fff;font-weight:900">${priceFormatter(c.close)}${pct(c.close, c.open)}</span></div>` +
                 `</div>`;
 
             const closeVal = (data as CandlestickData<Time>).close;

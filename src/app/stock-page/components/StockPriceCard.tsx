@@ -66,10 +66,10 @@ const MemoUpdateDialog = memo(({
             {/* backdrop-blur 성능을 위해 xl -> md로 부드럽게 조정 */}
             <DialogContent className="max-w-md p-8 border-none bg-card/95 backdrop-blur-md shadow-2xl rounded-[2.5rem]">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-black tracking-tighter italic uppercase text-foreground/80">
+                    <DialogTitle className="text-2xl font-black tracking-tighter uppercase text-foreground/80">
                         메모 업데이트
                     </DialogTitle>
-                    <DialogDescription className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                    <DialogDescription className="text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase">
                         티커: {symbol}
                     </DialogDescription>
                 </DialogHeader>
@@ -86,7 +86,7 @@ const MemoUpdateDialog = memo(({
                             placeholder={`${longName}에 대한 전략적 메모를 입력하세요...`}
                             className="min-h-[250px] w-full bg-black/5 dark:bg-white/5 border-none rounded-3xl p-6 text-base font-medium resize-none focus-visible:ring-blue-500/20 placeholder:text-muted-foreground/30 break-all overflow-y-auto custom-scrollbar"
                         />
-                        <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase italic">
+                        <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/30 uppercase">
                             {memoInput.length} / 500
                         </div>
                     </div>
@@ -140,7 +140,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
 
                             <h3 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none group-hover:text-blue-500 transition-all duration-500">
                                 {stockData?.longName || stockData?.shortName || 'Unknown'}
-                                <span className="ml-3 text-muted-foreground/20 font-black text-xl uppercase tracking-widest inline-block not-italic">{stockData?.symbol}</span>
+                                <span className="ml-3 text-muted-foreground/20 font-black text-xl uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                             </h3>
                         </div>
 

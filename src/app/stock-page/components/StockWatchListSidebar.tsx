@@ -80,7 +80,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     activeTab === 'WATCH' ? "text-blue-500 fill-blue-500/10 scale-110" : "text-muted-foreground/40"
                                 )} />
                                 <span className={cn(
-                                    "text-[10px] font-black tracking-tighter uppercase italic",
+                                    "text-[10px] font-black tracking-tighter uppercase",
                                     activeTab === 'WATCH' ? "text-foreground" : "text-muted-foreground/40"
                                 )}>관심목록</span>
 
@@ -105,7 +105,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     activeTab === 'POPULAR' ? "text-blue-500 scale-110" : "text-muted-foreground/40"
                                 )} />
                                 <span className={cn(
-                                    "text-[10px] font-black tracking-tighter uppercase italic",
+                                    "text-[10px] font-black tracking-tighter uppercase",
                                     activeTab === 'POPULAR' ? "text-foreground" : "text-muted-foreground/40"
                                 )}>인기목록</span>
                                 {activeTab === 'POPULAR' && (
@@ -167,7 +167,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                                     <h4 className="text-[13px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-1">
                                                         {activeTab === 'WATCH' ? '관심 목록이 비어있습니다' : '인기 종목이 없습니다'}
                                                     </h4>
-                                                    <p className="text-[10px] font-bold text-muted-foreground/30 uppercase tracking-widest italic">
+                                                    <p className="text-[10px] font-bold text-muted-foreground/30 uppercase tracking-widest">
                                                         {activeTab === 'WATCH' ? '종목을 추가하여 실시간으로 확인하세요' : '잠시 후 다시 시도해 주세요'}
                                                     </p>
                                                 </div>

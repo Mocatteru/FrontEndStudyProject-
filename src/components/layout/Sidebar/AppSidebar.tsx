@@ -107,12 +107,12 @@ export default function AppSidebar() {
                             !mounted ? "opacity-0" : "opacity-100"
                         )}>
                             <div className="flex items-center gap-1.5">
-                                <span className="font-black text-sm tracking-tighter italic uppercase text-foreground">
+                                <span className="font-black text-sm tracking-tighter uppercase text-foreground">
                                     {userName}
                                 </span>
                                 <div className="size-1 rounded-full bg-blue-500" />
                             </div>
-                            <span className="text-[10px] font-black text-blue-500/80 uppercase tracking-[0.2em] italic leading-none">{userRole}</span>
+                            <span className="text-[10px] font-black text-blue-500/80 uppercase tracking-[0.2em] leading-none">{userRole}</span>
                         </div>
                 </div>
             </SidebarHeader>
@@ -122,7 +122,7 @@ export default function AppSidebar() {
             <SidebarContent className="px-3 py-4 gap-6">
                 {sidebarData.navMain.map((group) => (
                     <SidebarGroup key={group.title} className="p-0">
-                        <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/60 group-data-[collapsible=icon]:hidden uppercase italic">
+                        <SidebarGroupLabel className="px-4 mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground/60 group-data-[collapsible=icon]:hidden uppercase">
                             {group.title}
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
@@ -144,7 +144,7 @@ export default function AppSidebar() {
                                                 "size-4 shrink-0",
                                                 pathname === item.url ? "rotate-12 scale-110" : "group-hover/btn:rotate-12 group-hover/btn:scale-110"
                                             )} />
-                                            <span className="font-black text-[11px] uppercase tracking-[0.15em] truncate group-data-[collapsible=icon]:hidden italic">
+                                            <span className="font-black text-[11px] uppercase tracking-[0.15em] truncate group-data-[collapsible=icon]:hidden">
                                                 {item.title}
                                             </span>
                                             {pathname === item.url && (
@@ -177,7 +177,7 @@ export default function AppSidebar() {
                                 "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden",
                                 !mounted ? "opacity-0" : "opacity-100"
                             )}>
-                                <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80 italic">{userName}</span>
+                                <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80">{userName}</span>
                                 <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">{userDepartment}</span>
                             </div>
                         </SidebarMenuButton>

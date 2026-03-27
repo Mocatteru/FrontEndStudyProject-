@@ -43,7 +43,7 @@ export default function RestDataPage() {
                     <ServerCrash className="size-12 text-red-500 animate-bounce" />
                     <div className="absolute inset-0 border-4 border-red-500/20 rounded-full animate-ping" />
                 </div>
-                <h3 className="text-2xl font-black text-red-500 tracking-tighter uppercase italic mb-2">서버 연결 실패</h3>
+                <h3 className="text-2xl font-black text-red-500 tracking-tighter uppercase mb-2">서버 연결 실패</h3>
                 <p className="text-sm font-bold text-muted-foreground/60 tracking-tight">데이터를 불러오는 중 지연이 발생했습니다. 다시 시도해 주세요.</p>
             </div>
         );
@@ -59,7 +59,7 @@ export default function RestDataPage() {
                             <DatabaseZap className="size-6 text-blue-500" />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase italic drop-shadow-sm">데이터 목록</h2>
+                            <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase drop-shadow-sm">데이터 목록</h2>
                             <span className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/40 uppercase">Rest API Posts</span>
                         </div>
                     </div>
@@ -76,7 +76,7 @@ export default function RestDataPage() {
                 {posts?.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5">
                         <DatabaseZap className="size-10 text-muted-foreground/30 mb-4" />
-                        <p className="text-sm font-black text-muted-foreground/50 tracking-widest uppercase italic">등록된 게시글이 없습니다</p>
+                        <p className="text-sm font-black text-muted-foreground/50 tracking-widest uppercase">등록된 게시글이 없습니다</p>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

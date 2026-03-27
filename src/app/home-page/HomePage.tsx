@@ -25,7 +25,7 @@ export default function HomePage() {
         <div className="flex-1 flex flex-col items-center justify-center py-20 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5 border-dashed">
           <LayoutDashboard className="size-16 text-muted-foreground/20 mb-6" />
           <h3 className="text-xl font-black text-foreground/60 mb-2 uppercase italic tracking-widest">Under Construction</h3>
-          <p className="text-sm font-bold text-muted-foreground/40 tracking-widest uppercase italic">현재 주요 지표를 연동하고 있습니다.</p>
+          <p className="text-sm font-bold text-muted-foreground/40 tracking-widest uppercase">현재 주요 지표를 연동하고 있습니다.</p>
         </div>
       </div>
     </ScrollArea>

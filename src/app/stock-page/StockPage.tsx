@@ -50,7 +50,7 @@ const StockDashboardContent = memo((
                         <TrendingUp className="size-6 text-blue-500/60 animate-pulse" />
                     </div>
                 </div>
-                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse italic">Synchronizing Data Nodes</p>
+                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse">Synchronizing Data Nodes</p>
             </div>
         );
     }
@@ -59,7 +59,7 @@ const StockDashboardContent = memo((
         return (
             <div className="bg-red-500/5 dark:bg-red-500/10 p-12 rounded-[4rem] border border-red-500/20 shadow-2xl shadow-red-500/5 text-center max-w-4xl mx-auto">
                 <TrendingUp className="size-16 text-red-500/60 rotate-180 mx-auto mb-8 animate-bounce" />
-                <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase italic">Critical Failure: Invalid Ticker</h3>
+                <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase">Critical Failure: Invalid Ticker</h3>
                 <p className="text-muted-foreground font-semibold max-w-lg mx-auto">티커 코드 정보가 존재하지 않습니다.</p>
             </div>
         );
