@@ -8,6 +8,8 @@ import { Save } from "lucide-react";
 import { useUiStore } from "@/store/uiStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useStockStore } from "@/store/useStockStore";
+import { AlertDialogButton } from "@/components/common/AlertDialog";
 
 /**
  * [학습 포인트] SettingItem 컴포넌트
@@ -79,6 +81,8 @@ export default function SettingPage() {
     const [userDepartmentInput, setUserDepartmentInput] = useState(userDepartment);
     const [userRoleInput, setUserRoleInput] = useState(userRole);
 
+    const { clearStockWatchList, clearStockMemo } = useStockStore();
+
 
     const pressSaveSettingButton = useCallback(() => {
         setIsEditing(false)
@@ -140,28 +144,17 @@ export default function SettingPage() {
                         </SettingSectionItem>
                     </SettingSection>
 
-
-                    {/* MOCK */}
-                    <SettingSection
-                        title="동기화 엔진"
-                        description="주식 시장 데이터의 실시간 동기화 인터벌을 설정합니다. 최적의 주기는 1~5초 사이로 권장됩니다."
-                    >
-                        <SettingSectionItem label="갱신 주기 (초)">
-                            <Input placeholder="예: 2" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                    <SettingSection title="주식 페이지 설정" description="주식 페이지의 기본 설정을 관리합니다.">
+                        <SettingSectionItem label="관심종목 초기화">
+                            <AlertDialogButton onConfirm={clearStockWatchList} title="관심종목 초기화" description="관심종목을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다." variant="destructive" size='lg' className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold w-64">
+                                초기화
+                            </AlertDialogButton>
                         </SettingSectionItem>
-                        <SettingSectionItem label="캐시 보관 시간">
-                            <Input placeholder="분 단위 입력" className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold" />
+                        <SettingSectionItem label="메모 초기화">
+                            <AlertDialogButton onConfirm={clearStockMemo} title="메모 초기화" description="메모를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다." variant="destructive" size='lg' className="rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold w-64">
+                                초기화
+                            </AlertDialogButton>
                         </SettingSectionItem>
-                    </SettingSection>
-
-                    {/* MOCK */}
-                    <SettingSection
-                        title="알림 인프라"
-                        description="시스템 변동 알림 및 주요 이벤트에 대한 푸시 서버 설정을 관리합니다."
-                    >
-                        <div className="col-span-full h-48 bg-muted/5 border-2 border-dashed border-black/5 dark:border-white/5 rounded-[3rem] flex items-center justify-center">
-                            <p className="font-black text-muted-foreground/40 uppercase tracking-[0.3em] text-sm">시스템 인프라 업데이트 진행 중</p>
-                        </div>
                     </SettingSection>
                 </div>
             </main>

@@ -20,6 +20,7 @@ interface StockState {
     updateWatchListBulk: (list: StockWatchListItemProps[]) => void, // [Senior] 백그라운드 일괄 데이터 새로고침 액션
     clearRecentSearch: () => void,
     clearStockWatchList: () => void,
+    clearStockMemo: () => void,
     setStockMemo: (ticker: string, memo: string) => void,
     setStockPopularList: (list: StockWatchListItemProps[]) => void,
 }
@@ -75,6 +76,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             })),
             clearStockWatchList: () => set(() => ({
                 stockWatchList: []
+            })),
+            clearStockMemo: () => set(() => ({
+                stockMemo: []
             })),
             updateStockWatchList: (stock: StockWatchListItemProps) => set((state) => {
                 const existingIndex = state.stockWatchList.findIndex(m => m.ticker === stock.ticker);

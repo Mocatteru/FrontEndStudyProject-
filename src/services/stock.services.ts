@@ -19,3 +19,12 @@ export const getStockQuote = async (ticker: string, range: string = '1mo', inter
     // range와 interval 파라미터를 추가하여 차트 데이터를 조절합니다.
     return fetchData(baseURL, `/api/stock?ticker=${ticker}&range=${range}&interval=${interval}`);
 }
+
+/**
+ * [Senior] 여러 종목의 시세를 한 번에 가져오는 벌크 요청 서비스
+ */
+export const getStocksQuotesBulk = async (tickers: string[]): Promise<Stock[]> => {
+    if (tickers.length === 0) return [];
+    const tickerQuery = tickers.join(',');
+    return fetchData(baseURL, `/api/stock?ticker=${tickerQuery}`);
+}
