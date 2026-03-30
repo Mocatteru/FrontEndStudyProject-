@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -74,13 +74,15 @@ function SettingSection({
 }
 
 export default function SettingPage() {
-    const { userName, userEmail, userDepartment, userRole, setUserName, setUserEmail, setUserDepartment, setUserRole } = useUiStore();
+    const { userName, userEmail, userDepartment, userRole, userAvatar, setUserName, setUserEmail, setUserDepartment, setUserRole, setUserAvatar } = useUiStore();
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [userNameInput, setUserNameInput] = useState(userName);
     const [userEmailInput, setUserEmailInput] = useState(userEmail);
     const [userDepartmentInput, setUserDepartmentInput] = useState(userDepartment);
     const [userRoleInput, setUserRoleInput] = useState(userRole);
+    const [userAvatarInput, setUserAvatarInput] = useState(userAvatar);
 
     const { clearStockWatchList, clearStockMemo } = useStockStore();
 
@@ -91,16 +93,35 @@ export default function SettingPage() {
         setUserEmail(userEmailInput);
         setUserDepartment(userDepartmentInput);
         setUserRole(userRoleInput);
+        setUserAvatar(userAvatarInput);
         toast.success("설정이 성공적으로 저장되었습니다.", {
             description: "변경사항이 모든 노드에 반영되었습니다."
         });
-    }, [userNameInput, userEmailInput, userDepartmentInput, userRoleInput, setUserName, setUserEmail, setUserDepartment, setUserRole]);
+    }, [userNameInput, userEmailInput, userDepartmentInput, userRoleInput, userAvatarInput, setUserName, setUserEmail, setUserDepartment, setUserRole, setUserAvatar]);
+
+    const handleImageUpload = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            /** 
+             * [Best Practice] URL.createObjectURL
+             * - 브라우저 메모리에 임시 URL을 생성하여 이미지 미리보기를 즉시 구현합니다.
+             * - 업로드 전 사용자에게 피드백을 주기 위해 사용합니다.
+             */
+            const previewUrl = URL.createObjectURL(file);
+            setUserAvatarInput(previewUrl);
+            setIsEditing(true);
+        }
+    };
 
     return (
         <div className="flex flex-col h-full min-h-0 bg-background selection:bg-blue-500/20 overflow-hidden">
 
             {/* [1] 프리미엄 고정 헤더 */}
-            <header className="flex-none w-full px-12 py-10 bg-background/95 backdrop-blur-md border-b border-black/5 dark:border-white/10 flex justify-between items-center z-40 transition-all">
+            <header className="flex-none w-full px-12 py-10 bg-background/95 backdrop-blur-md border-b border-black/5 dark:border-white/10 flex justify-between items-center z-50">
                 <div className="flex flex-col gap-1">
                     <h1 className="md:text-6xl text-4xl font-black tracking-tighter uppercase text-foreground/90">설정</h1>
                     <p className="text-sm font-black tracking-[0.4em] text-blue-500/60 uppercase">종합 설정 관리</p>
@@ -121,16 +142,37 @@ export default function SettingPage() {
                         description="시스템 프로필과 기본 계정 정보를 관리합니다. 모든 변경 사항은 즉시 동기화 노드에 반영됩니다."
                     >
                         <SettingSectionItem label="사용자 프로필 사진">
-                            <div className="flex justify-between items-center px-4 py-2">
-                                <Avatar className="h-24 w-24">
-                                    <AvatarImage src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf4lZX2ZWovlNMo9gsrjDnlFs1GocmrsriYw&s" />
-                                    <AvatarFallback>CN</AvatarFallback>
+                            {/**
+                             * [학습 포인트] 컴포넌트 합성 (Composition)
+                             * - shadcn의 Avatar 내부를 클릭해도 업로드가 실행되도록 개선하여 UX를 높입니다.
+                             */}
+                            <div
+                                className="relative group cursor-pointer w-fit outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
+                                onClick={handleImageUpload}
+                                onKeyDown={(e) => e.key === 'Enter' && handleImageUpload()}
+                                tabIndex={0}
+                                role="button"
+                                aria-label="프로필 이미지 변경"
+                            >
+                                <Avatar className="h-32 w-32 border-4 border-background shadow-2xl transition-transform group-hover:scale-105">
+                                    <AvatarImage src={userAvatarInput} className="object-cover" referrerPolicy="no-referrer" />
+                                    <AvatarFallback className="text-2xl font-bold bg-blue-50 text-blue-600">USER</AvatarFallback>
                                 </Avatar>
-                                <Button variant="outline" className="rounded-xl px-6 h-11 font-bold tracking-tight shadow-lg shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-sm">
-                                    <Upload className="mr-2 size-4" />
-                                    사진 업로드
-                                </Button>
+
+                                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 will-change-opacity">
+                                    <Upload className="text-white size-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 will-change-transform" />
+                                </div>
+
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
                             </div>
+
+
 
                         </SettingSectionItem>
                         <SettingSectionItem label=""><></></SettingSectionItem>

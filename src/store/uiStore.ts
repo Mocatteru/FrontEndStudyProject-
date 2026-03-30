@@ -14,12 +14,14 @@ interface UiState {
     userEmail: string;
     userDepartment: string;
     userRole: "ADMIN USER" | "USER";
+    userAvatar: string;
     toggleSidebar: () => void;
     toggleWatchList: () => void; // [Senior] 와치리스트 토글 액션 추가
     setUserName: (userName: string) => void;
     setUserEmail: (userEmail: string) => void;
     setUserDepartment: (userDepartment: string) => void;
     setUserRole: (userRole: "ADMIN USER" | "USER") => void;
+    setUserAvatar: (avatar: string) => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -31,6 +33,7 @@ export const useUiStore = create<UiState>()(
             userEmail: "[EMAIL_ADDRESS]",
             userDepartment: "부서 없음",
             userRole: "USER",
+            userAvatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf4lZX2ZWovlNMo9gsrjDnlFs1GocmrsriYw&s",
             toggleSidebar: () => set((state) => ({
                 isSidebarOpen: !state.isSidebarOpen
             })),
@@ -49,6 +52,9 @@ export const useUiStore = create<UiState>()(
             setUserRole: (role: "ADMIN USER" | "USER") => set(() => ({
                 userRole: role
             })),
+            setUserAvatar: (avatar: string) => set(() => ({
+                userAvatar: avatar
+            })),
         }),
         {
             name: "ui-storage",
@@ -59,6 +65,7 @@ export const useUiStore = create<UiState>()(
                 userEmail: state.userEmail,
                 userDepartment: state.userDepartment,
                 userRole: state.userRole,
+                userAvatar: state.userAvatar,
             })
         }
     ));

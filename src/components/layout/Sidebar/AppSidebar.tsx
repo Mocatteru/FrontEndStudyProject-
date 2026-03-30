@@ -10,7 +10,6 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -24,9 +23,9 @@ import {
     Database,
     TrendingUp,
     Settings,
-    UserCircle,
 } from "lucide-react";
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // ─────────────────────────────────────────
 // 메뉴 데이터: 이름, 경로, 아이콘을 함께 정의
@@ -85,7 +84,7 @@ export default function AppSidebar() {
     );
 
     const pathname = usePathname();
-    const { userName, userDepartment, userRole } = useUiStore();
+    const { userName, userDepartment, userAvatar } = useUiStore();
     const { isMobile, setOpenMobile } = useSidebar();
 
     // ── 경로 변경 시 모바일 사이드바 자동 닫기 UX ──
@@ -98,24 +97,6 @@ export default function AppSidebar() {
     return (
         <Sidebar collapsible="icon" className="border-r border-black/5 dark:border-white/5 bg-slate-100/60 dark:bg-black/80 backdrop-blur-xl">
             <TabKeyToggle />
-
-            {/* ── 상단 로고 및 유저 간략 정보 - [Tactical Design Update] ── */}
-            <SidebarHeader className="px-5 py-6">
-                <div className="flex items-center gap-4 overflow-hidden group-data-[collapsible=icon]:justify-center">
-                        <div className={cn(
-                            "flex w-full flex-col gap-1 overflow-hidden group-data-[collapsible=icon]:hidden",
-                            !mounted ? "opacity-0" : "opacity-100"
-                        )}>
-                            <div className="flex items-center gap-1.5">
-                                <span className="font-black text-sm tracking-tighter uppercase text-foreground">
-                                    {userName}
-                                </span>
-                                <div className="size-1 rounded-full bg-blue-500" />
-                            </div>
-                            <span className="text-[10px] font-black text-blue-500/80 uppercase tracking-[0.2em] leading-none">{userRole}</span>
-                        </div>
-                </div>
-            </SidebarHeader>
 
             <SidebarSeparator className="mx-4 opacity-30" />
 
@@ -169,10 +150,12 @@ export default function AppSidebar() {
                             tooltip={userName}
                             className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
                         >
-                            <div className="relative shrink-0 flex aspect-square size-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/20">
-                                <UserCircle className="size-6 text-white" />
-                                <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-white dark:border-black" />
-                            </div>
+                            <Avatar className="h-10 w-10 border-2 border-white/20 shadow-lg shrink-0">
+                                <AvatarImage src={userAvatar} className="object-cover" referrerPolicy="no-referrer" />
+                                <AvatarFallback className="bg-blue-500 text-white text-[10px] font-bold">
+                                    {userName.slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
                             <div className={cn(
                                 "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden",
                                 !mounted ? "opacity-0" : "opacity-100"
