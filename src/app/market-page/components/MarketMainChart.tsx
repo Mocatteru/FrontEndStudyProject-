@@ -142,12 +142,13 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
             wickUpColor: '#ef4444', wickDownColor: '#3b82f6',
             priceFormat,
         });
+
         priceS.setData(raw.map((d, i) => ({
             time: times[i],
             open: d.open, high: d.high, low: d.low, close: d.close,
         })));
         priceSeriesRef.current = priceS;
-
+        
         // 마커 초기화
         markersRef.current = createSeriesMarkers(priceS, []);
         chart.timeScale().fitContent();
@@ -155,6 +156,16 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
         // ── 고점/저점 마커 업데이트 (가시 범위 기반) ──
         let markerRafId = -1;
         const currentPrice = stockData.regularMarketPrice || closes[closes.length - 1];
+
+        const padText = (text: string, barIdx: number, lr: LogicalRange) => {
+            const total = lr.to - lr.from;
+            if (total <= 0) return text;
+            const ratio = (barIdx - lr.from) / total;
+            const spaceStr = '\u2002'.repeat(Math.floor(text.length * 1.5));
+            if (ratio < 0.15) return spaceStr + text;
+            if (ratio > 0.85) return text + spaceStr;
+            return text;
+        };
 
         const updateMarkers = (lr: LogicalRange | null) => {
             if (markerRafId !== -1) return;
@@ -164,6 +175,8 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
 
                 const from = Math.max(0, Math.floor(lr.from));
                 const to = Math.min(raw.length - 1, Math.ceil(lr.to));
+                if (from > to || to < 0) return;
+                
                 const visible = raw.slice(from, to + 1);
                 if (!visible.length) return;
 
@@ -174,17 +187,23 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
                     if (visible[i].low < minBar.low) minBar = visible[i];
                 }
 
+                const maxPct = ((maxBar.high - currentPrice) / currentPrice * 100).toFixed(2);
+                const minPct = ((minBar.low - currentPrice) / currentPrice * 100).toFixed(2);
+                
+                const maxRawText = `최고 ${formatter(maxBar.high)} (${maxPct}%)`;
+                const minRawText = `최저 ${formatter(minBar.low)} (${minPct}%)`;
+
                 const markers: SeriesMarker<Time>[] = [
                     {
                         time: Math.floor(maxBar.timestamp / (isMs ? 1000 : 1)) as Time,
                         position: 'aboveBar', color: '#ef4444', shape: 'arrowDown',
-                        text: `최고 ${formatter(maxBar.high)} (${((maxBar.high - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                        text: padText(maxRawText, raw.indexOf(maxBar), lr),
                         size: 1,
                     },
                     {
                         time: Math.floor(minBar.timestamp / (isMs ? 1000 : 1)) as Time,
                         position: 'belowBar', color: '#3b82f6', shape: 'arrowUp',
-                        text: `최저 ${formatter(minBar.low)} (${((minBar.low - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                        text: padText(minRawText, raw.indexOf(minBar), lr),
                         size: 1,
                     },
                 ];

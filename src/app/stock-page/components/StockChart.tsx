@@ -26,9 +26,9 @@ const TOTAL_DIVIDERS = PANEL_COUNT - 1;
 const DEFAULT_RATIOS = [0.52, 0.16, 0.16, 0.16];
 
 const MA_CONFIGS = [
-    { period: 5,   color: '#facc15', label: 'MA 5' },
-    { period: 20,  color: '#a78bfa', label: 'MA 20' },
-    { period: 60,  color: '#fb923c', label: 'MA 60' },
+    { period: 5, color: '#facc15', label: 'MA 5' },
+    { period: 20, color: '#a78bfa', label: 'MA 20' },
+    { period: 60, color: '#fb923c', label: 'MA 60' },
     { period: 120, color: '#34d399', label: 'MA 120' },
 ] as const;
 
@@ -307,6 +307,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             wickUpColor: '#ef4444', wickDownColor: '#3b82f6',
             priceFormat: priceFormatConfig,
         });
+
         priceS.setData(raw.map((d, i) => ({ time: times[i], open: d.open, high: d.high, low: d.low, close: d.close })));
         priceSeriesRef.current = priceS;
 
@@ -373,17 +374,33 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
 
         // [성능] 마커 업데이트 - RAF 기반 throttle로 스크롤 시 매 프레임 reduce 방지
         let markerRafId = -1;
+
+        // 텍스트 위치 보정을 위한 동적 패딩 유틸
+        const padText = (text: string, barIdx: number, lr: LogicalRange) => {
+            const total = lr.to - lr.from;
+            if (total <= 0) return text;
+            const ratio = (barIdx - lr.from) / total;
+            const spaceStr = '\u2002'.repeat(Math.floor(text.length * 1.5)); // EN-Space로 글자 수비례 여백 생성
+            if (ratio < 0.15) return spaceStr + text; // 왼쪽 15% 진입 시 오른쪽으로 밀어내기
+            if (ratio > 0.85) return text + spaceStr; // 오른쪽 85% 진입 시 왼쪽으로 밀어내기
+            return text;
+        };
+
         const updateVisibleMarkers = (lr: LogicalRange | null) => {
             if (markerRafId !== -1) return; // 이미 대기 중이면 스킵
             markerRafId = requestAnimationFrame(() => {
                 markerRafId = -1;
                 if (!lr || !priceSeriesRef.current || !raw.length) return;
+
                 const from = Math.max(0, Math.floor(lr.from));
                 const to = Math.min(raw.length - 1, Math.ceil(lr.to));
+
+                if (from > to || to < 0) return;
+
                 const visibleBars = raw.slice(from, to + 1);
                 if (!visibleBars.length) return;
 
-                // O(n) 순회 1회로 최고/최저 동시 탐색 (reduce 2번 → 루프 1번)
+                // O(n) 순회 1회로 최고/최저 탐색
                 let maxBar = visibleBars[0];
                 let minBar = visibleBars[0];
                 for (let i = 1; i < visibleBars.length; i++) {
@@ -392,17 +409,23 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 }
 
                 const currentPrice = stockData.regularMarketPrice || closes[closes.length - 1];
+                const maxPct = ((maxBar.high - currentPrice) / currentPrice * 100).toFixed(2);
+                const minPct = ((minBar.low - currentPrice) / currentPrice * 100).toFixed(2);
+
+                const maxRawText = `최고 ${priceFormatter(maxBar.high)} (${maxPct}%)`;
+                const minRawText = `최저 ${priceFormatter(minBar.low)} (${minPct}%)`;
+
                 const markers: SeriesMarker<Time>[] = [
                     {
                         time: Math.floor(maxBar.timestamp / (isMs ? 1000 : 1)) as Time,
                         position: 'aboveBar', color: '#ef4444', shape: 'arrowDown',
-                        text: `최고 ${priceFormatter(maxBar.high)} (${((maxBar.high - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                        text: padText(maxRawText, raw.indexOf(maxBar), lr),
                         size: 1,
                     },
                     {
                         time: Math.floor(minBar.timestamp / (isMs ? 1000 : 1)) as Time,
                         position: 'belowBar', color: '#3b82f6', shape: 'arrowUp',
-                        text: `최저 ${priceFormatter(minBar.low)} (${((minBar.low - currentPrice) / currentPrice * 100).toFixed(2)}%)`,
+                        text: padText(minRawText, raw.indexOf(minBar), lr),
                         size: 1,
                     },
                 ];
@@ -411,8 +434,10 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
         };
 
         pChart.timeScale().subscribeVisibleLogicalRangeChange(updateVisibleMarkers);
+
         pChart.timeScale().fitContent();
-        // [성능] setTimeout 제거 → fitContent 직후 동기로 가시범위를 가져와 마커 초기화
+
+        // [성능] 초기 가시범위를 가져와 마커 동기화
         updateVisibleMarkers(pChart.timeScale().getVisibleLogicalRange());
 
         // ── [성능] Tooltip: innerHTML 빌딩 제거 → 미리 렌더된 DOM 노드를 직접 업데이트 ──
