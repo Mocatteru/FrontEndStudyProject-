@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
     LayoutDashboard,
-    Database,
+    Globe,
     TrendingUp,
     Settings,
 } from "lucide-react";
@@ -36,7 +36,7 @@ const sidebarData = {
             title: "메뉴",
             items: [
                 { title: "홈화면", url: "/home-page", icon: LayoutDashboard },
-                { title: "데이터 리스트 (REST)", url: "/rest-data-page", icon: Database },
+                { title: "글로벌 마켓", url: "/market-page", icon: Globe },
                 { title: "주식 검색", url: "/stock-page", icon: TrendingUp },
                 { title: "설정", url: "/settings-page", icon: Settings },
             ]
@@ -84,8 +84,13 @@ export default function AppSidebar() {
     );
 
     const pathname = usePathname();
-    const { userName, userDepartment, userAvatar } = useUiStore();
+    const { userName, userDepartment, userAvatar, fetchProfile } = useUiStore();
     const { isMobile, setOpenMobile } = useSidebar();
+
+    // ── 서버 프로필 데이터 초기 동기화 ──
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     // ── 경로 변경 시 모바일 사이드바 자동 닫기 UX ──
     useEffect(() => {

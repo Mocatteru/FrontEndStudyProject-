@@ -152,21 +152,19 @@ export default function StockPage() {
             <div className="flex-1 flex flex-col min-w-0 border-r border-black/5 dark:border-white/5">
                 <div className="flex-1 scroll-smooth">
 
-                    {/* [1] 헤더 섹션 (정적) - 모바일 최적화 */}
-                    <div className="px-4 sm:px-10 pt-6 sm:pt-12 pb-0 flex justify-between items-center">
-                        <div className="flex items-center gap-3 sm:gap-5">
-                            <div className="hidden sm:block p-4 bg-blue-500/10 rounded-3xl shadow-sm border border-blue-500/10 group hover:rotate-6 transition-all duration-300">
-                                <TrendingUp className="size-6 sm:size-8 text-blue-500" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-foreground leading-tight">주식 대시보드</h1>
-                                <p className="text-[10px] sm:text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">실시간 시장 분석</p>
-                            </div>
+                    {/* [1] 헤더 섹션 (정적) - 마켓 대시보드 규격 통일 */}
+                    <div className="flex items-center gap-3 px-6 h-11 border-b border-black/5 dark:border-white/5 shrink-0 bg-background/95 z-50">
+                        <div className="p-1.5 bg-blue-500/10 rounded-lg border border-blue-500/10">
+                            <TrendingUp className="size-4 text-blue-500" />
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/80">주식 검색</h1>
+                            <p className="text-[9px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase">Stock Insights</p>
                         </div>
                     </div>
 
                     {/* [2] 스티키 액션 바 - 주식검색 섹션 무조건 상단 유지 */}
-                    <div className="sticky top-0 z-40 h-20 sm:h-24 bg-slate-50/80 dark:bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm mt-4 sm:mt-8 px-4 sm:px-10">
+                    <div className="sticky top-0 z-40 h-16 sm:h-20 bg-slate-50/80 dark:bg-background/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 border-b border-black/5 dark:border-white/10 transition-all duration-500 group/sticky shadow-sm px-4 sm:px-6">
                         <div className="flex-1 max-w-3xl">
                             <StockSearchInput />
                         </div>
