@@ -162,13 +162,13 @@ export default function MarketDashboard() {
     const { stockData } = useStockSync(selected.symbol, chartConfig.range, chartConfig.interval);
 
     return (
-        <div className="flex h-full bg-background overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full bg-background overflow-y-auto lg:overflow-hidden custom-scrollbar">
 
             {/* ── 좌측: 메인 차트 영역 ──────────────────── */}
-            <div className="flex-1 flex flex-col min-w-0">
+            <div className="flex-none lg:flex-1 flex flex-col min-w-0">
 
                 {/* 페이지 타이틀 */}
-                <div className="flex items-center gap-3 px-6 h-11 border-b border-black/5 dark:border-white/5 shrink-0">
+                <div className="flex items-center gap-2 lg:gap-3 px-4 lg:px-6 h-11 border-b border-black/5 dark:border-white/5 shrink-0">
                     <div className="p-1.5 bg-blue-500/10 rounded-lg border border-blue-500/10">
                         <Globe className="size-4 text-blue-500" />
                     </div>
@@ -192,11 +192,11 @@ export default function MarketDashboard() {
                 />
 
                 {/* 메인 차트 */}
-                <div className="flex-1 overflow-hidden px-3 pb-3 min-h-0">
+                <div className="flex-none h-[400px] lg:h-auto lg:flex-1 overflow-hidden px-3 pb-3 min-h-0">
                     {stockData ? (
                         <MarketMainChart stockData={stockData} symbol={selected.symbol} />
                     ) : (
-                        <div className="h-[400px] rounded-[1.5rem] bg-card/40 border border-black/5 dark:border-white/5 animate-pulse flex items-center justify-center">
+                        <div className="h-full w-full rounded-[1.5rem] bg-card/40 border border-black/5 dark:border-white/5 animate-pulse flex items-center justify-center">
                             <div className="flex flex-col items-center gap-3 opacity-30">
                                 <TrendingUp className="size-8" />
                                 <span className="text-[11px] font-black uppercase tracking-widest">데이터 로딩 중...</span>
@@ -207,11 +207,13 @@ export default function MarketDashboard() {
             </div>
 
             {/* ── 우측: 탭 리스트 패널 ─────────────────── */}
-            <div className="w-[340px] xl:w-[380px] shrink-0 flex flex-col overflow-hidden">
-                <MarketListPanel
-                    selectedSymbol={selected.symbol}
-                    onSelect={handleSelect}
-                />
+            <div className="w-full lg:w-[340px] xl:w-[380px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-black/5 dark:border-white/5 bg-background/50 lg:overflow-hidden p-0 pb-10 lg:pb-0">
+                <div className="h-[500px] lg:h-full w-full">
+                    <MarketListPanel
+                        selectedSymbol={selected.symbol}
+                        onSelect={handleSelect}
+                    />
+                </div>
             </div>
         </div>
     );
