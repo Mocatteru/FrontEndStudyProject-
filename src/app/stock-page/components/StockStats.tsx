@@ -17,20 +17,20 @@ interface StockStatsProps {
 const StockStats = React.memo(({ stockData }: StockStatsProps) => {
     const stats = useMemo(() => [
         // 1. 가격 관련 지표
-        { label: '시가 (Open)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketOpen) },
-        { label: '고가 (High)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayHigh) },
-        { label: '저가 (Low)', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayLow) },
+        { label: '시가', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketOpen) },
+        { label: '고가', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayHigh) },
+        { label: '저가', value: FormatPriceCurrency(stockData.currency, stockData?.regularMarketDayLow) },
         {
-            label: '전일 종가 (Prev Close)', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange)
+            label: '전일 종가', value: (stockData?.regularMarketPrice && stockData?.regularMarketChange)
                 ? FormatPriceCurrency(stockData.currency, stockData.regularMarketPrice - stockData.regularMarketChange)
                 : '---'
         },
 
         // 2. 통계 및 볼륨
-        { label: '거래량 (Volume)', value: stockData?.regularMarketVolume?.toLocaleString() },
-        { label: '평균 거래량 (3M)', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
+        { label: '거래량', value: stockData?.regularMarketVolume?.toLocaleString() },
+        { label: '3개월 평균 거래량', value: stockData?.averageDailyVolume3Month?.toLocaleString() },
         {
-            label: '시가총액 (Market Cap)', value: stockData?.marketCap ? (
+            label: '시가총액', value: stockData?.marketCap ? (
                 stockData.currency === 'KRW'
                     ? `${(stockData.marketCap / 1e12).toFixed(1)}조 원`
                     : `$${(stockData.marketCap / 1e9).toFixed(2)}B`
@@ -39,16 +39,16 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
         { label: '유통 주식수', value: stockData?.sharesOutstanding?.toLocaleString() },
 
         // 3. 투자 지표 (PE, EPS 등)
-        { label: 'P/E Ratio (Trailing)', value: stockData?.trailingPE?.toFixed(2) ?? '---' },
-        { label: 'P/E Ratio (Forward)', value: stockData?.forwardPE?.toFixed(2) ?? '---' },
+        { label: 'PER (과거 12개월)', value: stockData?.trailingPE?.toFixed(2) ?? '---' },
+        { label: 'PER (예상)', value: stockData?.forwardPE?.toFixed(2) ?? '---' },
         { label: 'EPS (TTM)', value: stockData?.epsTrailingTwelveMonths?.toFixed(2) ?? '---' },
-        { label: '배당 수익률 (Div Yield)', value: stockData?.dividendYield ? `${stockData.dividendYield.toFixed(2)}%` : '---' },
+        { label: '배당 수익률', value: stockData?.dividendYield ? `${stockData.dividendYield.toFixed(2)}%` : '---' },
 
         // 4. 주가 범위 정보
         { label: '52주 최고가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyTwoWeekHigh) },
         { label: '52주 최저가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyTwoWeekLow) },
-        { label: '50일 평균가', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyDayAverage) },
-        { label: '200일 평균가', value: FormatPriceCurrency(stockData.currency, stockData?.twoHundredDayAverage) },
+        { label: '50일 이동평균', value: FormatPriceCurrency(stockData.currency, stockData?.fiftyDayAverage) },
+        { label: '200일 이동평균', value: FormatPriceCurrency(stockData.currency, stockData?.twoHundredDayAverage) },
 
         // 5. 기타 정보
         { label: '거래 통화', value: stockData?.currency },
@@ -56,16 +56,20 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
     ], [stockData]);
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 bg-white dark:bg-card/10 p-6">
-            {stats.map((item, idx) => (
-                <div
-                    key={idx}
-                    className="flex justify-between p-4 border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                >
-                    <span className="text-sm text-gray-400 font-medium">{item.label}</span>
-                    <span className="text-sm font-bold tabular-nums">{item.value ?? 'N/A'}</span>
-                </div>
-            ))}
+        // [Rule 34] StockPriceCard와 동일한 card 스타일로 시각적 통일성 확보
+        <div className="bg-card border-2 border-black/5 dark:border-white/5 rounded-3xl sm:rounded-[3.5rem] overflow-hidden shadow-xl shadow-black/5">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3">
+                {stats.map((item) => (
+                    <div
+                        key={item.label}
+                        className="flex justify-between items-center px-6 py-4 border-b border-r border-black/5 dark:border-white/5 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+                    >
+                        {/* [Rule 2] 3단계 위계: label(약함) → divider → value(강함) */}
+                        <span className="text-[11px] font-bold text-muted-foreground/50 tracking-wide">{item.label}</span>
+                        <span className="text-sm font-black tabular-nums text-foreground/80">{item.value ?? '---'}</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 });

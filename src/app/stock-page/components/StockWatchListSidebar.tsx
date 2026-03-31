@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSidebarSync } from "@/hooks/useStockSync";
 
 import { useStockStore } from "@/store/useStockStore";
-import * as _ from "radash";
+import { isEmpty } from "radash";
 
 interface StockWatchListSidebarProps {
     isOpen: boolean;
@@ -68,10 +68,11 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     {isOpen ? (
                         <div className="flex w-full h-full items-stretch">
                             {/* [1] 관심목록 버튼 */}
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => setActiveTab('WATCH')}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center justify-center gap-1 relative border-r border-black/5 dark:border-white/5",
+                                    "flex-1 h-full flex flex-col items-center justify-center gap-1 relative rounded-none border-r border-black/5 dark:border-white/5",
                                     activeTab === 'WATCH' ? "bg-black/5 dark:bg-white/5" : "hover:bg-black/2 dark:hover:bg-white/2"
                                 )}
                             >
@@ -90,13 +91,14 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                 {activeTab === 'WATCH' && (
                                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_-2px_10px_rgba(59,130,246,0.5)]" />
                                 )}
-                            </button>
+                            </Button>
 
                             {/* [2] 인기목록 버튼 */}
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => setActiveTab('POPULAR')}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center justify-center gap-1 relative border-r border-black/5 dark:border-white/5",
+                                    "flex-1 h-full flex flex-col items-center justify-center gap-1 relative rounded-none border-r border-black/5 dark:border-white/5",
                                     activeTab === 'POPULAR' ? "bg-black/5 dark:bg-white/5" : "hover:bg-black/2 dark:hover:bg-white/2"
                                 )}
                             >
@@ -111,15 +113,17 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                 {activeTab === 'POPULAR' && (
                                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_-2px_10px_rgba(59,130,246,0.5)]" />
                                 )}
-                            </button>
+                            </Button>
 
                             {/* [3] 탭 닫기 버튼 */}
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={onToggle}
-                                className="flex-1 flex flex-col items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 group"
+                                className="flex-1 h-full flex flex-col items-center justify-center rounded-none group"
+                                aria-label="사이드바 닫기"
                             >
-                                <ChevronRight className="size-5 text-muted-foreground/30 group-hover:text-foreground group-hover:translate-x-0.5" />
-                            </button>
+                                <ChevronRight className="size-5 text-muted-foreground/30 group-hover:text-foreground group-hover:translate-x-0.5 transition-transform" />
+                            </Button>
                         </div>
                     ) : (
                         <div className="flex w-full h-full flex-col items-center justify-center">
@@ -155,7 +159,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                 <div className="px-8 pb-10">
                                     <SidebarGroup className="p-0">
                                         <SidebarMenu className="gap-4">
-                                            {_.isEmpty(filteredList) ? (
+                                            {isEmpty(filteredList) ? (
                                                 <div className="flex flex-col items-center justify-center py-32 text-center">
                                                     <div className="size-20 rounded-[2.5rem] bg-linear-to-br from-black/3 to-transparent dark:from-white/3 border-2 border-dashed border-black/5 dark:border-white/5 flex items-center justify-center mb-8 group">
                                                         {activeTab === 'WATCH' ? (

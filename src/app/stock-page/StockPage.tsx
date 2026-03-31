@@ -1,9 +1,19 @@
 'use client'
 
 import { useState, useCallback, useEffect, memo } from "react";
+import dynamic from "next/dynamic";
 import StockSearchInput from "./components/StockSearch";
 import StockPriceCard from "./components/StockPriceCard";
-import StockChart from "./components/StockChart";
+// [성능] 차트 컴포넌트 lazy load — lightweight-charts를 초기 번들에서 분리하여 첫 화면 로드 단축
+const StockChart = dynamic(
+    () => import("./components/StockChart"),
+    {
+        ssr: false, // 서버에서 DOM/window API를 사용하므로 CSR 전용
+        loading: () => (
+            <div className="h-[530px] rounded-[3.5rem] bg-card/40 animate-pulse border border-black/5 dark:border-white/5" />
+        ),
+    }
+);
 import StockStats from "./components/StockStats";
 import { useStockStore } from "@/store/useStockStore";
 import { useUiStore } from "@/store/uiStore";
@@ -50,7 +60,7 @@ const StockDashboardContent = memo((
                         <TrendingUp className="size-6 text-blue-500/60 animate-pulse" />
                     </div>
                 </div>
-                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse">Synchronizing Data Nodes</p>
+                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse">데이터 동기화 중...</p>
             </div>
         );
     }
@@ -59,8 +69,8 @@ const StockDashboardContent = memo((
         return (
             <div className="bg-red-500/5 dark:bg-red-500/10 p-12 rounded-[4rem] border border-red-500/20 shadow-2xl shadow-red-500/5 text-center max-w-4xl mx-auto">
                 <TrendingUp className="size-16 text-red-500/60 rotate-180 mx-auto mb-8 animate-bounce" />
-                <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase">Critical Failure: Invalid Ticker</h3>
-                <p className="text-muted-foreground font-semibold max-w-lg mx-auto">티커 코드 정보가 존재하지 않습니다.</p>
+                <h3 className="font-black text-4xl tracking-tighter text-red-600 dark:text-red-400 mb-4 uppercase">종목 정보 없음</h3>
+                <p className="text-muted-foreground font-semibold max-w-lg mx-auto">해당 티커 코드의 정보를 불러올 수 없습니다. 코드를 다시 확인해주세요.</p>
             </div>
         );
     }
@@ -149,8 +159,8 @@ export default function StockPage() {
                                 <TrendingUp className="size-6 sm:size-8 text-blue-500" />
                             </div>
                             <div>
-                                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-foreground leading-tight">Stock Dashboard</h1>
-                                <p className="text-[10px] sm:text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">Market Analytics Node</p>
+                                <h1 className="text-2xl sm:text-4xl font-black tracking-tighter text-foreground leading-tight">주식 대시보드</h1>
+                                <p className="text-[10px] sm:text-[11px] uppercase font-bold tracking-[0.3em] text-muted-foreground/40">실시간 시장 분석</p>
                             </div>
                         </div>
                     </div>

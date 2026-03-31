@@ -11,12 +11,13 @@ import { toast } from "sonner";
 import { useStockStore } from "@/store/useStockStore";
 import { AlertDialogButton } from "@/components/common/AlertDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 // ─── 하위 컴포넌트 (Rule 4: Atomic Design) ───────────────────────────────────
 
-function SettingSectionItem({ label, children }: { label: string; children: React.ReactNode }) {
+function SettingSectionItem({ label, children, fullWidth }: { label: string; children: React.ReactNode; fullWidth?: boolean }) {
     return (
-        <div className="space-y-3 w-full animate-in fade-in duration-500">
+        <div className={cn("space-y-3 w-full animate-in fade-in duration-500", fullWidth && "sm:col-span-2")}>
             <label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">
                 {label}
             </label>
@@ -49,6 +50,8 @@ function SettingSection({ title, description, children }: {
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
 const INPUT_CLASS = "rounded-2xl h-14 border-2 border-black/5 dark:border-white/5 focus-visible:ring-blue-500/20 bg-muted/5 font-bold";
+// [Rule 11 DRY] 초기화 버튼 공통 className - 동일 패턴이 2회 이상 반복되므로 상수로 추상화
+const RESET_BUTTON_CLASS = `${INPUT_CLASS} w-64`;
 
 export default function SettingPage() {
     const { fetchProfile, saveProfile } = useUiStore();
@@ -145,8 +148,7 @@ export default function SettingPage() {
                         title="사용자 정보"
                         description="시스템 프로필과 기본 계정 정보를 관리합니다. 모든 변경 사항은 즉시 동기화 노드에 반영됩니다."
                     >
-                        {/* 프로필 사진 */}
-                        <SettingSectionItem label="프로필 사진">
+                        <SettingSectionItem label="프로필 사진" fullWidth>
                             <div
                                 className="relative group cursor-pointer w-fit outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-full"
                                 onClick={handleAvatarClick}
@@ -162,17 +164,17 @@ export default function SettingPage() {
                                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     <Upload className="text-white size-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-300" />
                                 </div>
+                                {/* [Rule 29] file input에 aria-label 추가하여 스크린리더 접근성 보강 */}
                                 <input
                                     type="file"
                                     ref={fileInputRef}
                                     onChange={handleAvatarFileChange}
                                     className="hidden"
                                     accept="image/*"
+                                    aria-label="프로필 사진 파일 선택"
                                 />
                             </div>
                         </SettingSectionItem>
-
-                        <SettingSectionItem label=""><></></SettingSectionItem>
 
                         <SettingSectionItem label="이름">
                             <Input
@@ -225,7 +227,7 @@ export default function SettingPage() {
                                 description="관심종목을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다."
                                 variant="destructive"
                                 size="lg"
-                                className={`${INPUT_CLASS} w-64`}
+                                className={RESET_BUTTON_CLASS}
                             >
                                 초기화
                             </AlertDialogButton>
@@ -237,7 +239,7 @@ export default function SettingPage() {
                                 description="메모를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다."
                                 variant="destructive"
                                 size="lg"
-                                className={`${INPUT_CLASS} w-64`}
+                                className={RESET_BUTTON_CLASS}
                             >
                                 초기화
                             </AlertDialogButton>
