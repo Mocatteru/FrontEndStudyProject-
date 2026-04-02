@@ -82,8 +82,8 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     activeTab === 'WATCH' ? "text-blue-500 fill-blue-500/10 scale-110" : "text-muted-foreground/40"
                                 )} />
                                 <span className={cn(
-                                    "text-[10px] font-black tracking-tighter uppercase",
-                                    activeTab === 'WATCH' ? "text-foreground" : "text-muted-foreground/40"
+                                    "text-xs font-black tracking-tighter uppercase",
+                                    activeTab === 'WATCH' ? "text-foreground" : "text-muted-foreground/60"
                                 )}>관심목록</span>
 
                                 {isSyncing && activeTab === 'WATCH' && (
@@ -108,8 +108,8 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                     activeTab === 'POPULAR' ? "text-blue-500 scale-110" : "text-muted-foreground/40"
                                 )} />
                                 <span className={cn(
-                                    "text-[10px] font-black tracking-tighter uppercase",
-                                    activeTab === 'POPULAR' ? "text-foreground" : "text-muted-foreground/40"
+                                    "text-xs font-black tracking-tighter uppercase",
+                                    activeTab === 'POPULAR' ? "text-foreground" : "text-muted-foreground/60"
                                 )}>인기목록</span>
                                 {activeTab === 'POPULAR' && (
                                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_-2px_10px_rgba(59,130,246,0.5)]" />
@@ -149,10 +149,10 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                             className="flex-1 flex flex-col min-h-0"
                         >
                             <div className="px-8 mb-6">
-                                <TabsList className="w-full flex h-10 p-1.5 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-sm">
-                                    <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-[10px] tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">전체</TabsTrigger>
-                                    <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-[10px] tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">국내</TabsTrigger>
-                                    <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-[10px] tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">해외</TabsTrigger>
+                                <TabsList className="w-full flex h-11 p-1.5 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-sm">
+                                    <TabsTrigger value="ALL" className="flex-1 rounded-xl font-black text-xs tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">전체</TabsTrigger>
+                                    <TabsTrigger value="KR" className="flex-1 rounded-xl font-black text-xs tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">국내</TabsTrigger>
+                                    <TabsTrigger value="US" className="flex-1 rounded-xl font-black text-xs tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-black/60 data-[state=active]:shadow-lg">해외</TabsTrigger>
                                 </TabsList>
                             </div>
 

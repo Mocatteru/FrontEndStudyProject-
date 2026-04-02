@@ -39,7 +39,7 @@ type TabValue = "index" | "commodity";
 // ── 섹션 레이블 ────────────────────────────────────
 function SectionLabel({ children }: { children: string }) {
     return (
-        <p className="px-3 pt-3 pb-0.5 text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/40 select-none">
+        <p className="px-3 pt-3 pb-0.5 text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/75 select-none">
             {children}
         </p>
     );

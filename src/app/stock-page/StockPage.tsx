@@ -61,7 +61,7 @@ const StockDashboardContent = memo((
                         <TrendingUp className="size-6 text-blue-500/60 animate-pulse" />
                     </div>
                 </div>
-                <p className="mt-8 text-xs font-black text-muted-foreground/40 uppercase tracking-[0.4em] animate-pulse">데이터 동기화 중...</p>
+                <p className="mt-8 text-[11px] font-black text-muted-foreground/60 uppercase tracking-[0.4em] animate-pulse">데이터 동기화 중...</p>
             </div>
         );
     }
@@ -102,8 +102,8 @@ const StockDashboardContent = memo((
 
             <div className="space-y-8">
                 <div className="flex items-center gap-4 group cursor-pointer w-fit">
-                    <div className="w-2 h-8 bg-blue-500 rounded-full group-hover:h-12 transition-all duration-500 shadow-xl shadow-blue-500/50" />
-                    <h2 className="text-3xl font-black tracking-tighter uppercase text-foreground/90">세부사항</h2>
+                    <div className="w-2 h-10 bg-blue-500 rounded-full group-hover:h-14 transition-all duration-500 shadow-xl shadow-blue-500/50" />
+                    <h2 className="text-4xl font-black tracking-tighter uppercase text-foreground">세부사항</h2>
                 </div>
                 <StockStats stockData={stockData} />
             </div>
@@ -169,8 +169,8 @@ export default function StockPage() {
                             <TrendingUp className="size-4 text-blue-500" />
                         </div>
                         <div>
-                            <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/80">주식 검색</h1>
-                            <p className="text-[9px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase">Stock Insights</p>
+                            <h1 className="text-base font-black uppercase tracking-[0.2em] text-foreground/90">주식 검색</h1>
+                            <p className="text-[10px] font-black tracking-[0.3em] text-muted-foreground/60 uppercase">Stock Insights</p>
                         </div>
                     </div>
 

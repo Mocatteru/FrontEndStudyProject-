@@ -40,8 +40,8 @@ export default function Header() {
 
                 {/* [Senior] 현재 경로 힌트 추가 */}
                 <div className="hidden lg:flex flex-col">
-                    <span className="text-[10px] font-black tracking-widest text-muted-foreground/30 leading-none mb-1 uppercase">현재 위치</span>
-                    <span className="text-sm font-black tracking-tighter text-foreground/60">
+                    <span className="text-xs font-black tracking-widest text-muted-foreground/60 leading-none mb-1 uppercase">현재 위치</span>
+                    <span className="text-sm font-black tracking-tighter text-foreground/80">
                         {pathname === '/' ? '홈 화면' : pathname.replace('/', '').replace('-', ' ').toUpperCase()}
                     </span>
                 </div>
@@ -62,7 +62,7 @@ export default function Header() {
                         variant="link"
                         size="sm"
                         onClick={handleLogout}
-                        className="text-[11px] font-medium text-muted-foreground hover:text-destructive transition-colors bg-gray-200"
+                        className="text-xs font-bold text-muted-foreground hover:text-destructive transition-colors p-0 h-auto"
                     >
                         로그아웃
                     </Button>

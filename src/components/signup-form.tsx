@@ -157,8 +157,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        회원가입 시 <Link href="https://gall.dcinside.com/mgallery/board/view/?id=stockus&no=7403529&exception_mode=recommend&search_head=320&page=1">이용약관</Link>{" "}
-        및 <Link href="https://gall.dcinside.com/mgallery/board/view/?id=stockus&no=7403529&exception_mode=recommend&search_head=320&page=1">개인정보처리방침</Link>에 동의하는 것으로 간주됩니다.
+        회원가입 시 <Link href="https://gall.dcinside.com/mgallery/board/view/?id=stockus&no=7403529&exception_mode=recommend&search_head=320&page=1">이용약관 및 개인정보처리방침{" "}</Link>
+        에 동의하는 것으로 간주됩니다.
       </FieldDescription>
     </div>
   )

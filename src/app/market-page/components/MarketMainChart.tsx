@@ -235,18 +235,36 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
             const elDate = tip.querySelector<HTMLElement>('[data-tip="date"]');
             const elOpen = tip.querySelector<HTMLElement>('[data-tip="open-val"]');
             const elHigh = tip.querySelector<HTMLElement>('[data-tip="high-val"]');
+            const elHighPct = tip.querySelector<HTMLElement>('[data-tip="high-pct"]');
             const elLow = tip.querySelector<HTMLElement>('[data-tip="low-val"]');
+            const elLowPct = tip.querySelector<HTMLElement>('[data-tip="low-pct"]');
             const elClose = tip.querySelector<HTMLElement>('[data-tip="close-val"]');
+            const elClosePct = tip.querySelector<HTMLElement>('[data-tip="close-pct"]');
+
+            const pctColor = (change: number) => change > 0 ? '#ef4444' : change < 0 ? '#3b82f6' : 'rgba(255,255,255,0.4)';
+            const pctText = (t: number, b: number) => {
+                const ch = ((t - b) / b) * 100;
+                return { text: `(${ch > 0 ? '+' : ''}${ch.toFixed(2)}%)`, color: pctColor(ch) };
+            };
 
             if (elDate) elDate.textContent = dateStr;
             if (elOpen) elOpen.textContent = formatter(data.open);
+            
+            const hPct = pctText(data.high, data.open);
             if (elHigh) elHigh.textContent = formatter(data.high);
+            if (elHighPct) { elHighPct.textContent = hPct.text; elHighPct.style.color = hPct.color; }
+            
+            const lPct = pctText(data.low, data.open);
             if (elLow) elLow.textContent = formatter(data.low);
+            if (elLowPct) { elLowPct.textContent = lPct.text; elLowPct.style.color = lPct.color; }
+            
+            const cPct = pctText(data.close, data.open);
             if (elClose) elClose.textContent = formatter(data.close);
+            if (elClosePct) { elClosePct.textContent = cPct.text; elClosePct.style.color = cPct.color; }
 
             const coord = priceSeriesRef.current.priceToCoordinate(data.close);
             let x = param.point.x + 16;
-            if (x > container.clientWidth - 160) x = param.point.x - 164;
+            if (x > container.clientWidth - 190) x = param.point.x - 194;
             let y = coord ? coord - 30 : param.point.y;
             if (y < 10) y = 10;
             const maxY = container.clientHeight - tip.clientHeight - 10;
@@ -274,15 +292,22 @@ const MarketMainChart = memo(({ stockData, symbol = "" }: MarketMainChartProps) 
                 style={{ pointerEvents: 'none', top: 0, left: 0 }}
             >
                 <div data-tip="date" style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 7, paddingBottom: 6, borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 900 }} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '2px 16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto auto', gap: '4px 12px', alignItems: 'center' }}>
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>시가</span>
                     <span data-tip="open-val" style={{ color: '#fff', fontWeight: 900, textAlign: 'right' }} />
+                    <span />
+
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>고가</span>
                     <span data-tip="high-val" style={{ color: '#ef4444', fontWeight: 900, textAlign: 'right' }} />
+                    <span data-tip="high-pct" style={{ fontSize: '9px', fontWeight: 900 }} />
+
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>저가</span>
                     <span data-tip="low-val" style={{ color: '#3b82f6', fontWeight: 900, textAlign: 'right' }} />
+                    <span data-tip="low-pct" style={{ fontSize: '9px', fontWeight: 900 }} />
+
                     <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 900 }}>종가</span>
                     <span data-tip="close-val" style={{ color: '#fff', fontWeight: 900, textAlign: 'right' }} />
+                    <span data-tip="close-pct" style={{ fontSize: '9px', fontWeight: 900 }} />
                 </div>
             </div>
         </div>

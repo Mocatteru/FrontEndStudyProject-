@@ -171,8 +171,8 @@ export default function AppSidebar() {
                                     "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden",
                                     !mounted ? "opacity-0" : "opacity-100"
                                 )}>
-                                    <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80 wrap-break-word">{userName}</span>
-                                    <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em] truncate">{userDepartment}</span>
+                                    <span className="font-black text-xs uppercase tracking-widest text-foreground wrap-break-word">{userName}</span>
+                                    <span className="text-[10px] font-black text-muted-foreground/80 uppercase tracking-widest truncate">{userDepartment}</span>
                                 </div>
                             </SidebarMenuButton>
                         )}

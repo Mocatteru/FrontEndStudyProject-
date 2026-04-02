@@ -50,12 +50,12 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                     <div className="flex justify-between items-start w-full gap-4.5">
                         {/* [좌측] 이름 및 티커 영역 */}
                         <div className="flex flex-col gap-1.5 items-start flex-1 min-w-0 overflow-hidden">
-                            <span className="font-black text-[12px] text-foreground leading-[1.3] text-left whitespace-normal wrap-break-word line-clamp-2 group-hover:text-blue-500">
+                            <span className="font-black text-[13px] text-foreground leading-[1.3] text-left whitespace-normal wrap-break-word line-clamp-2 group-hover:text-blue-500">
                                 {name}
                             </span>
                             <div className="flex items-center gap-1.5">
                                 <div className="size-1 rounded-full bg-amber-300" />
-                                <span className="text-[11px] font-black text-amber-300/80 uppercase tracking-widest shrink-0">
+                                <span className="text-xs font-black text-amber-500 tracking-widest shrink-0">
                                     {ticker}
                                 </span>
                             </div>
@@ -68,7 +68,7 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                                     {formattedPrice}
                                 </span>
                                 <span className={cn(
-                                    "text-[10px] font-black tracking-tighter",
+                                    "text-[11px] font-black tracking-tighter",
                                     isPositive ? "text-red-500" : "text-blue-500"
                                 )}>
                                     {isPositive ? '+' : '-'}{formattedChange}

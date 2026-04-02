@@ -58,7 +58,7 @@ const MemoUpdateDialog = memo(({
                     >
                         <div className="flex items-center gap-2">
                             <PencilIcon className="size-3.5" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">메모</span>
+                            <span className="text-xs font-black uppercase tracking-widest">메모</span>
                         </div>
                     </Button>
                 }
@@ -140,7 +140,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
 
                             <h3 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none group-hover:text-blue-500 transition-all duration-500">
                                 {stockData?.longName || stockData?.shortName || 'Unknown'}
-                                <span className="ml-3 text-muted-foreground/20 font-black text-xl uppercase tracking-widest inline-block">{stockData?.symbol}</span>
+                                <span className="ml-3 text-muted-foreground/60 font-black text-xl uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                             </h3>
                         </div>
 
@@ -156,8 +156,8 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
 
                     <div className="inline-flex items-center gap-3 px-4 py-2 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
                         <span className="size-2 rounded-full bg-blue-500/50 animate-pulse" />
-                        <span className="text-[10px] font-black text-muted-foreground/40 tracking-[0.2em]">
-                            장 상태 : <span className="text-foreground/60">{getMarketStateName(stockData?.marketState)}</span>
+                        <span className="text-xs font-black text-muted-foreground/80 tracking-[0.2em]">
+                            장 상태 : <span className="text-foreground">{getMarketStateName(stockData?.marketState)}</span>
                         </span>
                     </div>
 

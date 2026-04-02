@@ -20,7 +20,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 function SettingSectionItem({ label, children, fullWidth }: { label: string; children: React.ReactNode; fullWidth?: boolean }) {
     return (
         <div className={cn("space-y-3 w-full animate-in fade-in duration-500", fullWidth && "sm:col-span-2")}>
-            <label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">
+            <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/85 ml-1">
                 {label}
             </label>
             <div className="relative group">{children}</div>

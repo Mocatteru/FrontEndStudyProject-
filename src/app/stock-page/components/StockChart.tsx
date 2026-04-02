@@ -50,7 +50,7 @@ const makeChartOpts = (showTimeAxis: boolean): Parameters<typeof createChart>[1]
         borderColor: 'rgba(55,65,81,0.6)',
         autoScale: true,
         borderVisible: true,
-        minimumWidth: 100,
+        minimumWidth: 80,
     },
     leftPriceScale: { visible: false },
     timeScale: {
@@ -363,7 +363,7 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
             priceScaleId: 'right',
             priceFormat: { type: 'custom', formatter: formatVolume },
         });
-        volS.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 }, borderVisible: false });
+        volS.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 }, borderVisible: true });
         volS.setData(volData);
         volumeSeriesRef.current = volS;
 
@@ -582,8 +582,8 @@ const StockChart = memo(({ stockData, range, interval, onConfigChange }: StockCh
                 {PANEL_LABELS.map((label, idx) => (
                     <div key={label} className="flex flex-col shrink-0">
                         <div style={{ height: panelHeights[idx] }} className="w-full relative">
-                            <div className="absolute top-1 left-2 z-10 pointer-events-none">
-                                <span className="text-[8.5px] font-black tracking-widest text-muted-foreground/30 uppercase">
+                            <div className="absolute top-2 left-3 z-10 pointer-events-none">
+                                <span className="text-[10px] font-black tracking-widest text-muted-foreground/80 uppercase">
                                     {label}
                                 </span>
                             </div>
