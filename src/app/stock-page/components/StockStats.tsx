@@ -64,8 +64,8 @@ const StockStats = React.memo(({ stockData }: StockStatsProps) => {
                         key={item.label}
                         className="flex justify-between items-center px-6 py-5 border-b border-r border-black/5 dark:border-white/5 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
                     >
-                        {/* [QA] 폰트 크기 증설 및 대비 강화 (text-[11px] -> text-xs, /50 -> /70) */}
-                        <span className="text-xs font-bold text-muted-foreground/70 tracking-wide">{item.label}</span>
+                        {/* [QA] 지표 라벨 가독성 최종 보정 (대비 80% 상향 및 Black Weight 적용) */}
+                        <span className="text-xs font-black text-foreground/80 tracking-widest uppercase">{item.label}</span>
                         <span className="text-base font-black tabular-nums text-foreground">{item.value ?? '---'}</span>
                     </div>
                 ))}
