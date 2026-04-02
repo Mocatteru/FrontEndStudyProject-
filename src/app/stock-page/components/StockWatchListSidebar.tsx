@@ -128,13 +128,18 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                         </div>
                     ) : (
                         <div className="flex w-full h-full flex-col items-center justify-center">
+                             {/* [Senior UX] 신규 사용자 가이드를 위한 시각적 강조 버튼 (디자인 유지, 레이아웃 원복) */}
                             <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="icon"
                                 onClick={onToggle}
-                                className="size-9 p-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl text-muted-foreground/60 hover:text-foreground"
+                                className="size-11 rounded-2xl bg-blue-500 hover:bg-blue-600 border-none shadow-xl shadow-blue-500/50 transition-all active:scale-95 group relative overflow-hidden"
+                                aria-label="관심목록 열기"
                             >
-                                <Menu className="size-4.5" />
+                                <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                                <Menu className="size-5 text-white relative z-10" />
+                                
+                                <div className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full border-2 border-slate-100 dark:border-sidebar animate-bounce shadow-sm z-20" />
                             </Button>
                         </div>
                     )}

@@ -9,10 +9,11 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export default function Header() {
     const pathname = usePathname();
-    const { isWatchListOpen, userName } = useUiStore();
+    const { isWatchListOpen, userName, userAvatar } = useUiStore();
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
@@ -54,18 +55,31 @@ export default function Header() {
                 <div className="hidden sm:block h-6 w-px bg-black/5 dark:bg-white/10" />
 
                 {/* [Rule 2, 23] Visual Hierarchy & Alignment */}
-                <div className={pathname === "/stock-page" ? "flex flex-col items-end gap-0.5 pr-10" : "flex flex-col items-end gap-0.5"}>
-                    <span className="text-sm font-bold text-foreground/80">
-                        {userName || "사용자"}님
-                    </span>
-                    <Button
-                        variant="link"
-                        size="sm"
-                        onClick={handleLogout}
-                        className="text-xs font-bold text-muted-foreground hover:text-destructive transition-colors p-0 h-auto"
-                    >
-                        로그아웃
-                    </Button>
+                <div className={cn(
+                    "flex items-center gap-4 transition-all duration-500",
+                    pathname === "/stock-page" ? "pr-10" : ""
+                )}>
+                    {/* [Senior UX] 전역 헤더 아바타 추가 (크기 상향: size-12) */}
+                    <Avatar className="size-12 border-2 border-white/20 dark:border-white/5 shadow-md shrink-0">
+                        <AvatarImage src={userAvatar} className="object-cover" referrerPolicy="no-referrer" />
+                        <AvatarFallback className="bg-blue-500 text-white text-[10px] font-bold">
+                            {userName?.slice(0, 2).toUpperCase() || "US"}
+                        </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex flex-col items-end justify-center py-1">
+                        <span className="text-sm font-bold text-foreground/80 leading-tight">
+                            {userName || "사용자"}님
+                        </span>
+                        <Button
+                            variant="link"
+                            size="sm"
+                            onClick={handleLogout}
+                            className="text-[11px] font-bold text-muted-foreground hover:text-destructive transition-colors p-0 h-4 min-h-0"
+                        >
+                            로그아웃
+                        </Button>
+                    </div>
                 </div>
             </div>
 
