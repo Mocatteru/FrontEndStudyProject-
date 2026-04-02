@@ -6,10 +6,23 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import { useUiStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
+import { Button } from '../ui/button';
+import { toast } from 'sonner';
 
 export default function Header() {
     const pathname = usePathname();
-    const { isWatchListOpen } = useUiStore();
+    const { isWatchListOpen, userName } = useUiStore();
+
+    const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            toast.error("로그아웃 중 오류가 발생했습니다.");
+            return;
+        }
+        // [Rule 16] Proactive Suggestion: 로그아웃 후 모든 상태 초기화를 위해 강제 리로드 리다이렉트
+        window.location.href = "/login-page";
+    };
 
     // [Visual Context Sync] StockPage 렌더링 시 우측 서브사이드바 너비만큼 헤더 안전 영역(Safe Area) 확보
     const rightMargin = pathname === '/stock-page'
@@ -34,9 +47,28 @@ export default function Header() {
                 </div>
             </div>
 
-            <div className="flex mr-6 items-center p-1 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 transition-all">
-                <ThemeToggle />
+            <div className="flex items-center gap-4">
+                <div className="flex items-center p-1 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 transition-all">
+                    <ThemeToggle />
+                </div>
+                <div className="hidden sm:block h-6 w-px bg-black/5 dark:bg-white/10" />
+
+                {/* [Rule 2, 23] Visual Hierarchy & Alignment */}
+                <div className={pathname === "/stock-page" ? "flex flex-col items-end gap-0.5 pr-10" : "flex flex-col items-end gap-0.5"}>
+                    <span className="text-sm font-bold text-foreground/80">
+                        {userName || "사용자"}님
+                    </span>
+                    <Button
+                        variant="link"
+                        size="sm"
+                        onClick={handleLogout}
+                        className="text-[11px] font-medium text-muted-foreground hover:text-destructive transition-colors bg-gray-200"
+                    >
+                        로그아웃
+                    </Button>
+                </div>
             </div>
+
         </header>
     );
 }

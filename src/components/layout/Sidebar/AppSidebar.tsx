@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // ─────────────────────────────────────────
 // 메뉴 데이터: 이름, 경로, 아이콘을 함께 정의
@@ -84,13 +85,8 @@ export default function AppSidebar() {
     );
 
     const pathname = usePathname();
-    const { userName, userDepartment, userAvatar, fetchProfile } = useUiStore();
+    const { userName, userDepartment, userAvatar, isProfileLoading } = useUiStore();
     const { isMobile, setOpenMobile } = useSidebar();
-
-    // ── 서버 프로필 데이터 초기 동기화 ──
-    useEffect(() => {
-        fetchProfile();
-    }, [fetchProfile]);
 
     // ── 경로 변경 시 모바일 사이드바 자동 닫기 UX ──
     useEffect(() => {
@@ -150,25 +146,36 @@ export default function AppSidebar() {
             <SidebarFooter className="p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton
-                            size="lg"
-                            tooltip={userName}
-                            className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
-                        >
-                            <Avatar className="h-10 w-10 border-2 border-white/20 shadow-lg shrink-0">
-                                <AvatarImage src={userAvatar} className="object-cover" referrerPolicy="no-referrer" />
-                                <AvatarFallback className="bg-blue-500 text-white text-[10px] font-bold">
-                                    {userName.slice(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className={cn(
-                                "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden",
-                                !mounted ? "opacity-0" : "opacity-100"
-                            )}>
-                                <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80">{userName}</span>
-                                <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">{userDepartment}</span>
+                        {isProfileLoading ? (
+                            // [Rule 5] Skeleton UI: 데이터 패칭 중 어색한 깜빡임 방지
+                            <div className="flex h-16 w-full items-center gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 px-4 overflow-hidden">
+                                <Skeleton className="h-10 w-10 shrink-0 rounded-full bg-black/10 dark:bg-white/10" />
+                                <div className="flex flex-col gap-2 group-data-[collapsible=icon]:hidden flex-1">
+                                    <Skeleton className="h-3 w-20 bg-black/10 dark:bg-white/10" />
+                                    <Skeleton className="h-2 w-12 bg-black/10 dark:bg-white/10" />
+                                </div>
                             </div>
-                        </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                size="lg"
+                                tooltip={userName}
+                                className="h-16 gap-4 rounded-[1.5rem] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-transparent hover:border-black/5 dark:hover:border-white/5 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
+                            >
+                                <Avatar className="h-10 w-10 border-2 border-white/20 shadow-lg shrink-0">
+                                    <AvatarImage src={userAvatar} className="object-cover" referrerPolicy="no-referrer" />
+                                    <AvatarFallback className="bg-blue-500 text-white text-[10px] font-bold">
+                                        {userName?.slice(0, 2).toUpperCase() || "US"}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className={cn(
+                                    "flex flex-col text-left overflow-hidden group-data-[collapsible=icon]:hidden",
+                                    !mounted ? "opacity-0" : "opacity-100"
+                                )}>
+                                    <span className="font-black text-[11px] uppercase tracking-widest text-foreground/80 wrap-break-word">{userName}</span>
+                                    <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em] truncate">{userDepartment}</span>
+                                </div>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

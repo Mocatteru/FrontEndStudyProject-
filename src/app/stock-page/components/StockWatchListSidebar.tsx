@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSidebarSync } from "@/hooks/useStockSync";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useStockStore } from "@/store/useStockStore";
 import { isEmpty } from "radash";
@@ -159,7 +160,24 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                 <div className="px-8 pb-10">
                                     <SidebarGroup className="p-0">
                                         <SidebarMenu className="gap-4">
-                                            {isEmpty(filteredList) ? (
+                                            {isSyncing && isEmpty(filteredList) ? (
+                                                // [Rule 5] Skeleton UI: 초기 로딩 시 레이아웃 쉬프트 방지 및 기대감 부여
+                                                <div className="flex flex-col gap-4">
+                                                    {[1, 2, 3, 4, 5].map((i) => (
+                                                        <div key={i} className="flex items-center gap-4 px-2 py-3 rounded-2xl bg-black/2 dark:bg-white/2 animate-pulse">
+                                                            <Skeleton className="size-10 rounded-xl bg-black/5 dark:bg-white/5" />
+                                                            <div className="flex-1 space-y-2">
+                                                                <Skeleton className="h-4 w-20 bg-black/5 dark:bg-white/5" />
+                                                                <Skeleton className="h-3 w-12 bg-black/5 dark:bg-white/5" />
+                                                            </div>
+                                                            <div className="text-right space-y-2">
+                                                                <Skeleton className="h-4 w-16 ml-auto bg-black/5 dark:bg-white/5" />
+                                                                <Skeleton className="h-3 w-10 ml-auto bg-black/5 dark:bg-white/5" />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : isEmpty(filteredList) ? (
                                                 <div className="flex flex-col items-center justify-center py-32 text-center">
                                                     <div className="size-20 rounded-[2.5rem] bg-linear-to-br from-black/3 to-transparent dark:from-white/3 border-2 border-dashed border-black/5 dark:border-white/5 flex items-center justify-center mb-8 group">
                                                         {activeTab === 'WATCH' ? (

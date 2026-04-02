@@ -13,6 +13,7 @@ import { AlertDialogButton } from "@/components/common/AlertDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // ─── 하위 컴포넌트 (Rule 4: Atomic Design) ───────────────────────────────────
 
@@ -83,6 +84,7 @@ const RESET_BUTTON_CLASS = `${INPUT_CLASS} w-64`;
 export default function SettingPage() {
     const { fetchProfile, saveProfile } = useUiStore();
     const { clearStockWatchList, clearStockMemo } = useStockStore();
+    const { user } = useAuthStore();
 
     // [Rule 20] 개별 useState 5개 → 단일 form 객체로 통합
     const [form, setForm] = useState<UserProfile>({
@@ -90,7 +92,8 @@ export default function SettingPage() {
         userEmail: "",
         userDepartment: "",
         userRole: "USER",
-        userAvatar: "",
+        userAvatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf4lZX2ZWovlNMo9gsrjDnlFs1GocmrsriYw&s",
+        id: "",
     });
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -100,12 +103,15 @@ export default function SettingPage() {
 
     // [Rule 20] 마운트 시 서버 데이터 조회 후 form 단 1회 초기화
     useEffect(() => {
+        // [Vibe Check] user.id가 "undefined" 인 상태로 넘어가면 DB 에러가 납니다.
+        if (!user || !user.id || user.id === "undefined") return;
+
         setIsLoading(true);
-        fetchProfile().then((data) => {
+        fetchProfile(user.id).then((data) => {
             if (data) setForm(data);
             setIsLoading(false);
         });
-    }, [fetchProfile]);
+    }, [fetchProfile, user]);
 
     // [Rule 11] 반복되는 onChange 패턴 → 단일 핸들러로 추상화
     const handleChange = useCallback((field: keyof UserProfile, value: string) => {
@@ -141,6 +147,23 @@ export default function SettingPage() {
             setIsSaving(false);
         }
     }, [form, avatarFile, saveProfile]);
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col w-full bg-background min-h-screen">
+                {/* 페이지 타이틀 레이아웃 유지하며 스켈레톤 노출 */}
+                <div className="sticky top-0 flex items-center gap-3 px-6 h-11 border-b border-black/5 dark:border-white/5 bg-background/95 backdrop-blur-xl z-50">
+                    <Skeleton className="size-4 rounded-lg bg-black/10" />
+                    <Skeleton className="h-4 w-24 bg-black/10" />
+                </div>
+                <main className="flex-1 px-12 py-20">
+                    <div className="max-w-[1600px] w-full">
+                        <SettingSkeleton />
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col w-full bg-background selection:bg-blue-500/20 relative">

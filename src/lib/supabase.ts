@@ -1,15 +1,16 @@
-import { createClient } from "@supabase/supabase-js";
+// src/lib/supabase.ts
+
+import { createBrowserClient } from '@supabase/ssr'
 
 /**
- * [Senior Pattern] Supabase 클라이언트 싱글톤 객체
- * - 서비스 전역에서 단 하나의 클라이언트 인스턴스만 사용하여 효율적으로 통신합니다.
- * - 환경 변수(env.local)에 등록된 정보를 기반으로 수파베이스 서버와 연결됩니다.
+ * [Best Practice] Next.js App Router용 브라우저 클라이언트
+ * - createBrowserClient는 로그인 시 토큰을 브라우저 쿠키에 자동으로 저장합니다.
+ * - 이 덕분에 서버의 middleware.ts와 로그인 세션을 완벽하게 공유할 수 있습니다.
  */
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Vercel 등 배포 환경에서 Prerender 단계(환경변수 로드 전)에 'supabaseUrl is required' 에러가 나는 것을 방지합니다.
-export const supabase = createClient(
-    supabaseUrl || "https://dummy.supabase.co",
-    supabaseAnonKey || "dummy_key"
-);
+export const supabase = createBrowserClient(
+    supabaseUrl,
+    supabaseAnonKey
+)

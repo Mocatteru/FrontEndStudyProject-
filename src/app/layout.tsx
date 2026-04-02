@@ -13,12 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 import { ThemeProvider } from "@/providers/ThemeProvider";
-
-import Header from "@/components/layout/Header";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/layout/Sidebar/AppSidebar";
+import MainLayout from "@/components/layout/MainLayout";
 
 
 export const metadata: Metadata = {
@@ -53,15 +50,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset className="flex flex-col flex-1 min-h-screen bg-background items-stretch">
-                <Header />
-                <main className="flex-1 min-w-0 relative flex flex-col">
-                  {children}
-                </main>
-              </SidebarInset>
-            </SidebarProvider>
+            <MainLayout>
+              {children}
+            </MainLayout>
             <Toaster position="bottom-right" richColors />
           </QueryProvider>
         </ThemeProvider>
