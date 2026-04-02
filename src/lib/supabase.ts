@@ -8,12 +8,13 @@ import { createBrowserClient } from '@supabase/ssr'
  * - 이 덕분에 서버의 middleware.ts와 로그인 세션을 완벽하게 공유할 수 있습니다.
  */
 // [Rule 26, 30] 환경 변수 안전 접근 및 빌드 타임 에러 방지
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+// URL 유효성 검사 통과를 위해 빌드 시점에 더미 URL 제공
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tstpeyjaanpvoavqlhjd.supabase.co"; 
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_key";
 
-// [Best Practice] 빌드 시점에 환경 변수가 없어도 프로세스가 죽지 않도록 방어 로직 추가
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("Supabase 환경 변수가 설정되지 않았습니다. 빌드 타임이거나 설정 누락일 수 있습니다.");
+// [Best Practice] 빌드 시점에 실제 환경 변수가 없는 경우 경고 표시
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn("Supabase 환경 변수가 설정되지 않았습니다. 빌드 타임용 더미 데이터가 사용됩니다.");
 }
 
 export const supabase = createBrowserClient(

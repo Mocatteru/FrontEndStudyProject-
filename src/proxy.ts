@@ -3,7 +3,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     let response = NextResponse.next({
         request: {
             headers: request.headers,
@@ -11,9 +11,13 @@ export async function proxy(request: NextRequest) {
     })
 
     // 1. SSR용 Supabase 클라이언트 생성 (Rule 26: 환경 변수 안전 처리)
+    // 빌드 타임 에러 방지를 위해 더미 환경 변수 주입
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tstpeyjaanpvoavqlhjd.supabase.co";
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_key";
+
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 get(name: string) {
