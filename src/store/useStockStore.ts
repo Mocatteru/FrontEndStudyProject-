@@ -1,10 +1,13 @@
+import { supabase } from "@/lib/supabase";
 import { StockWatchListItemProps, Stock } from "@/types/stock";
+import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; //  1. 미들웨어 추가
 
 
 
 interface StockState {
+    isLoading: boolean,
     stock: Stock | null,
     currentTicker: string,
     recentSearchList: string[],
@@ -14,7 +17,6 @@ interface StockState {
     setStock: (stock: Stock) => void,
     setCurrentTicker: (ticker: string) => void,
     addRecentSearch: (ticker: string) => void,
-    toggleWatchList: (stock: StockWatchListItemProps) => void,
     removeRecentSearch: (ticker: string) => void,
     updateStockWatchList: (stock: StockWatchListItemProps) => void,
     updateWatchListBulk: (list: StockWatchListItemProps[]) => void, // [Senior] 백그라운드 일괄 데이터 새로고침 액션
@@ -23,6 +25,9 @@ interface StockState {
     clearStockMemo: () => void,
     setStockMemo: (ticker: string, memo: string) => void,
     setStockPopularList: (list: StockWatchListItemProps[]) => void,
+    fetchWatchList: (userId: string) => Promise<void>;
+    insertWatchList: (userId: string, stock: StockWatchListItemProps) => Promise<void>;
+    deleteFromWatchList: (userId: string, ticker: string) => Promise<void>;
 }
 
 /**
@@ -33,13 +38,14 @@ interface StockState {
  */
 export const useStockStore = create<StockState>()( // 추가된 () 주의!
     persist(
-        (set) => ({
+        (set, get) => ({
             stock: null,
             currentTicker: "",
             recentSearchList: [],
             stockWatchList: [],
             stockPopularList: [],
             stockMemo: [],
+            isLoading: false,
 
             // Actions
             setStock: (stock: Stock) => set({ stock }),
@@ -55,19 +61,6 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
              * 1. StockWatchListItemProps를 도입하여 관심종목 저장 시 대용량 historical 데이터를 제외함.
              * 2. persist 미들웨어의 partialize 옵션을 사용하여 불필요한 원본 stock 데이터가 로컬스토리지에 저장되는 것을 방지함.
              */
-            // [Refactoring: Performance & Defensive Programming]
-            // map() + includes() 대신 some()을 사용하여 단축 평가(Short-circuit evaluation)로 O(N) 순회 성능 최적화
-            // ticker 정보가 유효한지 엣지 케이스 방어 로직 추가
-            toggleWatchList: (stock: StockWatchListItemProps) => set((state) => {
-                if (!stock?.ticker) return state;
-
-                const isExist = state.stockWatchList.some(m => m.ticker === stock.ticker);
-                return {
-                    stockWatchList: isExist
-                        ? state.stockWatchList.filter(m => m.ticker !== stock.ticker)
-                        : [...state.stockWatchList, stock]
-                };
-            }),
             removeRecentSearch: (ticker: string) => set((state) => ({
                 recentSearchList: state.recentSearchList.filter(t => t !== ticker.toUpperCase())
             })),
@@ -120,6 +113,98 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                         : [...state.stockMemo, { ticker, memo }]
                 };
             }),
+            // [New] 서버 관심 목록 데이터 조회 (Global Sync)
+            fetchWatchList: async (userId: string) => {
+                if (!userId) return;
+
+                set({ isLoading: true });
+                try {
+                    const { data: watchlist, error } = await supabase
+                        .from('watchlist')
+                        .select('*')
+                        .eq('user_id', userId);
+
+                    if (error) throw error;
+
+                    if (watchlist) {
+                        /** 
+                         * [Rule 18: Strict Typing] DB 행(WatchList)을 UI용 DTO(StockWatchListItemProps)로 변환
+                         * 시세 데이터는 초기값 0으로 설정 후 useSidebarSync에서 실시간으로 채워집니다.
+                         */
+                        const formattedList: StockWatchListItemProps[] = watchlist.map(item => ({
+                            ticker: item.ticker,
+                            name: item.name,
+                            price: 0,
+                            change: 0,
+                            changePercent: 0,
+                            currency: item.currency || 'USD',
+                            isPositive: true,
+                        }));
+
+                        set({ stockWatchList: formattedList });
+                    }
+                } catch (error) {
+                    console.error("[Fetch WatchList Error]", error);
+                    toast.error("관심 목록을 불러오는데 실패했습니다.");
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
+
+            // [New] 서버에 관심 종목 추가 (Server-State Synchronization)
+            insertWatchList: async (userId: string, stock: StockWatchListItemProps) => {
+                if (!userId || !stock?.ticker) return;
+
+                set({ isLoading: true });
+                try {
+                    const { error } = await supabase
+                        .from('watchlist')
+                        .insert([{
+                            user_id: userId,
+                            ticker: stock.ticker,
+                            name: stock.name,
+                            currency: stock.currency
+                        }]);
+
+                    if (error) throw error;
+
+                    // [Rule 20] 로컬 상태 업데이트 (클라이언트-서버 동기화)
+                    const { stockWatchList } = get();
+                    if (!stockWatchList.some(item => item.ticker === stock.ticker)) {
+                        set({ stockWatchList: [...stockWatchList, stock] });
+                    }
+                } catch (error) {
+                    console.error("[Add WatchList Error]", error);
+                    toast.error("종목 추가 중 오류가 발생했습니다.");
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
+
+            // [New] 서버에서 관심 종목 삭제
+            deleteFromWatchList: async (userId: string, ticker: string) => {
+                if (!userId || !ticker) return;
+
+                set({ isLoading: true });
+                try {
+                    const { error } = await supabase
+                        .from('watchlist')
+                        .delete()
+                        .eq('user_id', userId)
+                        .eq('ticker', ticker);
+
+                    if (error) throw error;
+
+                    // 로컬 상태 업데이트
+                    const { stockWatchList } = get();
+                    set({ stockWatchList: stockWatchList.filter(item => item.ticker !== ticker) });
+                } catch (error) {
+                    console.error("[Remove WatchList Error]", error);
+                    toast.error("종목 삭제 중 오류가 발생했습니다.");
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
         }),
         {
             name: "stock-storage",

@@ -36,8 +36,6 @@ export function SignupForm({
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirm-password") as string;
 
-    console.log(confirmPassword, password);
-
     if (password !== confirmPassword) {
       toast.error("비밀번호가 일치하지 않습니다.");
       setIsLoading(false);

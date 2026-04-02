@@ -10,6 +10,15 @@ export interface StockWatchListItemProps {
     isOpen?: boolean; // [Senior] 사이드바의 확장/축소 상태를 전달받음
 }
 
+export interface WatchList {
+    id: string;
+    user_id: string;
+    name: string;
+    ticker: string;
+    currency: string;
+    created_at: string;
+}
+
 export interface Stock {
     // 1. 기본 식별 정보
     symbol: string;               // 종목 코드 (예: AAPL)

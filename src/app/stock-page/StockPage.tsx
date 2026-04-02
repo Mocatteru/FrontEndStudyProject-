@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { FormatStockWatchListItem, Stock } from "@/types/stock";
 import { toast } from "sonner";
 import { useStockSync } from "@/hooks/useStockSync";
+import { useAuthStore } from "@/store/useAuthStore";
 
 /**
  * [Senior Optimization] 
@@ -121,31 +122,41 @@ export default function StockPage() {
     const currentTicker = useStockStore(s => s.currentTicker);
     // [Optimization] stockWatchList 전체 구독 대신 선택적 조회
     const isWatchListItem = useStockStore(s => s.stockWatchList.some(v => v.ticker === s.currentTicker));
-    const toggleWatchList = useStockStore(s => s.toggleWatchList);
     const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
     const toggleWatchListOpen = useUiStore(s => s.toggleWatchList);
+    const { deleteFromWatchList, insertWatchList, isLoading } = useStockStore();
+    const user = useAuthStore(s => s.user);
+
 
     const handleConfigChange = useCallback((newRange: string, newInterval: string) => {
         setChartConfig({ range: newRange, interval: newInterval });
     }, []);
 
     // [단일 태스크] useStockSync를 StockPage에서 1회만 호출하여 stockData를 하위 컴포넌트에 prop으로 전달
-    const { stockData, isLoading, isError } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
+    const { stockData, isError } = useStockSync(currentTicker, chartConfig.range, chartConfig.interval);
 
     // [성능] 인라인 핸들러 제거 - 매 렌더마다 새 함수 생성 방지
-    const handleToggleWatchList = useCallback(() => {
+    const handleToggleWatchList = useCallback(async () => {
         if (!stockData) return;
-        toggleWatchList(FormatStockWatchListItem(stockData));
-        if (isWatchListItem) {
-            toast.info("관심종목에서 제거되었습니다.", {
-                description: `${stockData.symbol} 종목이 목록에서 제외되었습니다.`
-            });
-        } else {
-            toast.success("관심종목에 추가되었습니다!", {
-                description: `${stockData.symbol} 종목을 이제 와치리스트에서 확인하실 수 있습니다.`
-            });
+
+        /**
+         * [Learning Point] 
+         * 기존 toggleWatchList(로컬) 대신 insert/delete(서버)를 사용하여
+         * SSOT(Single Source of Truth) 원칙을 준수합니다.
+         */
+        if (!user?.id) {
+            toast.error("로그인이 필요한 기능입니다.");
+            return;
         }
-    }, [stockData, toggleWatchList, isWatchListItem]);
+
+        if (isWatchListItem) {
+            await deleteFromWatchList(user.id, stockData.symbol);
+            toast.info("관심목록에서 제거되었습니다.");
+        } else {
+            await insertWatchList(user.id, FormatStockWatchListItem(stockData));
+            toast.success("관심목록에 추가되었습니다!");
+        }
+    }, [stockData, user, isWatchListItem, deleteFromWatchList, insertWatchList]);
 
     return (
         <div className="flex flex-1 min-w-0 bg-slate-50/30 dark:bg-background relative selection:bg-blue-500/20">
@@ -173,6 +184,7 @@ export default function StockPage() {
                             {/* stockData가 있을 때만 하트 버튼 노출 */}
                             {stockData && (
                                 <Button
+                                    disabled={isLoading}
                                     variant="outline"
                                     size="icon"
                                     onClick={handleToggleWatchList}

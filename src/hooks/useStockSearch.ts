@@ -2,21 +2,31 @@ import { useStockStore } from "@/store/useStockStore";
 import { FormatStockWatchListItem, FormatTicker, FormatTickerKR, KR_TICKER_LENGTH, Stock } from "@/types/stock";
 import { isEmpty, isEqual } from "radash";
 import { useCallback } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "sonner";
 
 export default function useStockSearch() {
+    const {
+        currentTicker,
+        setCurrentTicker,
+        addRecentSearch,
+        removeRecentSearch,
+        clearRecentSearch,
+        stockWatchList,
+        insertWatchList,
+        deleteFromWatchList
+    } = useStockStore();
 
-    const { currentTicker, setCurrentTicker, addRecentSearch, toggleWatchList, removeRecentSearch, clearRecentSearch } = useStockStore();
-
+    const user = useAuthStore(s => s.user);
 
     /**
-     * 
      * @param ticker 티커명(정제전)
-     * @returns 티커 포멧팅 후 비어있는지 여부확인과 국내주식 판별후 포멧팅도 수행하는 함수입니다
      */
     const handleRecentSearch = useCallback((ticker: string) => {
         const formattedTicker = FormatTicker(ticker);
         if (isEmpty(formattedTicker) || isEqual(formattedTicker, currentTicker))
             return;
+
         if (formattedTicker.length === KR_TICKER_LENGTH) {
             const tickerKS = FormatTickerKR(formattedTicker);
             setCurrentTicker(tickerKS);
@@ -27,9 +37,23 @@ export default function useStockSearch() {
         addRecentSearch(formattedTicker);
     }, [currentTicker, setCurrentTicker, addRecentSearch]);
 
-    const handleWatchList = useCallback((stock: Stock) => {
-        toggleWatchList(FormatStockWatchListItem(stock));
-    }, [toggleWatchList]);
+    const handleWatchList = useCallback(async (stock: Stock) => {
+        if (!user) {
+            toast.error("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        const isExist = stockWatchList.some(m => m.ticker === stock.symbol);
+        const formattedStock = FormatStockWatchListItem(stock);
+
+        if (isExist) {
+            await deleteFromWatchList(user.id, stock.symbol);
+            toast.info("관심목록에서 제거되었습니다.");
+        } else {
+            await insertWatchList(user.id, formattedStock);
+            toast.success("관심목록에 추가되었습니다!");
+        }
+    }, [stockWatchList, user, insertWatchList, deleteFromWatchList]);
 
     const handleRemoveRecentSearch = useCallback((ticker: string) => {
         removeRecentSearch(ticker);
@@ -43,4 +67,3 @@ export default function useStockSearch() {
         handleRecentSearch, handleWatchList, handleRemoveRecentSearch, handleClearRecentSearch
     }
 }
-
