@@ -14,12 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useStockStore } from "@/store/useStockStore";
 import { isEmpty } from "radash";
 
-interface StockWatchListSidebarProps {
-    isOpen: boolean;
-    onToggle: () => void;
-}
+import { useUiStore } from "@/store/uiStore";
 
-export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchListSidebarProps) {
+export default function StockWatchListSidebar() {
+    const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
+    const toggleWatchListOpen = useUiStore(s => s.toggleWatchList);
     const stockWatchList = useStockStore(s => s.stockWatchList);
     const stockPopularList = useStockStore(s => s.stockPopularList);
     const [filterMode, setFilterMode] = useState<'ALL' | 'KR' | 'US'>('ALL');
@@ -40,17 +39,17 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
 
     return (
         <>
-            {isOpen && (
+            {isWatchListOpen && (
                 <div
                     className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-90 md:hidden"
-                    onClick={onToggle}
+                    onClick={toggleWatchListOpen}
                 />
             )}
 
             {/* [UX] 본문 레이아웃 점유용 Spacer (md 이상에서만 존재하여 차트가 사이드바에 가려지지 않도록 함) */}
             <div className={cn(
                 "hidden md:block shrink-0",
-                isOpen ? "w-80" : "w-15"
+                isWatchListOpen ? "w-80" : "w-15"
             )} />
 
             {/* 실제 우측 사이드바 (메인 사이드바처럼 화면 전체 높이를 차지하도록 fixed top-0으로 덮음) */}
@@ -58,15 +57,15 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                 className={cn(
                     "fixed top-0 bottom-0 right-0 h-screen flex flex-col shrink-0 z-100 border-l overflow-hidden",
                     "bg-slate-100/60 dark:bg-sidebar backdrop-blur-md border border-black/5 dark:border-white/5 shadow-xl md:shadow-[0_0_15px_rgba(0,0,0,0.1)]",
-                    isOpen ? "w-[85vw] sm:w-80" : "w-0 md:w-15",
-                    !isOpen && "invisible md:visible"
+                    isWatchListOpen ? "w-[85vw] sm:w-80" : "w-0 md:w-15",
+                    !isWatchListOpen && "invisible md:visible"
                 )}
             >
                 <SidebarHeader className={cn(
                     "p-0 border-b border-black/5 dark:border-white/5 shrink-0",
-                    isOpen ? "h-24" : "h-20"
+                    isWatchListOpen ? "h-24" : "h-20"
                 )}>
-                    {isOpen ? (
+                    {isWatchListOpen ? (
                         <div className="flex w-full h-full items-stretch">
                             {/* [1] 관심목록 버튼 */}
                             <Button
@@ -119,7 +118,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                             {/* [3] 탭 닫기 버튼 */}
                             <Button
                                 variant="ghost"
-                                onClick={onToggle}
+                                onClick={toggleWatchListOpen}
                                 className="flex-1 h-full flex flex-col items-center justify-center rounded-none group"
                                 aria-label="사이드바 닫기"
                             >
@@ -132,7 +131,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                             <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={onToggle}
+                                onClick={toggleWatchListOpen}
                                 className="size-11 rounded-2xl bg-blue-500 hover:bg-blue-600 border-none shadow-xl shadow-blue-500/50 transition-all active:scale-95 group relative overflow-hidden"
                                 aria-label="관심목록 열기"
                             >
@@ -145,7 +144,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                     )}
                 </SidebarHeader>
 
-                {isOpen && (
+                {isWatchListOpen && (
                     <div className="flex-1 min-h-0 pt-6 pb-0 flex flex-col">
                         <Tabs
                             defaultValue="ALL"
@@ -203,7 +202,7 @@ export default function StockWatchListSidebar({ isOpen, onToggle }: StockWatchLi
                                                     <StockWatchListItem
                                                         key={stock.ticker}
                                                         {...stock}
-                                                        isOpen={isOpen}
+                                                        isOpen={isWatchListOpen}
                                                     />
                                                 ))
                                             )}

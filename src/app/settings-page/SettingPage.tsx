@@ -1,19 +1,17 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Upload, Settings } from "lucide-react";
-import { useUiStore, UserProfile } from "@/store/uiStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
 import { useStockStore } from "@/store/useStockStore";
 import { AlertDialogButton } from "@/components/common/AlertDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useProfileForm } from "@/hooks/useProfileForm";
 
 // ─── 하위 컴포넌트 (Rule 4: Atomic Design) ───────────────────────────────────
 
@@ -82,71 +80,16 @@ const INPUT_CLASS = "rounded-2xl h-14 border-2 border-black/5 dark:border-white/
 const RESET_BUTTON_CLASS = `${INPUT_CLASS} w-64`;
 
 export default function SettingPage() {
-    const { fetchProfile, saveProfile } = useUiStore();
     const { clearStockWatchList, clearStockMemo } = useStockStore();
-    const { user } = useAuthStore();
-
-    // [Rule 20] 개별 useState 5개 → 단일 form 객체로 통합
-    const [form, setForm] = useState<UserProfile>({
-        userName: "",
-        userEmail: "",
-        userDepartment: "",
-        userRole: "USER",
-        userAvatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf4lZX2ZWovlNMo9gsrjDnlFs1GocmrsriYw&s",
-        id: "",
-    });
-    const [isEditing, setIsEditing] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const { form, isEditing, isSaving, isLoading, handleChange, handleAvatarChange, handleSave, handleReset } = useProfileForm();
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // [Rule 20] 마운트 시 서버 데이터 조회 후 form 단 1회 초기화
-    useEffect(() => {
-        // [Vibe Check] user.id가 "undefined" 인 상태로 넘어가면 DB 에러가 납니다.
-        if (!user || !user.id || user.id === "undefined") return;
-
-        setIsLoading(true);
-        fetchProfile(user.id).then((data) => {
-            if (data) setForm(data);
-            setIsLoading(false);
-        });
-    }, [fetchProfile, user]);
-
-    // [Rule 11] 반복되는 onChange 패턴 → 단일 핸들러로 추상화
-    const handleChange = useCallback((field: keyof UserProfile, value: string) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-        setIsEditing(true);
-    }, []);
 
     const handleAvatarClick = useCallback(() => fileInputRef.current?.click(), []);
 
-    const handleAvatarFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-        setAvatarFile(file);
-        setForm((prev) => ({ ...prev, userAvatar: URL.createObjectURL(file) }));
-        setIsEditing(true);
-    }, []);
-
-    // [Rule 20] 저장 로직 전체를 스토어 액션 1회 호출로 위임
-    const handleSave = useCallback(async () => {
-        setIsSaving(true);
-        try {
-            await saveProfile(form, avatarFile);
-            setAvatarFile(null);
-            setIsEditing(false);
-            toast.success("클라우드 서버와 동기화 완료", {
-                description: "모든 기기에서 동일한 프로필이 적용됩니다.",
-            });
-        } catch {
-            toast.error("저장 중 오류가 발생했습니다.", {
-                description: "네트워크 상태 또는 서버 설정을 확인해주세요.",
-            });
-        } finally {
-            setIsSaving(false);
-        }
-    }, [form, avatarFile, saveProfile]);
+        if (file) handleAvatarChange(file);
+    }, [handleAvatarChange]);
 
     if (isLoading) {
         return (
@@ -176,14 +119,25 @@ export default function SettingPage() {
                     <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/80">설정</h1>
                     <p className="text-[9px] font-black tracking-[0.3em] text-muted-foreground/40 uppercase">System Config</p>
                 </div>
-                <Button
-                    disabled={!isEditing || isSaving}
-                    onClick={handleSave}
-                    size="sm"
-                    className="ml-auto rounded-lg px-4 h-7 tracking-widest font-black shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-[10px] disabled:opacity-50"
-                >
-                    {isSaving ? "동기화 중..." : "저장하기"}
-                </Button>
+                <div className="ml-auto flex items-center gap-2">
+                    {/* [Best Practice] 변경 사항 취소 버튼 추가 */}
+                    <Button
+                        variant="ghost"
+                        disabled={!isEditing || isSaving}
+                        onClick={handleReset}
+                        className="rounded-lg px-4 h-7 tracking-widest font-black transition-all text-muted-foreground/40 hover:text-foreground text-[10px]"
+                    >
+                        취소
+                    </Button>
+                    <Button
+                        disabled={!isEditing || isSaving}
+                        onClick={handleSave}
+                        size="sm"
+                        className="rounded-lg px-4 h-7 tracking-widest font-black shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all bg-blue-600 hover:bg-blue-500 text-white border-none text-[10px] disabled:opacity-50"
+                    >
+                        {isSaving ? "동기화 중..." : "저장하기"}
+                    </Button>
+                </div>
             </div>
 
             {/* 본문 */}
@@ -207,17 +161,21 @@ export default function SettingPage() {
                                         aria-label="프로필 이미지 변경"
                                     >
                                         <Avatar className="h-32 w-32 border-4 border-background shadow-2xl transition-transform group-hover:scale-105">
-                                            <AvatarImage src={form.userAvatar} className="object-cover" referrerPolicy="no-referrer" />
+                                            {/* [Best Practice] referrerPolicy 및 명확한 Fallback 설정 */}
+                                            <AvatarImage
+                                                src={form.userAvatar || "/images/placeholder-avatar.png"}
+                                                className="object-cover"
+                                                referrerPolicy="no-referrer"
+                                            />
                                             <AvatarFallback className="text-2xl font-bold bg-blue-50 text-blue-600">사용자</AvatarFallback>
                                         </Avatar>
                                         <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <Upload className="text-white size-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-300" />
                                         </div>
-                                        {/* [Rule 29] file input에 aria-label 추가하여 스크린리더 접근성 보강 */}
                                         <input
                                             type="file"
                                             ref={fileInputRef}
-                                            onChange={handleAvatarFileChange}
+                                            onChange={onFileChange}
                                             className="hidden"
                                             accept="image/*"
                                             aria-label="프로필 사진 파일 선택"

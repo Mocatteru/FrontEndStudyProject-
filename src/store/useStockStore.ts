@@ -14,6 +14,7 @@ interface StockState {
     stockWatchList: StockWatchListItemProps[],
     stockPopularList: StockWatchListItemProps[],
     stockMemo: { ticker: string, memo: string }[],
+    tickerToName: Record<string, string>, // [New] 티커 -> 한글 종목명 매핑 사전
     setStock: (stock: Stock) => void,
     setCurrentTicker: (ticker: string) => void,
     addRecentSearch: (ticker: string) => void,
@@ -24,6 +25,7 @@ interface StockState {
     clearStockWatchList: () => void,
     clearStockMemo: () => void,
     setStockMemo: (ticker: string, memo: string) => void,
+    setTickerToName: (ticker: string, name: string) => void,
     setStockPopularList: (list: StockWatchListItemProps[]) => void,
     fetchWatchList: (userId: string) => Promise<void>;
     insertWatchList: (userId: string, stock: StockWatchListItemProps) => Promise<void>;
@@ -45,6 +47,7 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
             stockWatchList: [],
             stockPopularList: [],
             stockMemo: [],
+            tickerToName: {},
             isLoading: false,
 
             // Actions
@@ -113,6 +116,9 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                         : [...state.stockMemo, { ticker, memo }]
                 };
             }),
+            setTickerToName: (ticker: string, name: string) => set((state) => ({
+                tickerToName: { ...state.tickerToName, [ticker]: name }
+            })),
             // [New] 서버 관심 목록 데이터 조회 (Global Sync)
             fetchWatchList: async (userId: string) => {
                 if (!userId) return;
@@ -212,7 +218,8 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                 recentSearchList: state.recentSearchList,
                 stockWatchList: state.stockWatchList,
                 currentTicker: state.currentTicker,
-                stockMemo: state.stockMemo
+                stockMemo: state.stockMemo,
+                tickerToName: state.tickerToName
             })
         }
     )

@@ -58,7 +58,7 @@ export default function StockSearchInput() {
                         type="text"
                         autoComplete="off"
                         value={ticker}
-                        onChange={(e) => setTicker(e.target.value.toUpperCase())} // 실무: 티커명은 주로 대문자만 입력/표기됨
+                        onChange={(e) => setTicker(e.target.value)} // [QA] 한글 검색 지원을 위해 대문자 강제 변환 제거
                         placeholder="종목 입력 (NVDA, 005930...)"
                         className={cn(
                             "pl-11 pr-4 h-12 w-full font-bold",
@@ -113,7 +113,9 @@ export default function StockSearchInput() {
                                         <div className="p-2 bg-black/5 dark:bg-white/5 rounded-xl group-hover/item:rotate-12 transition-all duration-300">
                                             <History className="size-4 text-muted-foreground/60 group-hover/item:text-blue-500" />
                                         </div>
-                                        <span className="text-[13px] font-black tracking-tight text-foreground/80 group-hover/item:text-blue-500 transition-colors uppercase">{v}</span>
+                                        <span className="text-[13px] font-black tracking-tight text-foreground/80 group-hover/item:text-blue-500 transition-colors uppercase">
+                                            {useStockStore.getState().tickerToName[v] ? `${useStockStore.getState().tickerToName[v]} (${v})` : v}
+                                        </span>
                                     </div>
                                     <Button
                                         variant="ghost"

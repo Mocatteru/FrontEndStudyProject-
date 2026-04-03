@@ -12,8 +12,19 @@ export function useSidebarSync() {
     const updateWatchListBulk = useStockStore(s => s.updateWatchListBulk);
     const setStockPopularList = useStockStore(s => s.setStockPopularList);
     const [isSyncing, setIsSyncing] = useState(false);
+    const [syncVersion, setSyncVersion] = useState(0); // [Fix] 강제 재sync 트리거용
 
     const currentTicker = useStockStore(s => s.currentTicker);
+
+    // [Fix] watchlist fetch 완료 신호를 받기 위한 구독
+    // fetchWatchList가 끝나면 price=0인 아이템이 존재 → 이를 감지해 syncVersion을 올림
+    const hasZeroPrice = stockWatchList.some(item => item.price === 0);
+    useEffect(() => {
+        if (hasZeroPrice && stockWatchList.length > 0) {
+            setSyncVersion(v => v + 1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasZeroPrice]);
 
     useEffect(() => {
         let isMounted = true;
@@ -55,7 +66,7 @@ export function useSidebarSync() {
         syncSidebarData();
         return () => { isMounted = false; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stockWatchList.length, currentTicker]);
+    }, [stockWatchList.length, currentTicker, syncVersion]); // [Fix] syncVersion: fetch 후 0원 감지 시 재sync
 
     return { isSyncing };
 }

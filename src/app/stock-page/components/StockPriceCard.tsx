@@ -122,6 +122,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
     const currentMemo = useStockStore(s =>
         s.stockMemo.find(m => m.ticker === stockData.symbol)?.memo || ""
     );
+    const localName = useStockStore(s => s.tickerToName[stockData.symbol]);
 
     const marketPrice = stockData.regularMarketPrice;
     const marketChange = stockData.regularMarketChange;
@@ -139,7 +140,7 @@ const StockPriceCard = memo(({ stockData }: StockPriceCardProps) => {
                         <div className="flex flex-col gap-1">
 
                             <h3 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none group-hover:text-blue-500 transition-all duration-500">
-                                {stockData?.longName || stockData?.shortName || 'Unknown'}
+                                {localName || stockData?.shortName || stockData?.longName || 'Unknown'}
                                 <span className="ml-3 text-muted-foreground/60 font-black text-xl uppercase tracking-widest inline-block">{stockData?.symbol}</span>
                             </h3>
                         </div>

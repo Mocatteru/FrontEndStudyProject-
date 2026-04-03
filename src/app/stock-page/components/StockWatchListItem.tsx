@@ -15,9 +15,9 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
     const formattedPrice = FormatPriceCurrency(currency, price);
     const formattedChange = FormatPriceCurrency(currency, Number(marketChange));
 
-    // [Senior Optimization] Selector를 사용하여 액션만 구독
     const currentTicker = useStockStore(s => s.currentTicker);
     const setCurrentTicker = useStockStore(s => s.setCurrentTicker);
+    const localName = useStockStore(s => s.tickerToName[ticker]);
     const { isWatchListOpen, toggleWatchList } = useUiStore();
 
     const isActive = currentTicker === ticker;
@@ -38,7 +38,7 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                     "group relative flex items-center justify-center",
                     isOpen
                         ? "h-auto py-5 px-5 rounded-[2.25rem] w-full"
-                        : "size-11 p-0 rounded-xl", 
+                        : "size-11 p-0 rounded-xl",
                     "bg-card/40 dark:bg-white/3 border border-black/5 dark:border-white/8",
                     "hover:bg-card/80 dark:hover:bg-white/8 hover:border-blue-500/20",
                     // [Senior] 현재 선택된 종목 하이라이트
@@ -51,7 +51,7 @@ const StockWatchListItem = memo(({ ticker, name, price, change, changePercent, i
                         {/* [좌측] 이름 및 티커 영역 */}
                         <div className="flex flex-col gap-1.5 items-start flex-1 min-w-0 overflow-hidden">
                             <span className="font-black text-[13px] text-foreground leading-[1.3] text-left whitespace-normal wrap-break-word line-clamp-2 group-hover:text-blue-500">
-                                {name}
+                                {localName || name}
                             </span>
                             <div className="flex items-center gap-1.5">
                                 <div className="size-1 rounded-full bg-amber-300" />

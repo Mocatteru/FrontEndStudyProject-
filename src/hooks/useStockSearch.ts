@@ -1,41 +1,54 @@
 import { useStockStore } from "@/store/useStockStore";
-import { FormatStockWatchListItem, FormatTicker, FormatTickerKR, KR_TICKER_LENGTH, Stock } from "@/types/stock";
-import { isEmpty, isEqual } from "radash";
+import { FormatStockWatchListItem, Stock } from "@/types/stock";
+import { isEmpty } from "radash";
 import { useCallback } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 
 export default function useStockSearch() {
     const {
-        currentTicker,
         setCurrentTicker,
         addRecentSearch,
         removeRecentSearch,
         clearRecentSearch,
         stockWatchList,
         insertWatchList,
-        deleteFromWatchList
+        deleteFromWatchList,
+        setTickerToName
     } = useStockStore();
 
     const user = useAuthStore(s => s.user);
 
     /**
-     * @param ticker 티커명(정제전)
+     * [Senior UX] 종목명 자동 매칭 시스템
+     * - 티커 형식(영문/숫자)이 아닐 경우 검색 API 호출 -> 가장 첫번째 결과의 티커 적용
+     * - "삼성전자" -> 005930.KS / "엔비디아" -> NVDA
      */
-    const handleRecentSearch = useCallback((ticker: string) => {
-        const formattedTicker = FormatTicker(ticker);
-        if (isEmpty(formattedTicker) || isEqual(formattedTicker, currentTicker))
-            return;
+    const handleRecentSearch = useCallback(async (ticker: string) => {
+        if (isEmpty(ticker)) return;
 
-        if (formattedTicker.length === KR_TICKER_LENGTH) {
-            const tickerKS = FormatTickerKR(formattedTicker);
-            setCurrentTicker(tickerKS);
-            addRecentSearch(tickerKS);
-            return;
+        try {
+            // [UX Improvement] 'AAPL' 같은 영문 직입력 시에도 한글 종목명('애플')을 가져오기 위해 무조건 API 경유
+            const res = await fetch(`/api/stock/search?q=${encodeURIComponent(ticker.trim())}`);
+            const data = await res.json();
+            
+            if (data && data.length > 0) {
+                const bestMatch = data[0].symbol;
+                const koName = data[0].shortName;
+                
+                setCurrentTicker(bestMatch);
+                addRecentSearch(bestMatch);
+                if (koName) {
+                    setTickerToName(bestMatch, koName);
+                }
+            } else {
+                toast.error(`"${ticker}"에 해당하는 종목을 찾을 수 없습니다.`);
+            }
+        } catch (err) {
+            console.error("[Search] Sync Error:", err);
+            toast.error("연결 상태를 확인해 주세요.");
         }
-        setCurrentTicker(formattedTicker);
-        addRecentSearch(formattedTicker);
-    }, [currentTicker, setCurrentTicker, addRecentSearch]);
+    }, [setCurrentTicker, addRecentSearch, setTickerToName]);
 
     const handleWatchList = useCallback(async (stock: Stock) => {
         if (!user) {

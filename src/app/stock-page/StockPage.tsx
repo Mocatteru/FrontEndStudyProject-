@@ -122,8 +122,6 @@ export default function StockPage() {
     const currentTicker = useStockStore(s => s.currentTicker);
     // [Optimization] stockWatchList 전체 구독 대신 선택적 조회
     const isWatchListItem = useStockStore(s => s.stockWatchList.some(v => v.ticker === s.currentTicker));
-    const isWatchListOpen = useUiStore(s => s.isWatchListOpen);
-    const toggleWatchListOpen = useUiStore(s => s.toggleWatchList);
     const { deleteFromWatchList, insertWatchList, isLoading } = useStockStore();
     const user = useAuthStore(s => s.user);
 
@@ -216,7 +214,7 @@ export default function StockPage() {
             </div>
 
             {/* 우측 사이드바 */}
-            <StockWatchListSidebar isOpen={isWatchListOpen} onToggle={toggleWatchListOpen} />
+            <StockWatchListSidebar />
         </div>
     );
 }
