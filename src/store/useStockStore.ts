@@ -30,6 +30,7 @@ interface StockState {
     fetchWatchList: (userId: string) => Promise<void>;
     insertWatchList: (userId: string, stock: StockWatchListItemProps) => Promise<void>;
     deleteFromWatchList: (userId: string, ticker: string) => Promise<void>;
+    resolveNames: (tickers: string[]) => Promise<void>;
 }
 
 /**
@@ -209,6 +210,46 @@ export const useStockStore = create<StockState>()( // 추가된 () 주의!
                     toast.error("종목 삭제 중 오류가 발생했습니다.");
                 } finally {
                     set({ isLoading: false });
+                }
+            },
+            // [Senior] 티커 기반 한글 종목명 통합 해결사
+            resolveNames: async (tickers: string[]) => {
+                const { tickerToName } = get();
+                const missingTickers = tickers.filter(t => !tickerToName[t]);
+                
+                if (missingTickers.length === 0) return;
+
+                // [Optimization] 너무 많은 요청 방지를 위해 병렬 처리하되 가볍게 처리
+                try {
+                    const promises = missingTickers.map(async (ticker) => {
+                        try {
+                            // 우리 서버의 하이브리드 검색 API(/api/stock/search)는 네이버 명칭을 최우선으로 가져옴
+                            const res = await fetch(`/api/stock/search?q=${encodeURIComponent(ticker)}`);
+                            if (!res.ok) return null;
+                            const data = await res.json();
+                            
+                            // 검색 결과 중 첫 번째가 해당 티커와 일치하면 이름 저장
+                            const match = data.find((item: any) => item.symbol === ticker || item.symbol.split('.')[0] === ticker.split('.')[0]);
+                            if (match) {
+                                return { ticker, name: match.shortName };
+                            }
+                        } catch (e) { return null; }
+                        return null;
+                    });
+
+                    const results = await Promise.all(promises);
+                    const newNames: Record<string, string> = {};
+                    results.forEach(res => {
+                        if (res) newNames[res.ticker] = res.name;
+                    });
+
+                    if (Object.keys(newNames).length > 0) {
+                        set((state) => ({
+                            tickerToName: { ...state.tickerToName, ...newNames }
+                        }));
+                    }
+                } catch (err) {
+                    console.error("[Resolve Names Error]", err);
                 }
             },
         }),

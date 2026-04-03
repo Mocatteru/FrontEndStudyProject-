@@ -44,6 +44,14 @@ const StockDashboardContent = memo((
     { currentTicker, chartConfig, handleConfigChange, stockData, isLoading, isError }: StockDashboardContentProps
 ) => {
     const updateStockWatchList = useStockStore(s => s.updateStockWatchList);
+    const resolveNames = useStockStore(s => s.resolveNames);
+
+    // [New] 현재 종목의 한글 종목명 동기화
+    useEffect(() => {
+        if (currentTicker) {
+            resolveNames([currentTicker]);
+        }
+    }, [currentTicker, resolveNames]);
 
     // 종목 조회 성공 시 관심목록 데이터 실시간 완치 (데이터 업데이트)
     useEffect(() => {

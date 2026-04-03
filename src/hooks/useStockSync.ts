@@ -11,6 +11,7 @@ export function useSidebarSync() {
     const stockWatchList = useStockStore(s => s.stockWatchList);
     const updateWatchListBulk = useStockStore(s => s.updateWatchListBulk);
     const setStockPopularList = useStockStore(s => s.setStockPopularList);
+    const resolveNames = useStockStore(s => s.resolveNames);
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncVersion, setSyncVersion] = useState(0); // [Fix] 강제 재sync 트리거용
 
@@ -54,6 +55,15 @@ export function useSidebarSync() {
                 if (isMounted && popularData?.length > 0) {
                     const results = popularData.map(stock => FormatStockWatchListItem(stock));
                     setStockPopularList(results);
+                }
+
+                // 3. 한글 종목명 동기화 (네이버 API 활용)
+                const allTickers = [
+                    ...stockWatchList.map(item => item.ticker),
+                    ...POPULAR_TICKERS
+                ];
+                if (allTickers.length > 0) {
+                    await resolveNames(allTickers);
                 }
 
             } catch (err) {
